@@ -8,8 +8,7 @@ class Memory:
         self.buffer = BytesIO(b'\x00'*size)
 
     def load(self, address: int, size: T.Literal[1,2,4] = 4) -> int:
-        self.buffer.seek(address, 0)
-        _bytes = self.buffer.read(size)
+        _bytes = self.load_bytes(address, size)
         return int.from_bytes(_bytes, 'little', signed=True)
     
     def load_bytes(self, address: int, count=1) -> bytes:
@@ -18,5 +17,8 @@ class Memory:
     
     def store(self, address: int, value: int) -> None:
         _bytes = value.to_bytes(4, 'little', signed=True)
+        self.store_bytes(address, _bytes)
+    
+    def store_bytes(self, address: int, _bytes: bytes) -> None:
         self.buffer.seek(address, 0)
         self.buffer.write(_bytes)

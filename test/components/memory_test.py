@@ -32,6 +32,16 @@ def test_mem_resize(value: int, address: int, expected: bytes):
     assert len(m.buffer.read()) == 256
     assert m.load(address) == value
 
+@pytest.mark.parametrize('_bytes,address', [
+    (b'\x03\x00\x00\x00', 2),
+    (b'\x00\x00\xff\xff\xff\xff', 3),
+])
+def test_mem_resize(_bytes: bytes, address: int):
+    m = Memory()
+    m.store_bytes(address, _bytes)
+    assert m.load_bytes(address, len(_bytes)) == _bytes
+
+
 # def test_mem_err():
 #     m = Memory(8)
 #     with pytest.raises(Exception):

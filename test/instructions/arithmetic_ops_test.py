@@ -1,6 +1,6 @@
 import sys
 
-sys.path.append("D:\\programming\\py\\ssmal\\src")
+sys.path.append('C:\\Users\\natha\\programming\\py\\ssmal\\src')
 
 import pytest
 
