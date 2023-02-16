@@ -36,7 +36,7 @@ def test_mem_resize(value: int, address: int, expected: bytes):
     (b'\x03\x00\x00\x00', 2),
     (b'\x00\x00\xff\xff\xff\xff', 3),
 ])
-def test_mem_resize(_bytes: bytes, address: int):
+def test_mem_load_bytes(_bytes: bytes, address: int):
     m = Memory()
     m.store_bytes(address, _bytes)
     assert m.load_bytes(address, len(_bytes)) == _bytes
