@@ -2,7 +2,7 @@ from components.memory import Memory
 from components.registers import Registers
 
 def _psh(r: Registers, m: Memory, v: int) -> None: m.store(r.SP, v); r.SP += 4
-def _pop(r: Registers, m: Memory)         -> int:  r.SP -= 4; v: int = m.load(r.SP); return v
+def _pop(r: Registers, m: Memory)         -> int:  r.SP -= 4; return m.load(r.SP)
 
 def PSHA(r: Registers, m: Memory) -> None: r.IP += 1; _psh(r, m, r.A)
 def POPA(r: Registers, m: Memory) -> None: r.IP += 1; r.A = _pop(r, m)

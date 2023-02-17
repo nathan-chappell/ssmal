@@ -15,10 +15,10 @@ _opcode_map = {
     b'\x15': a_op.SUBi,
     b'\x16': a_op.MULi,
     b'\x17': a_op.DIVi,
-    b'\x18': a_op.ADDb,
-    b'\x19': a_op.SUBb,
-    b'\x1a': a_op.MULb,
-    b'\x1b': a_op.DIVb,
+    b'\x18': a_op.ADD_,
+    b'\x19': a_op.SUB_,
+    b'\x1a': a_op.MUL_,
+    b'\x1b': a_op.DIV_,
 
     b'\x20': d_op.LDAi,
     b'\x21': d_op.LDAb,
@@ -27,12 +27,12 @@ _opcode_map = {
     b'\x24': d_op.STAb,
     b'\x25': d_op.STA_,
 
-    b'\x20': s_op.PSHA,
-    b'\x21': s_op.POPA,
-    b'\x22': s_op.CALi,
-    b'\x23': s_op.CALA,
-    b'\x24': s_op.CAL_,
-    b'\x25': s_op.RETN,
+    b'\x30': s_op.PSHA,
+    b'\x31': s_op.POPA,
+    b'\x32': s_op.CALi,
+    b'\x33': s_op.CALA,
+    b'\x34': s_op.CAL_,
+    b'\x35': s_op.RETN,
 }
 
 class Processor:
