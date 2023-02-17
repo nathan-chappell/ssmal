@@ -6,6 +6,7 @@ from components.registers import Registers
 import instructions.arithmetic_ops as a_op
 import instructions.data_ops as d_op
 import instructions.stack_ops as s_op
+import instructions.syscall as sys_op
 
 opcode_map: Dict[bytes, Callable[[Registers, Memory], None]] = {
     b"\x10": a_op.ADDB,
@@ -32,6 +33,7 @@ opcode_map: Dict[bytes, Callable[[Registers, Memory], None]] = {
     b"\x33": s_op.CALA,
     b"\x34": s_op.CAL_,
     b"\x35": s_op.RETN,
+    b"\x80": sys_op.SYS,
 }
 
 reverse_opcode_map: Dict[str, bytes] = {v.__name__.lower(): k for k, v in opcode_map.items()}
