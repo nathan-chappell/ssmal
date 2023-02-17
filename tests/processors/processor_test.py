@@ -1,6 +1,5 @@
-import sys
-
-sys.path.append("C:\\Users\\natha\\programming\\py\\ssmal\\src")
+from tests import path_fix
+path_fix()
 
 import pytest
 
