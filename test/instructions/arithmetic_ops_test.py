@@ -1,6 +1,6 @@
 import sys
 
-sys.path.append("D:\\programming\\py\\ssmal\\src")
+sys.path.append('C:\\Users\\natha\\programming\\py\\ssmal\\src')
 
 import pytest
 
@@ -47,10 +47,10 @@ def test_opsi(op_name: str, A: int, i: int, expected: int):
 @pytest.mark.parametrize(
     "op_name,A,B,v,expected",
     [
-        ("ADDb", 3, 0, 4, 7),
-        ("SUBb", 3, 1, 4, -1),
-        ("MULb", 3, 2, 4, 12),
-        ("DIVb", 3, 2, 4, 0),
+        ("ADD_", 3, 0, 4, 7),
+        ("SUB_", 3, 1, 4, -1),
+        ("MUL_", 3, 2, 4, 12),
+        ("DIV_", 3, 2, 4, 0),
     ],
 )
 def test_opsb(op_name: str, A: int, B: int, v: int, expected: int):

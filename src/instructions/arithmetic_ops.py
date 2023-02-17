@@ -12,7 +12,7 @@ def SUBi(r: Registers, m: Memory) -> None: r.IP += 1; r.A -= m.load(r.IP); r.IP 
 def MULi(r: Registers, m: Memory) -> None: r.IP += 1; r.A *= m.load(r.IP); r.IP += 4
 def DIVi(r: Registers, m: Memory) -> None: r.IP += 1; r.A //= m.load(r.IP); r.IP += 4
 
-def ADDb(r: Registers, m: Memory) -> None: r.IP += 1; r.A += m.load(r.B)
-def SUBb(r: Registers, m: Memory) -> None: r.IP += 1; r.A -= m.load(r.B)
-def MULb(r: Registers, m: Memory) -> None: r.IP += 1; r.A *= m.load(r.B)
-def DIVb(r: Registers, m: Memory) -> None: r.IP += 1; r.A //= m.load(r.B)
+def ADD_(r: Registers, m: Memory) -> None: r.IP += 1; r.A += m.load(r.B)
+def SUB_(r: Registers, m: Memory) -> None: r.IP += 1; r.A -= m.load(r.B)
+def MUL_(r: Registers, m: Memory) -> None: r.IP += 1; r.A *= m.load(r.B)
+def DIV_(r: Registers, m: Memory) -> None: r.IP += 1; r.A //= m.load(r.B)
