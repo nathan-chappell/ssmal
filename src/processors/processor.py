@@ -12,7 +12,7 @@ class Processor:
 
     def __init__(self) -> None:
         self.memory = Memory()
-        self.opcode_map = _opcode_map
+        self.opcode_map = opcode_map
         self.registers = Registers()
 
     def advance(self):
