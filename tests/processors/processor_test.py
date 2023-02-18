@@ -1,10 +1,15 @@
 from tests import path_fix
 path_fix()
 
+import io
+from functools import partial
+
 import pytest
 
 from processors.processor import Processor
 from components.registers import Registers
+import instructions.sys_io as sys_io
+import instructions.processor_ops as processor_ops
 
 
 @pytest.mark.parametrize(
@@ -97,3 +102,30 @@ def test_processor_generic(
     p.advance()
     assert p.memory.load_bytes(0, len(b1 or b0)) == b1 or b0
     assert p.registers == r1
+
+@pytest.mark.parametrize(
+    "A,_memory,expected_out,",
+    [
+        (sys_io.PREG, b'\x80', str(Registers(A=sys_io.PREG, SP=9))),
+        (sys_io.PTOPi, b'\x80\x00\x00\x00\x00\x01\x01\x00\x00', "257"),
+        (sys_io.PTOPx, b'\x80\x00\x00\x00\x00\x01\x01\x00\x00', "0x00000101"),
+        (sys_io.PTOPz, b'\x80\x41\x42\x43\x00\x01\x00\x00\x00', "ABC"),
+    ],
+)
+def test_sys_call(A: int, _memory: bytes, expected_out: str):
+    p = Processor()
+    p.memory.store_bytes(0, _memory)
+    p.registers = Registers(A=A, SP=9)
+    cout = io.StringIO()
+    cin = io.StringIO()
+    syscall = partial(sys_io.SYS, cout=cout, cin=cin)
+    p.update_syscall(syscall)
+    p.advance()
+    assert cout.getvalue()[:len(expected_out)] == expected_out
+    assert cout.getvalue() == expected_out
+
+def test_HALT():
+    p = Processor()
+    p.memory.store(0, 0x00)
+    with pytest.raises(processor_ops.HaltException):
+        p.advance()
