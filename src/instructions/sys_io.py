@@ -32,6 +32,6 @@ def SYS(r: Registers, m: Memory, cin: io.TextIOBase, cout: io.TextIOBase) -> Non
         cout.write(f"{i}")
     elif r.A == PTOPx:
         i = m.load(r.SP - 4, 4)
-        cout.write(f"{i:08x}")
+        cout.write(f"0x{i:08x}")
     else:
         raise Exception(f"unknown syscall: 0x{r.A:x}")
