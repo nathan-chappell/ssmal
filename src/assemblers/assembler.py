@@ -10,15 +10,22 @@ class Assembler:
     encoding: str = "ascii"
 
     buffer: io.BytesIO
+    debug_info: Dict[int, Token]
     symbol_table: Dict[str, bytes]
 
     def __init__(self):
-        self.symbol_table = dict(reverse_opcode_map)
         self.buffer = io.BytesIO()
+        self.debug_info = {}
+        self.symbol_table = dict(reverse_opcode_map)
 
     @property
     def current_position(self) -> int:
         return self.buffer.tell()
+    
+    def _write(self, _bytes: bytes, token: Token):
+        self.buffer.write(_bytes)
+        for i in range(len(_bytes)):
+            self.debug_info[self.current_position + i] = token
 
     def assemble(self, tokens: List[Token]):
         i = 0
@@ -26,10 +33,10 @@ class Assembler:
         while i < len(tokens):
             token = tokens[i]
             if token.type == "id":
-                self.buffer.write(self.symbol_table[self.get_id(token)])
+                self._write(self.symbol_table[self.get_id(token)], token)
             elif token.type == "dir":
                 if token.value == ".here":
-                    self.buffer.write(self.current_position.to_bytes(4, "little"))
+                    self._write(self.current_position.to_bytes(4, "little"), token)
                     i += 1
                     continue
                 elif token.value == ".byteorder":
@@ -49,17 +56,17 @@ class Assembler:
                     i += 3
                     continue
                 elif token.value == ".repeat":
-                    self.buffer.write(self.get_value(tokens[i + 1]) * self.get_bytes(tokens[i + 2])) # type: ignore
+                    self._write(self.get_value(tokens[i + 1]) * self.get_bytes(tokens[i + 2]), token) # type: ignore
                     i += 3
                     continue
             elif token.type == "xint":
-                self.buffer.write(self.get_bytes(token))
+                self._write(self.get_bytes(token), token)
             elif token.type == "dint":
-                self.buffer.write(self.get_bytes(token))
+                self._write(self.get_bytes(token), token)
             elif token.type == "bstr":
-                self.buffer.write(self.get_bytes(token))
+                self._write(self.get_bytes(token), token)
             elif token.type == "zstr":
-                self.buffer.write(self.get_bytes(token))
+                self._write(self.get_bytes(token), token)
             elif token.type == "comment":
                 pass
             elif token.type == "ws":

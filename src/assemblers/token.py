@@ -6,3 +6,4 @@ class Token:
     value: str
     line: int
     column: int
+    filename: str | None = None
