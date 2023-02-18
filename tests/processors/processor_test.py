@@ -9,6 +9,7 @@ import pytest
 from processors.processor import Processor
 from components.registers import Registers
 import instructions.sys_io as sys_io
+import instructions.processor_ops as processor_ops
 
 
 @pytest.mark.parametrize(
@@ -122,3 +123,9 @@ def test_sys_call(A: int, _memory: bytes, expected_out: str):
     p.advance()
     assert cout.getvalue()[:len(expected_out)] == expected_out
     assert cout.getvalue() == expected_out
+
+def test_HALT():
+    p = Processor()
+    p.memory.store(0, 0x00)
+    with pytest.raises(processor_ops.HaltException):
+        p.advance()

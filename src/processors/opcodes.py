@@ -5,10 +5,12 @@ from components.registers import Registers
 
 import instructions.arithmetic_ops as a_op
 import instructions.data_ops as d_op
+import instructions.processor_ops as p_op
 import instructions.stack_ops as s_op
 import instructions.sys_io as sys_io
 
 opcode_map: Dict[bytes, Callable[[Registers, Memory], None]] = {
+    b"\x00": p_op.HALT,
     b"\x10": a_op.ADDB,
     b"\x11": a_op.SUBB,
     b"\x12": a_op.MULB,
