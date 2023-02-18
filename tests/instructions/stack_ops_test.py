@@ -15,7 +15,7 @@ def test_PSH_POP_A(address: int, value: int):
     r = Registers(A=value, SP=address)
     op.__dict__["PSHA"](r, m)
     assert r.SP == address + 4
-    r.A = None
+    r.A = 0
     assert r.A != value
     op.__dict__["POPA"](r, m)
     assert r.A == value

@@ -33,15 +33,15 @@ class Assembler:
                     i += 1
                     continue
                 elif token.value == ".byteorder":
-                    self.byteorder = self.get_value(tokens[i + 1])
+                    self.byteorder = self.get_value(tokens[i + 1]) # type: ignore
                     i += 2
                     continue
                 elif token.value == ".encoding":
-                    self.encoding = self.get_value(tokens[i + 1])
+                    self.encoding = self.get_value(tokens[i + 1]) # type: ignore
                     i += 2
                     continue
                 elif token.value == ".goto":
-                    self.buffer.seek(self.get_value(tokens[i + 1]))
+                    self.buffer.seek(self.get_value(tokens[i + 1])) # type: ignore
                     i += 2
                     continue
                 elif token.value == ".def":
@@ -49,7 +49,7 @@ class Assembler:
                     i += 3
                     continue
                 elif token.value == ".repeat":
-                    self.buffer.write(self.get_value(tokens[i + 1]) * self.get_bytes(tokens[i + 2]))
+                    self.buffer.write(self.get_value(tokens[i + 1]) * self.get_bytes(tokens[i + 2])) # type: ignore
                     i += 3
                     continue
             elif token.type == "xint":
@@ -68,13 +68,15 @@ class Assembler:
 
     def get_bytes(self, token: Token) -> bytes:
         if token.type == "xint":
-            return int(token.value, 16).to_bytes(4, self.byteorder)
+            return int(token.value, 16).to_bytes(4, self.byteorder )# type: ignore
         elif token.type == "dint":
-            return int(token.value).to_bytes(4, self.byteorder)
+            return int(token.value).to_bytes(4, self.byteorder) # type: ignore
         elif token.type == "bstr":
             return bytes(token.value, self.encoding)
         elif token.type == "zstr":
             return bytes(token.value, self.encoding) + b"\x00"
+        else:
+            raise NotImplementedError()
 
     def get_value(self, token: Token) -> int | str | bytes:
         if token.type == "xint":
@@ -87,6 +89,8 @@ class Assembler:
             return token.value[1:-1]
         elif token.type == "id":
             return self.symbol_table[token.value]
+        else:
+            raise NotImplementedError()
 
     def get_id(self, token: Token) -> str:
         if token.type == "id":

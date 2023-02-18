@@ -3,7 +3,7 @@ from dataclasses import dataclass
 @dataclass
 class Registers:
     # Flags
-    ZF: bool = 0
+    # ZF: bool = 0
     # GP
     A: int = 0
     B: int = 0
