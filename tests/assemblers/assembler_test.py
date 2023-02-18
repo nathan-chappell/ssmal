@@ -31,9 +31,9 @@ T = Token
     ],
 )
 def test_assembler(input: str, expected: bytes):
-    assembler = Assembler()
     tokens = list(tokenize(input))
-    assembler.assemble(tokens)
+    assembler = Assembler(tokens)
+    assembler.assemble()
     assert assembler.buffer.getvalue()[0 : len(expected)] == expected
 
 
@@ -46,7 +46,7 @@ def test_assembler(input: str, expected: bytes):
     ],
 )
 def test_assembler_directives(input: str, expected: Dict[str, str]):
-    assembler = Assembler()
     tokens = list(tokenize(input))
-    assembler.assemble(tokens)
+    assembler = Assembler(tokens)
+    assembler.assemble()
     assert {k: getattr(assembler, k) for k in expected.keys()} == expected
