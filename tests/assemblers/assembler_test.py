@@ -44,7 +44,7 @@ def test_assembler(input: str, expected: bytes):
 @pytest.mark.parametrize(
     "input,expected",
     [
-        (""" .encoding "foobar" """, {"encoding": "foobar"}),
+        (""" .encoding "latin1" """, {"encoding": "latin1"}),
         (""" .byteorder "big" """, {"byteorder": "big"}),
         (""" .goto 0x1234 """, {"current_position": 0x1234}),
     ],

@@ -15,8 +15,8 @@ from processors.processor import Processor
 
 @dataclass
 class VmConfig:
-    cin: io.TextIOBase = sys.stdin
-    cout: io.TextIOBase = sys.stdout
+    cin: T.TextIO = sys.stdin
+    cout: T.TextIO = sys.stdout
 
 
 class VM:

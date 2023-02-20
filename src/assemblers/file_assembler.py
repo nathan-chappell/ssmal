@@ -56,7 +56,7 @@ class FileAssembler(Assembler):
             if included_file_fullname not in self._byte_cache:
                 with open(included_file_fullname, "rb") as f:
                     self._byte_cache[included_file_fullname] = f.read()
-            self._write(self._byte_cache[included_file_fullname], token)
+            self.emit(self._byte_cache[included_file_fullname], token)
         else:
             if included_file_fullname not in self._token_cache:
                 self._token_cache[included_file_fullname] = list(self._tokenize(included_file_fullname))
@@ -65,7 +65,7 @@ class FileAssembler(Assembler):
     def handle_directive(self, t0: Token):
         if t0.value == ".include":
             settings = IncludeFileSettings()
-            ti = self.eat_token
+            ti = self.eat_token()
 
             while ti.type == "dir":
                 if ti.value == ".binary":
@@ -74,12 +74,12 @@ class FileAssembler(Assembler):
                     settings.once = True
                 else:
                     raise UnexpectedTokenError(ti, "dir.binary | dir.once")
-                ti = self.eat_token
+                ti = self.eat_token()
 
             if ti.type != "zstr":
                 raise UnexpectedTokenError(ti, "zstr [path to included file]")
             else:
-                settings.filename = T.cast(str, self.get_value(ti))
+                settings.filename = self._get_str_value(ti)
 
             self._include(settings, t0)
         else:

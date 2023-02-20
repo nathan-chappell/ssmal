@@ -1,4 +1,5 @@
 import io
+import typing as T
 
 from components.memory import Memory
 from components.registers import Registers
@@ -13,7 +14,7 @@ PREG = 3  # print registers
 PMEM = 4  # dump memory
 
 
-def SYS(r: Registers, m: Memory, cin: io.TextIOBase, cout: io.TextIOBase) -> None:
+def SYS(r: Registers, m: Memory, cin: T.TextIO, cout: T.TextIO) -> None:
     MAX_ZSTRLEN = 0x100
     if r.A == PMEM:
         start = m.load(r.SP - 8, 4)
