@@ -28,6 +28,10 @@ T = Token
             """ addb subb mulb divb addi subi muli divi add_ sub_ mul_ div_ ldai ldab lda_ stai stab sta_ psha popa cali cala cal_ retn """,
             b"\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x20\x21\x22\x23\x24\x25\x30\x31\x32\x33\x34\x35",
         ),
+        (
+            """ "abc" '001133' """,
+            b"\x61\x62\x63\x00\x00\x11\x33",
+        ),
     ],
 )
 def test_assembler(input: str, expected: bytes):

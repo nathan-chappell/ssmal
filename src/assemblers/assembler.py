@@ -91,9 +91,9 @@ class Assembler:
         elif token.type == "dint":
             return int(token.value).to_bytes(4, self.byteorder)  # type: ignore
         elif token.type == "bstr":
-            return bytes(token.value, self.encoding)
+            return bytes.fromhex(token.value[1:-1])
         elif token.type == "zstr":
-            return bytes(token.value, self.encoding) + b"\x00"
+            return bytes(token.value[1:-1], self.encoding) + b"\x00"
         else:
             raise NotImplementedError()
 
