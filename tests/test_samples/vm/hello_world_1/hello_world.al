@@ -1,5 +1,5 @@
 .def hello 32
-.def main 8
+.def main 0
 
 cali main
 .goto main
@@ -7,6 +7,7 @@ cali main
     psha
     ldai 0
     sys
+    halt
 
 .goto hello
 "hello world!"

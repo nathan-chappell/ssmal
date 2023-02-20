@@ -15,7 +15,6 @@ PMEM = 4  # dump memory
 
 def SYS(r: Registers, m: Memory, cin: io.TextIOBase, cout: io.TextIOBase) -> None:
     MAX_ZSTRLEN = 0x100
-
     if r.A == PMEM:
         start = m.load(r.SP - 8, 4)
         count = m.load(r.SP - 4, 4)
@@ -35,3 +34,5 @@ def SYS(r: Registers, m: Memory, cin: io.TextIOBase, cout: io.TextIOBase) -> Non
         cout.write(f"0x{i:08x}")
     else:
         raise Exception(f"unknown syscall: 0x{r.A:x}")
+    
+    r.IP += 1

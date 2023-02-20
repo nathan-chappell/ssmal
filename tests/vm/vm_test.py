@@ -12,6 +12,7 @@ from pathlib import Path
 import pytest
 
 from assemblers.token import Token
+from components.registers import Registers
 from instructions.processor_ops import HaltException
 from vm import VM, VmConfig
 
@@ -71,7 +72,7 @@ def test_vm_assemble(inputFile: str, expected: bytes):
 @pytest.mark.parametrize(
     "inputFile,expected",
     [
-        ("""tests\\test_samples\\vm\\hello_world_1\\hello_world.al""", "Hello World"),
+        ("""tests\\test_samples\\vm\\hello_world_1\\hello_world.al""", "hello world!"),
     ],
 )
 def test_vm_pipeline(inputFile: str, expected: str):
@@ -87,12 +88,9 @@ def test_vm_pipeline(inputFile: str, expected: str):
         vm.assemble(inputFile)
         assert Path(_obj_filename).exists()
         assert Path(_dbg_filename).exists()
-        try:
-            vm.run(_obj_filename)
-        except HaltException:
-            breakpoint()
-            assert cout.getvalue() == expected
-        else:
-            assert False
+        initial_registers = Registers(SP=0x80)
+        vm.run(_obj_filename, initial_registers=initial_registers)
+        assert cout.getvalue() == expected
     finally:
         _cleanup_paths([_obj_filename, _dbg_filename])
+        ...

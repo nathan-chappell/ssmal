@@ -4,11 +4,13 @@ import typing as T
 import sys
 
 from dataclasses import dataclass, asdict
+from functools import partial
 
 import instructions.sys_io as sys_io
 
 from assemblers.file_assembler import FileAssembler
 from components.registers import Registers
+from instructions.processor_ops import HaltException
 from processors.processor import Processor
 
 @dataclass
@@ -19,6 +21,7 @@ class VmConfig:
 
 class VM:
     config: VmConfig
+    processor: Processor
 
     DEBUG_INFO_VERSION = "0.0"
     OBJECT_FILE_EXT = "bin"
@@ -26,6 +29,7 @@ class VM:
 
     def __init__(self, config: VmConfig = VmConfig()) -> None:
         self.config = config
+        self.processor = Processor()
 
     def assemble(self, filename: str):
         """assembles input_file and outputs to input_file.bin"""
@@ -43,10 +47,13 @@ class VM:
         """runs input_file as binary"""
         with open(filename, "rb") as f:
             _bytes = f.read()
-        processor = Processor()
-        processor.update_syscall(sys_io.SYS)
-        processor.memory.store_bytes(0, _bytes)
-        processor.registers = initial_registers
-        while True:
-            breakpoint()
-            processor.advance()
+        syscall = partial(sys_io.SYS, cout=self.config.cout, cin=self.config.cin)
+        self.processor.update_syscall(syscall)
+        self.processor.memory.store_bytes(0, _bytes)
+        self.processor.registers = initial_registers
+        try:
+            while True:
+                # breakpoint()
+                self.processor.advance()
+        except HaltException:
+            pass
