@@ -68,10 +68,12 @@ class FileAssembler(Assembler):
             ti = self.eat_token
 
             while ti.type == "dir":
-                if ti.value == ".bin":
+                if ti.value == ".binary":
                     settings.binary = True
                 elif ti.value == ".once":
                     settings.once = True
+                else:
+                    raise UnexpectedTokenError(ti, "dir.binary | dir.once")
                 ti = self.eat_token
 
             if ti.type != "zstr":

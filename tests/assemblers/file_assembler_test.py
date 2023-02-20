@@ -8,13 +8,12 @@ import pytest
 
 from assemblers.file_assembler import FileAssembler
 
+
 @pytest.mark.parametrize(
     "inputFile,expected",
     [
-        (
-            """tests\\test_samples\\file_assembler\\test_include_1\\ab.al""",
-            b"\xab\xcd",
-        ),
+        ("""tests\\test_samples\\file_assembler\\test_include_1\\ab.al""", b"\xab\x01\x02\x03\x04"),
+        ("""tests\\test_samples\\file_assembler\\test_include_2\\a\\ab.al""", b"\xab\x01\x02\x03\x04"),
     ],
 )
 def test_assembler(inputFile: str, expected: bytes):

@@ -1,1 +1,1 @@
-'ab' .include .binary "./cd.al"
+'ab' .include .binary "./cd.bin"
