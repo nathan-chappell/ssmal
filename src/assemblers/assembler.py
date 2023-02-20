@@ -10,7 +10,7 @@ class Assembler:
     encoding: str = "ascii"
 
     buffer: io.BytesIO
-    debug_info: Dict[int, Token]
+    source_map: Dict[int, Token]
     included_files: Set[str]
     symbol_table: Dict[str, bytes]
     tokens: List[Token]
@@ -19,7 +19,7 @@ class Assembler:
 
     def __init__(self, tokens: List[Token]):
         self.buffer = io.BytesIO()
-        self.debug_info = {}
+        self.source_map = {}
         self.symbol_table = dict(reverse_opcode_map)
         self.tokens = tokens
         self._index = 0
@@ -37,7 +37,7 @@ class Assembler:
     def _write(self, _bytes: bytes, token: Token):
         self.buffer.write(_bytes)
         for i in range(len(_bytes)):
-            self.debug_info[self.current_position + i] = token
+            self.source_map[self.current_position + i] = token
 
     def assemble(self):
         while self._index < len(self.tokens):
@@ -75,7 +75,7 @@ class Assembler:
             elif t0.value == ".encoding":
                 self.encoding = self.get_value(t1)  # type: ignore
             elif t0.value == ".goto":
-                self.buffer.seek(self.get_value(t1))  # type: ignore
+                self.buffer.seek(int.from_bytes(self.get_value(t1), self.byteorder, signed=True))
             else:
                 t2 = self.eat_token
                 if t0.value == ".def":
