@@ -126,6 +126,6 @@ def test_sys_call(A: int, _memory: bytes, expected_out: str):
 
 def test_HALT():
     p = Processor()
-    p.memory.store(0, 0x00)
+    p.memory.store(0, 0x02)
     with pytest.raises(processor_ops.HaltSignal):
         p.advance()

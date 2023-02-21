@@ -13,8 +13,9 @@ SYS_BYTE = b"\x80"
 
 opcode_map: Dict[bytes, Callable[[Registers, Memory], None]] = {
     # processor ops
-    b"\x00": p_op.HALT,
+    b"\x00": p_op.NOP,
     b"\x01": p_op.DBG,
+    b"\x02": p_op.HALT,
     # arithmetic ops
     b"\x10": a_op.ADDB,
     b"\x11": a_op.SUBB,
