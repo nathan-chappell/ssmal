@@ -1,11 +1,62 @@
+from dataclasses import dataclass
+import typing as T
+import re
 
 from processors.processor import Processor
 from instructions.processor_signals import HaltSignal, DebugSignal
 
 
+class DebugParseError(Exception):
+    ...
+
+
+@dataclass
+class DebuggerCommand:
+    command: T.Literal["print", "breakpoint", "step"]
+    argument: int = 0
+
+    _command_regex = re.compile(r"^ *(?<command>p|print|b|breakpoint|s|step) *(?<argument>\d+)? *$")
+
+    @classmethod
+    def fix_command(cls, command: str) -> T.Literal["print", "breakpoint", "step"]:
+        # fmt: off
+        if command == 'p':          return 'print'
+        if command == 'print':      return 'print'
+        if command == 'b':          return 'breakpoint'
+        if command == 'breakpoint': return 'breakpoint'
+        if command == 's':          return 'step'
+        if command == 'step':       return 'step'
+        # fmt: on
+        raise DebugParseError(f"invalid debugger command: {command}")
+
+    @classmethod
+    def fix_argument(cls, argument: T.Optional[str]) -> str:
+        if argument is None:
+            return 0
+        try:
+            if argument.startswith("0x"):
+                return int(argument, 16)
+            else:
+                return int(argument)
+        except ValueError as e:
+            raise DebugParseError(e.args[0])
+
+    @classmethod
+    def parse_command(cls, line: str) -> "DebuggerCommand":
+        match = cls._command_regex.match(line)
+        if not match:
+            raise DebugParseError(f"failed to parse line: {line}")
+
+        if match:
+            command = cls.fix_command(match.group["command"])
+            argument = cls.fix_argument(match.group["command"])
+            return cls(command=command, argument=argument)
+
+
 class Debugger:
     processor: Processor
     halt_signal: HaltSignal
+    breakpoints: T.Set[int]
 
     def run(self):
         while True:
@@ -19,7 +70,36 @@ class Debugger:
 
     def advance(self):
         self.processor.advance()
+        if self.processor.registers.IP in self.breakpoints:
+            raise DebugSignal()
+
+    def on_break(self):
+        self.write_message(self.processor.registers)
+        command = self.read_command()
+
+    def write_message(self, any: T.Any):
+        print(any)
+
+    def read_command(self) -> DebuggerCommand:
+        while True:
+            _input = input("> ")
+            try:
+                debugger_command = DebuggerCommand.parse_command(_input)
+                if debugger_command.command == 'print':
+                    ...
+                elif debugger_command.command == 'breakpoint':
+                    ...
+                elif debugger_command.command == 'step':
+                    ...
+                break
+            except DebugParseError as e:
+                self.write_message(e)
+
+    def _breakpoint(self, address: int):
+        ...
+
+    def _print(self, address: int):
         ...
     
-    def on_break(self):
+    def _step(self, count: int):
         ...
