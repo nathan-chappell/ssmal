@@ -12,5 +12,5 @@ from components.registers import Registers
 def test_HALT():
     m = Memory()
     r = Registers()
-    with pytest.raises(op.HaltException):
+    with pytest.raises(op.HaltSignal):
         op.HALT(r,m)

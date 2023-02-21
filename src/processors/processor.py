@@ -2,9 +2,11 @@ import typing as T
 
 from components.memory import Memory
 from components.registers import Registers
-from processors.opcodes import opcode_map
+from processors.opcodes import opcode_map, SYS_BYTE
+from instructions.sys_io import SysIO
 
 TOp = T.Callable[[Registers, Memory], None]
+
 
 class Processor:
     memory: Memory
@@ -19,6 +21,7 @@ class Processor:
     def advance(self):
         op = self.opcode_map[self.memory.load_bytes(self.registers.IP, 1)]
         op(self.registers, self.memory)
-    
-    def update_syscall(self, op: TOp):
-        self.opcode_map[b'\x80'] = op
+
+    @property
+    def sys_io(self) -> SysIO:
+        return T.cast(SysIO, self.opcode_map[SYS_BYTE])

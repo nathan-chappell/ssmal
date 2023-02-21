@@ -76,8 +76,8 @@ class FileAssembler(Assembler):
                     raise UnexpectedTokenError(ti, "dir.binary | dir.once")
                 ti = self.eat_token()
 
-            if ti.type != "zstr":
-                raise UnexpectedTokenError(ti, "zstr [path to included file]")
+            if ti.type not in ("zstr", "bstr"):
+                raise UnexpectedTokenError(ti, "zstr, bstr (path to included file)")
             else:
                 settings.filename = self._get_str_value(ti)
 

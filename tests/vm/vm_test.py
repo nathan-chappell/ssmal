@@ -13,7 +13,7 @@ import pytest
 
 from assemblers.token import Token
 from components.registers import Registers
-from instructions.processor_ops import HaltException
+from instructions.processor_ops import HaltSignal
 from vm import VM, VmConfig
 
 

@@ -1,7 +1,7 @@
 import typing as T
 import io
 
-from processors.opcodes import reverse_opcode_map
+from processors.opcodes import opcode_map
 from assemblers.token import Token
 from assemblers.errors import UnexpectedTokenError
 
@@ -21,7 +21,7 @@ class Assembler:
     def __init__(self, tokens: T.List[Token]):
         self.buffer = io.BytesIO()
         self.source_map = {}
-        self.symbol_table = dict(reverse_opcode_map)
+        self.symbol_table = {v.__name__.lower(): k for k, v in opcode_map.items()}
         self.tokens = tokens
         self._index = 0
 

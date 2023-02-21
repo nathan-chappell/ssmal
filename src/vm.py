@@ -10,7 +10,7 @@ import instructions.sys_io as sys_io
 
 from assemblers.file_assembler import FileAssembler
 from components.registers import Registers
-from instructions.processor_ops import HaltException
+from instructions.processor_ops import HaltSignal
 from processors.processor import Processor
 
 @dataclass
@@ -48,12 +48,13 @@ class VM:
         with open(filename, "rb") as f:
             _bytes = f.read()
         syscall = partial(sys_io.SYS, cout=self.config.cout, cin=self.config.cin)
-        self.processor.update_syscall(syscall)
+        self.processor.sys_io.cin = self.config.cin
+        self.processor.sys_io.cout = self.config.cout
         self.processor.memory.store_bytes(0, _bytes)
         self.processor.registers = initial_registers
         try:
             while True:
                 # breakpoint()
                 self.processor.advance()
-        except HaltException:
+        except HaltSignal:
             pass
