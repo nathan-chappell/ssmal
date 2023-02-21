@@ -9,3 +9,7 @@ share/
 pyvenv.cfg
 __pycache__/
 *.pyc
+
+# binary files from demo
+demo/**/*.bin
+demo/**/*.ssmdebug.json
