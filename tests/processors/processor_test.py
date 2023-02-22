@@ -129,14 +129,14 @@ def test_sys_call(A: int, _memory: bytes, expected_out: str):
 
     def _raise_test(*args, **kwargs):
         raise TestSignal()
-    
+
     p.sys_vector = {
         sys_io.PREG: _raise_test,
         sys_io.PTOPi: _raise_test,
         sys_io.PTOPx: _raise_test,
         sys_io.PTOPz: _raise_test,
     }
-    
+
     # p.sys_io.bind(cin=io.StringIO(), cout=io.StringIO())
     with pytest.raises(TestSignal):
         p.advance()
