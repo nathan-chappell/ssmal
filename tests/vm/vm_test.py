@@ -6,7 +6,6 @@ import json
 import io
 import typing as T
 
-from contextlib import contextmanager
 from pathlib import Path
 
 import pytest
@@ -14,6 +13,7 @@ import pytest
 from assemblers.token import Token
 from components.registers import Registers
 from instructions.processor_ops import HaltSignal
+from util.input_file_variant import InputFileVariant
 from vm import VM, VmConfig
 
 
@@ -43,7 +43,7 @@ def _cleanup_paths(pathnames: T.List[str]) -> T.Generator[None, None, None]:
 
 
 @pytest.mark.parametrize(
-    "inputFile,expected",
+    "input_file,expected",
     [
         ("""tests\\test_samples\\file_assembler\\include_bin_1\\ab.al""", b"\xab\x01\x02\x03\x04"),
         ("""tests\\test_samples\\file_assembler\\include_bin_2\\a\\ab.al""", b"\xab\x01\x02\x03\x04"),
@@ -51,46 +51,42 @@ def _cleanup_paths(pathnames: T.List[str]) -> T.Generator[None, None, None]:
         ("""tests\\test_samples\\file_assembler\\include_text_once_1\\ab.al""", b"\xab\x01\x02\x03\x04"),
     ],
 )
-def test_vm_assemble(inputFile: str, expected: bytes):
+def test_vm_assemble(input_file: str, expected: bytes):
     vm = VM()
-    _obj_filename = f"{inputFile}.{vm.OBJECT_FILE_EXT}"
-    _dbg_filename = f"{inputFile}.{vm.DEBUG_FILE_EXT}"
+    input_file_variant = InputFileVariant(input_file)
 
     try:
-        vm.assemble(inputFile)
-        with open(_obj_filename, "rb") as f:
+        vm.assemble(input_file_variant.assembler_filename)
+        with open(input_file_variant.object_filename, "rb") as f:
             assert f.read()[: len(expected)] == expected
-        with open(_dbg_filename, "rt") as f:
+        with open(input_file_variant.debug_filename, "rt") as f:
             debug_info = json.load(f)
             assert debug_info["version"] == "0.0"
             symbol_table = {byte: Token(**token) for byte, token in debug_info["source_map"].items()}
             # I guess for now just assert no error occurs here...
     finally:
-        _cleanup_paths([_obj_filename, _dbg_filename])
+        _cleanup_paths([input_file_variant.object_filename, input_file_variant.debug_filename])
         
         
 @pytest.mark.parametrize(
-    "inputFile,expected",
+    "input_file,expected",
     [
         ("""tests\\test_samples\\vm\\hello_world_1\\hello_world.al""", "hello world!"),
     ],
 )
-def test_vm_pipeline(inputFile: str, expected: str):
+def test_vm_pipeline(input_file: str, expected: str):
     cin = io.StringIO()
     cout = io.StringIO()
     config = VmConfig(cin=cin, cout=cout)
     vm = VM(config=config)
-    
-    _obj_filename = f"{inputFile}.{vm.OBJECT_FILE_EXT}"
-    _dbg_filename = f"{inputFile}.{vm.DEBUG_FILE_EXT}"
+    input_file_variant = InputFileVariant(input_file)
 
     try:
-        vm.assemble(inputFile)
-        assert Path(_obj_filename).exists()
-        assert Path(_dbg_filename).exists()
+        vm.assemble(input_file)
+        assert Path(input_file_variant.object_filename).exists()
+        assert Path(input_file_variant.debug_filename).exists()
         initial_registers = Registers(SP=0x80)
-        vm.run(_obj_filename, initial_registers=initial_registers)
+        vm.run(input_file_variant.object_filename, initial_registers=initial_registers)
         assert cout.getvalue() == expected
     finally:
-        _cleanup_paths([_obj_filename, _dbg_filename])
-        ...
+        _cleanup_paths([input_file_variant.object_filename, input_file_variant.debug_filename])

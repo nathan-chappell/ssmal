@@ -30,7 +30,7 @@ class DebuggerCommand:
         raise DebugParseError(f"invalid debugger command: {command}")
 
     @classmethod
-    def fix_argument(cls, argument: T.Optional[str]) -> str:
+    def fix_argument(cls, argument: T.Optional[str]) -> int:
         if argument is None:
             return 0
         try:
@@ -44,13 +44,12 @@ class DebuggerCommand:
     @classmethod
     def parse_command(cls, line: str) -> "DebuggerCommand":
         match = cls._command_regex.match(line)
-        if not match:
-            raise DebugParseError(f"failed to parse line: {line}")
-
         if match:
-            command = cls.fix_command(match.group["command"])
-            argument = cls.fix_argument(match.group["command"])
+            command = cls.fix_command(match.group("command"))
+            argument = cls.fix_argument(match.group("command"))
             return cls(command=command, argument=argument)
+        else:
+            raise DebugParseError(f"failed to parse line: {line}")
 
 
 class Debugger:
@@ -71,7 +70,7 @@ class Debugger:
     def advance(self):
         self.processor.advance()
         if self.processor.registers.IP in self.breakpoints:
-            raise DebugSignal()
+            raise DebugSignal(self.processor.registers, self.processor.memory)
 
     def on_break(self):
         self.write_message(self.processor.registers)
@@ -80,26 +79,19 @@ class Debugger:
     def write_message(self, any: T.Any):
         print(any)
 
-    def read_command(self) -> DebuggerCommand:
+    def read_command(self):
         while True:
             _input = input("> ")
             try:
                 debugger_command = DebuggerCommand.parse_command(_input)
                 if debugger_command.command == 'print':
-                    ...
+                    self.write_message(self.processor.memory.load_bytes(debugger_command.argument, 0x40))
                 elif debugger_command.command == 'breakpoint':
-                    ...
+                    self.breakpoints.add(debugger_command.argument)
                 elif debugger_command.command == 'step':
-                    ...
-                break
+                    for _ in range(debugger_command.argument):
+                        self.advance()
             except DebugParseError as e:
                 self.write_message(e)
-
-    def _breakpoint(self, address: int):
-        ...
-
-    def _print(self, address: int):
-        ...
-    
-    def _step(self, count: int):
-        ...
+            else:
+                break
