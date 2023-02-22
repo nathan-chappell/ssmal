@@ -126,7 +126,7 @@ class Assembler:
         else:
             raise UnexpectedTokenError(token, '"ascii", "latin1"')
 
-    def get_repeated_value(self, token: Token) -> int | str | bytes:
+    def get_repeated_value(self, token: Token) -> T.Union[int, str, bytes]:
         if token.type == "xint":
             return int(token.value, 16)
         elif token.type == "dint":

@@ -3,6 +3,7 @@ from tests import path_fix
 path_fix()
 
 import io
+import typing as T
 from functools import partial
 
 import pytest
@@ -94,7 +95,7 @@ def test_processor_generic(
     name: str,
     b0: bytes,
     r0: Registers,
-    b1: bytes | None,
+    b1: T.Optional[bytes],
     r1: Registers,
 ):
     p = Processor()
