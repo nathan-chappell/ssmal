@@ -27,3 +27,4 @@ class Processor:
         except SysSignal:
             sys_op = self.sys_vector[self.registers.A]
             sys_op(self.registers, self.memory)
+            self.registers.IP += 1

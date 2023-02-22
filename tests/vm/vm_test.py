@@ -76,7 +76,6 @@ def test_vm_assemble(input_file: str, expected: bytes):
         _cleanup_paths([input_file_variant.object_filename, input_file_variant.debug_filename])
 
 
-@pytest.mark.skip
 @pytest.mark.parametrize(
     "input_file,expected",
     [
@@ -95,7 +94,6 @@ def test_vm_pipeline(input_file: str, expected: str):
         assert Path(input_file_variant.object_filename).exists()
         assert Path(input_file_variant.debug_filename).exists()
         initial_registers = Registers(SP=0x80)
-        breakpoint()
         vm.run(input_file_variant.object_filename, initial_registers=initial_registers)
         assert cout.getvalue() == expected
     finally:

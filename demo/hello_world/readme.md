@@ -3,13 +3,13 @@
 To compile:
 
 ```
-python .\src\vm.py -c .\demo\hello_world\hello_world.al
+python -m ssmal -c -m vm1 .\demo\hello_world\hello_world.al
 ```
 
 To run:
 
 ```
-python .\src\vm.py -r .\demo\hello_world\hello_world.bin
+python -m ssmal -r -m vm1 .\demo\hello_world\hello_world.bin
 ```
 
 Expected output:
