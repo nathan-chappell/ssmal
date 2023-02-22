@@ -1,6 +1,7 @@
 import typing as T
 from dataclasses import dataclass
 
+
 @dataclass
 class Token:
     type: str

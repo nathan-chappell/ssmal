@@ -1,14 +1,10 @@
-from tests import path_fix
-
-path_fix()
-
 from typing import List, Dict
 
 import pytest
 
-from assemblers.token import Token
-from assemblers.tokenizer import tokenize
-from assemblers.assembler import Assembler
+from ssmal.assemblers.token import Token
+from ssmal.assemblers.tokenizer import tokenize
+from ssmal.assemblers.assembler import Assembler
 
 T = Token
 

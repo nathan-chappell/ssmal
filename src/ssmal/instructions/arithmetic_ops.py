@@ -1,5 +1,5 @@
-from components.memory import Memory
-from components.registers import Registers
+from ssmal.components.memory import Memory
+from ssmal.components.registers import Registers
 
 # fmt: off
 def ADDB(r: Registers, m: Memory) -> None: r.IP += 1; r.A += r.B

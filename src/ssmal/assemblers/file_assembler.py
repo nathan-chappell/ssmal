@@ -2,17 +2,19 @@ import typing as T
 from dataclasses import dataclass, replace
 from pathlib import Path
 
-from assemblers.assembler import Assembler
-from assemblers.errors import UnexpectedTokenError
-from assemblers.token import Token
-from assemblers.tokenizer import tokenize
+from ssmal.assemblers.assembler import Assembler
+from ssmal.assemblers.errors import UnexpectedTokenError
+from ssmal.assemblers.token import Token
+from ssmal.assemblers.tokenizer import tokenize
 
 TFileName = str
 TByteCache = T.Dict[TFileName, bytes]
 TTokenCache = T.Dict[TFileName, T.List[Token]]
 
+
 def _insert(l1: list, i: int, l2: list):
-                return l1[:i] + l2 + l1[i:]
+    return l1[:i] + l2 + l1[i:]
+
 
 @dataclass
 class IncludeFileSettings:
@@ -29,20 +31,20 @@ class FileAssembler(Assembler):
         super().__init__([])
         self._byte_cache = {}
         self._token_cache = {}
-    
+
     def assemble_file(self, filename: str):
         self._insert_tokens(list(self._tokenize(filename)))
         self.assemble()
-    
+
     def _tokenize(self, filename: str) -> T.Generator[Token, None, None]:
-        with open(filename, 'r') as f:
+        with open(filename, "r") as f:
             text = f.read()
         for token in tokenize(text):
             yield replace(token, filename=filename)
-    
+
     def _insert_tokens(self, tokens: T.List[Token]):
         self.tokens = _insert(self.tokens, self._index, tokens)
-    
+
     def _already_include(self, filename: str) -> bool:
         return filename in self._byte_cache or filename in self._token_cache
 

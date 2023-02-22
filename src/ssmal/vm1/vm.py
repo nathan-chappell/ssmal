@@ -6,13 +6,12 @@ import sys
 from dataclasses import dataclass, asdict
 from functools import partial
 
-import instructions.sys_io as sys_io
-
-from assemblers.file_assembler import FileAssembler
-from components.registers import Registers
-from instructions.processor_ops import HaltSignal
-from processors.processor import Processor
-from util.input_file_variant import InputFileVariant
+from ssmal.assemblers.file_assembler import FileAssembler
+from ssmal.components.registers import Registers
+from ssmal.instructions.processor_ops import HaltSignal
+from ssmal.processors.processor import Processor
+from ssmal.util.input_file_variant import InputFileVariant
+from ssmal.vm1.sys_io import SysIO
 
 
 @dataclass
@@ -25,6 +24,7 @@ class VmConfig:
 class VM:
     config: VmConfig
     processor: Processor
+    sys_io: SysIO
 
     DEBUG_INFO_VERSION = "0.0"
     OBJECT_FILE_EXT = "bin"
@@ -33,11 +33,12 @@ class VM:
     def __init__(self, config: VmConfig = VmConfig()) -> None:
         self.config = config
         self.processor = Processor()
+        self.sys_io = SysIO()
         self.configure()
 
     def configure(self):
-        self.processor.sys_io.cin = self.config.cin
-        self.processor.sys_io.cout = self.config.cout
+        self.sys_io.bind(cin=self.config.cin, cout=self.config.cout)
+        self.processor.sys_vector = self.sys_io.sys_vector
         self.processor.registers = self.config.initial_registers
 
     def assemble(self, filename: str):

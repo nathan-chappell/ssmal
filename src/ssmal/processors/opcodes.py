@@ -1,13 +1,13 @@
 from typing import Dict, Callable
 
-from components.memory import Memory
-from components.registers import Registers
+from ssmal.components.memory import Memory
+from ssmal.components.registers import Registers
 
-import instructions.arithmetic_ops as a_op
-import instructions.data_ops as d_op
-import instructions.processor_ops as p_op
-import instructions.stack_ops as s_op
-import instructions.sys_io as sys_io
+import ssmal.instructions.arithmetic_ops as a_op
+import ssmal.instructions.data_ops as d_op
+import ssmal.instructions.processor_ops as p_op
+import ssmal.instructions.stack_ops as s_op
+import ssmal.instructions.sys as sys_op
 
 SYS_BYTE = b"\x80"
 
@@ -44,5 +44,5 @@ opcode_map: Dict[bytes, Callable[[Registers, Memory], None]] = {
     b"\x34": s_op.CAL_,
     b"\x35": s_op.RETN,
     # syscall - must be added later so that io can be put in...
-    SYS_BYTE: sys_io.SysIO(),
+    SYS_BYTE: sys_op.SYS,
 }

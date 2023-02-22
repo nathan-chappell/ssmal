@@ -2,8 +2,8 @@ from dataclasses import dataclass
 import typing as T
 import re
 
-from processors.processor import Processor
-from instructions.processor_signals import HaltSignal, DebugSignal
+from ssmal.processors.processor import Processor
+from ssmal.instructions.processor_signals import HaltSignal, DebugSignal
 
 
 class DebugParseError(Exception):
@@ -84,11 +84,11 @@ class Debugger:
             _input = input("> ")
             try:
                 debugger_command = DebuggerCommand.parse_command(_input)
-                if debugger_command.command == 'print':
+                if debugger_command.command == "print":
                     self.write_message(self.processor.memory.load_bytes(debugger_command.argument, 0x40))
-                elif debugger_command.command == 'breakpoint':
+                elif debugger_command.command == "breakpoint":
                     self.breakpoints.add(debugger_command.argument)
-                elif debugger_command.command == 'step':
+                elif debugger_command.command == "step":
                     for _ in range(debugger_command.argument):
                         self.advance()
             except DebugParseError as e:

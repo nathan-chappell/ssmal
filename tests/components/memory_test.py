@@ -1,14 +1,15 @@
-from tests import path_fix
-path_fix()
-
 import pytest
 
-from components.memory import Memory
+from ssmal.components.memory import Memory
 
-@pytest.mark.parametrize('value,address,expected', [
-    (3,0,b'\x03\x00\x00\x00\x00\x00\x00\x00'),
-    (-1,2,b'\x00\x00\xff\xff\xff\xff\x00\x00'),
-])
+
+@pytest.mark.parametrize(
+    "value,address,expected",
+    [
+        (3, 0, b"\x03\x00\x00\x00\x00\x00\x00\x00"),
+        (-1, 2, b"\x00\x00\xff\xff\xff\xff\x00\x00"),
+    ],
+)
 def test_mem(value: int, address: int, expected: bytes):
     m = Memory(8)
     m.store(address, value)
@@ -17,12 +18,16 @@ def test_mem(value: int, address: int, expected: bytes):
     assert m.load(address) == value
 
     for i in range(1, len(expected)):
-        assert m.load_bytes(0,i) == expected[:i]
+        assert m.load_bytes(0, i) == expected[:i]
 
-@pytest.mark.parametrize('value,address,expected', [
-    (3,0,b'\x03\x00\x00\x00'),
-    (-1,2,b'\x00\x00\xff\xff\xff\xff'),
-])
+
+@pytest.mark.parametrize(
+    "value,address,expected",
+    [
+        (3, 0, b"\x03\x00\x00\x00"),
+        (-1, 2, b"\x00\x00\xff\xff\xff\xff"),
+    ],
+)
 def test_mem_resize(value: int, address: int, expected: bytes):
     m = Memory()
     m.store(address, value)
@@ -32,10 +37,14 @@ def test_mem_resize(value: int, address: int, expected: bytes):
     assert len(m.buffer.read()) == 256
     assert m.load(address) == value
 
-@pytest.mark.parametrize('_bytes,address', [
-    (b'\x03\x00\x00\x00', 2),
-    (b'\x00\x00\xff\xff\xff\xff', 3),
-])
+
+@pytest.mark.parametrize(
+    "_bytes,address",
+    [
+        (b"\x03\x00\x00\x00", 2),
+        (b"\x00\x00\xff\xff\xff\xff", 3),
+    ],
+)
 def test_mem_load_bytes(_bytes: bytes, address: int):
     m = Memory()
     m.store_bytes(address, _bytes)

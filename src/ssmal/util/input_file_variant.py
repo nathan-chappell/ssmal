@@ -1,5 +1,6 @@
 import typing as T
 
+
 class SuffixMap:
     assembler_file_suffix: str = ".al"
     object_file_suffix: str = ".bin"
@@ -9,6 +10,7 @@ class SuffixMap:
         yield self.assembler_file_suffix
         yield self.object_file_suffix
         yield self.debug_file_suffix
+
 
 class InputFileVariant:
     suffix_map = SuffixMap()

@@ -1,4 +1,4 @@
-from util.get_chunks import get_chunks
+from ssmal.util.get_chunks import get_chunks
 
 
 def ascii_safe_encode(_bytes: bytes):

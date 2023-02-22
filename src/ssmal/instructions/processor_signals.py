@@ -1,5 +1,5 @@
-from components.memory import Memory
-from components.registers import Registers
+from ssmal.components.memory import Memory
+from ssmal.components.registers import Registers
 
 
 class ProcessorSignal(Exception):
@@ -15,3 +15,4 @@ class ProcessorSignal(Exception):
 # fmt: off
 class HaltSignal(ProcessorSignal): ...
 class DebugSignal(ProcessorSignal): ...
+class SysSignal(ProcessorSignal): ...

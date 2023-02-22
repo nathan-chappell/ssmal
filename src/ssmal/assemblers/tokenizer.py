@@ -1,7 +1,7 @@
 import re
 import typing as T
 
-from assemblers.token import Token
+from ssmal.assemblers.token import Token
 
 _tokens: T.List[T.Tuple[str, str]] = [
     ("id", r"[a-zA-Z_][a-zA-Z_0-9.]*"),

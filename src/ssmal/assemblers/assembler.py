@@ -1,9 +1,9 @@
 import typing as T
 import io
 
-from processors.opcodes import opcode_map
-from assemblers.token import Token
-from assemblers.errors import UnexpectedTokenError
+from ssmal.processors.opcodes import opcode_map
+from ssmal.assemblers.token import Token
+from ssmal.assemblers.errors import UnexpectedTokenError
 
 
 class Assembler:
@@ -74,7 +74,10 @@ class Assembler:
                 if t0.value == ".def":
                     self.symbol_table[self.get_symbol(t1)] = self.get_bytes(t2)
                 elif t0.value == ".repeat":
-                    self.emit(T.cast(int, self.get_repeated_value(t1)) * self.get_bytes(t2), t0)
+                    self.emit(
+                        T.cast(int, self.get_repeated_value(t1)) * self.get_bytes(t2),
+                        t0,
+                    )
                 else:
                     raise UnexpectedTokenError(t0, "Error processing directive.")
 

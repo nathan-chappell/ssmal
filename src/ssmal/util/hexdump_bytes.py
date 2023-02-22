@@ -1,7 +1,7 @@
 import typing as T
 
-from util.get_chunks import get_chunks
-from util.ascii_safe_encode import ascii_safe_encode
+from ssmal.util.get_chunks import get_chunks
+from ssmal.util.ascii_safe_encode import ascii_safe_encode
 
 
 def hexdump_bytes(_bytes: bytes) -> T.Generator[str, None, None]:
