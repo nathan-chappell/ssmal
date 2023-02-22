@@ -1,12 +1,9 @@
-from tests import path_fix
-path_fix()
-
 import pytest
 
-import instructions.arithmetic_ops as op
+import ssmal.instructions.arithmetic_ops as op
 
-from components.memory import Memory
-from components.registers import Registers
+from ssmal.components.memory import Memory
+from ssmal.components.registers import Registers
 
 
 @pytest.mark.parametrize(

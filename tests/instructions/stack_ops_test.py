@@ -1,12 +1,9 @@
-from tests import path_fix
-path_fix()
-
 import pytest
 
-import instructions.stack_ops as op
+import ssmal.instructions.stack_ops as op
 
-from components.memory import Memory
-from components.registers import Registers
+from ssmal.components.memory import Memory
+from ssmal.components.registers import Registers
 
 
 @pytest.mark.parametrize("address,value", [(2, 1), (3, -1)])
@@ -22,7 +19,7 @@ def test_PSH_POP_A(address: int, value: int):
     assert r.SP == address
 
 
-@pytest.mark.parametrize("start,address", [(0,8), (2,8)])
+@pytest.mark.parametrize("start,address", [(0, 8), (2, 8)])
 def test_CALi(start: int, address: int):
     m = Memory()
     r = Registers(IP=start, SP=16)
@@ -34,7 +31,8 @@ def test_CALi(start: int, address: int):
     assert r.SP == 16
     assert r.IP == start + 5
 
-@pytest.mark.parametrize("start,A", [(0,8), (2,8)])
+
+@pytest.mark.parametrize("start,A", [(0, 8), (2, 8)])
 def test_CALA(start: int, A: int):
     m = Memory()
     r = Registers(IP=start, SP=16, A=A)
@@ -45,7 +43,8 @@ def test_CALA(start: int, A: int):
     assert r.SP == 16
     assert r.IP == start + 1
 
-@pytest.mark.parametrize("start,A,address", [(0,8,12), (2,8,12)])
+
+@pytest.mark.parametrize("start,A,address", [(0, 8, 12), (2, 8, 12)])
 def test_CAL_(start: int, A: int, address: int):
     m = Memory()
     r = Registers(IP=start, SP=16, A=A)

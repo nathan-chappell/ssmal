@@ -1,11 +1,7 @@
-from tests import path_fix
-
-path_fix()
-
 import typing as T
 import pytest
 
-from util.get_chunks import get_chunks
+from ssmal.util.get_chunks import get_chunks
 
 
 @pytest.mark.parametrize(
