@@ -15,6 +15,31 @@
 # NOTE:
 # "Failing" the `black` command just means that black ran and some file was reformatted.
 
+
+function Bannerfy([string[]] $lines) {
+    $lines | Measure-Object -Property Length -Maximum | Set-Variable 'stats'
+    $leftSide = '*'
+    $rightSide = '*'
+    $padding = 2
+    $topAndBottom = '*' * ($stats.Maximum + $leftSide.Length + $rightSide.Length + 2 * $padding)
+
+    $topAndBottom | Write-Host -BackgroundColor Blue -NoNewline
+    '' | Write-Host -BackgroundColor Black
+
+    $lines | ForEach-Object {
+        $leftSide | Write-Host -BackgroundColor Blue -NoNewline
+        ' ' * $padding | Write-Host -BackgroundColor Black -NoNewline
+        $_ | Write-Host -BackgroundColor Black -NoNewline
+        ' ' * ($stats.Maximum - $_.Length) | Write-Host -BackgroundColor Black -NoNewline
+        ' ' * $padding | Write-Host -BackgroundColor Black -NoNewline
+        $rightSide | Write-Host -BackgroundColor Blue -NoNewline
+        '' | Write-Host -BackgroundColor Black
+    }
+
+    $topAndBottom | Write-Host -BackgroundColor Blue -NoNewline
+    '' | Write-Host -BackgroundColor Black
+}
+
 $Commands = @(
     @{ 
         Command = 'black --check .';
@@ -44,30 +69,6 @@ $Commands | ForEach-Object {
         $_.Message | Write-Error
         exit 1
     }
-}
-
-function Bannerfy([string[]] $lines) {
-    $lines | Measure-Object -Property Length -Maximum | Set-Variable 'stats'
-    $leftSide = '*'
-    $rightSide = '*'
-    $padding = 2
-    $topAndBottom = '*' * ($stats.Maximum + $leftSide.Length + $rightSide.Length + 2 * $padding)
-
-    $topAndBottom | Write-Host -BackgroundColor Blue -NoNewline
-    '' | Write-Host -BackgroundColor Black
-
-    $lines | ForEach-Object {
-        $leftSide | Write-Host -BackgroundColor Blue -NoNewline
-        ' ' * $padding | Write-Host -BackgroundColor Black -NoNewline
-        $_ | Write-Host -BackgroundColor Black -NoNewline
-        ' ' * ($stats.Maximum - $_.Length) | Write-Host -BackgroundColor Black -NoNewline
-        ' ' * $padding | Write-Host -BackgroundColor Black -NoNewline
-        $rightSide | Write-Host -BackgroundColor Blue -NoNewline
-        '' | Write-Host -BackgroundColor Black
-    }
-
-    $topAndBottom | Write-Host -BackgroundColor Blue -NoNewline
-    '' | Write-Host -BackgroundColor Black
 }
 
 $successMessage = 'dev-pipline completed successfully!', "Have a `u{1f32e}"
