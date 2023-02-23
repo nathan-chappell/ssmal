@@ -15,8 +15,6 @@
 # NOTE:
 # "Failing" the `black` command just means that black ran and some file was reformatted.
 
-# . .\Scripts\Activate.ps1
-
 $Commands = @(
     @{ 
         Command = 'black --check .';
