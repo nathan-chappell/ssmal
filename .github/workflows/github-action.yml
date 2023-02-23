@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
   pull_request:
-    types: [opened, review_requested]
+    types: [opened, edited, synchronize]
 
 jobs:
   dev-pipeline:
