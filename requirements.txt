@@ -1,5 +1,5 @@
+-e src
+black
+pyright
 pytest
 pytest-asyncio
-black
-ipython
--e src

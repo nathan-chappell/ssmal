@@ -11,14 +11,8 @@ T = Token
 @pytest.mark.parametrize(
     "input,expected",
     [
-        (
-            "",
-            [],
-        ),
-        (
-            "id.ef",
-            [T("id", "id.ef", 0, 0)],
-        ),
+        ("", []),
+        ("id.ef", [T("id", "id.ef", 0, 0)]),
         (
             "id.ef .dir 123 0x123 'foo ''bar' \"foo \\\"bar\" ; ;comment \n meow",
             # fmt: off

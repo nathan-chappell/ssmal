@@ -14,12 +14,7 @@ import ssmal.instructions.processor_ops as processor_ops
 
 @pytest.mark.parametrize(
     "op,op_name,A,B,expected",
-    [
-        (b"\x10", "ADDB", 3, 4, 7),
-        (b"\x11", "SUBB", 3, 4, -1),
-        (b"\x12", "MULB", 3, 4, 12),
-        (b"\x13", "DIVB", 3, 4, 0),
-    ],
+    [(b"\x10", "ADDB", 3, 4, 7), (b"\x11", "SUBB", 3, 4, -1), (b"\x12", "MULB", 3, 4, 12), (b"\x13", "DIVB", 3, 4, 0)],
 )
 def test_arithmetic_opsB(op: bytes, op_name: str, A: int, B: int, expected: int):
     p = Processor()
@@ -32,12 +27,7 @@ def test_arithmetic_opsB(op: bytes, op_name: str, A: int, B: int, expected: int)
 
 @pytest.mark.parametrize(
     "op,op_name,A,i,expected",
-    [
-        (b"\x14", "ADDi", 3, 4, 7),
-        (b"\x15", "SUBi", 3, 4, -1),
-        (b"\x16", "MULi", 3, 4, 12),
-        (b"\x17", "DIVi", 3, 4, 0),
-    ],
+    [(b"\x14", "ADDi", 3, 4, 7), (b"\x15", "SUBi", 3, 4, -1), (b"\x16", "MULi", 3, 4, 12), (b"\x17", "DIVi", 3, 4, 0)],
 )
 def test_arithmetic_opsi(op: bytes, op_name: str, A: int, i: int, expected: int):
     p = Processor()
@@ -52,12 +42,7 @@ def test_arithmetic_opsi(op: bytes, op_name: str, A: int, i: int, expected: int)
 
 @pytest.mark.parametrize(
     "op,op_name,A,B,v,expected",
-    [
-        (b"\x18", "ADD_", 3, 1, 4, 7),
-        (b"\x19", "SUB_", 3, 1, 4, -1),
-        (b"\x1a", "MUL_", 3, 2, 4, 12),
-        (b"\x1b", "DIV_", 3, 2, 4, 0),
-    ],
+    [(b"\x18", "ADD_", 3, 1, 4, 7), (b"\x19", "SUB_", 3, 1, 4, -1), (b"\x1a", "MUL_", 3, 2, 4, 12), (b"\x1b", "DIV_", 3, 2, 4, 0)],
 )
 def test_arithmetic_ops_(op: bytes, op_name: str, A: int, B: int, v: int, expected: int):
     p = Processor()
@@ -85,23 +70,11 @@ R = Registers
         ("POPA", b"\x31\x12\x00\x00\x00", R(SP=5), None, R(SP=1, A=0x12, IP=1)),
         ("CALi", b"\x32\x20\x00\x00\x00", R(SP=5), b"\x32\x05\x00\x00\x00\x01\x00\x00\x00", R(IP=0x20, SP=9)),
         ("CALA", b"\x33", R(SP=1, A=0x66), b"\x32\x01\x00\x00\x00", R(IP=0x66, SP=5, A=0x66)),
-        (
-            "CAL_",
-            b"\x34\x12\x00\x00\x00",
-            R(SP=6, A=1),
-            b"\x34\x12\x00\x00\x00\x00\x01\x00\x00\x00",
-            R(IP=0x12, SP=10, A=1),
-        ),
+        ("CAL_", b"\x34\x12\x00\x00\x00", R(SP=6, A=1), b"\x34\x12\x00\x00\x00\x00\x01\x00\x00\x00", R(IP=0x12, SP=10, A=1)),
         ("RETN", b"\x35\x00\x00\x00", R(SP=4), None, R(IP=0x35, SP=0)),
     ],
 )
-def test_processor_generic(
-    name: str,
-    b0: bytes,
-    r0: Registers,
-    b1: T.Optional[bytes],
-    r1: Registers,
-):
+def test_processor_generic(name: str, b0: bytes, r0: Registers, b1: T.Optional[bytes], r1: Registers):
     p = Processor()
     p.memory.store_bytes(0, b0)
     p.registers = r0
@@ -130,12 +103,7 @@ def test_sys_call(A: int, _memory: bytes, expected_out: str):
     def _raise_test(*args, **kwargs):
         raise TestSignal()
 
-    p.sys_vector = {
-        sys_io.PREG: _raise_test,
-        sys_io.PTOPi: _raise_test,
-        sys_io.PTOPx: _raise_test,
-        sys_io.PTOPz: _raise_test,
-    }
+    p.sys_vector = {sys_io.PREG: _raise_test, sys_io.PTOPi: _raise_test, sys_io.PTOPx: _raise_test, sys_io.PTOPz: _raise_test}
 
     # p.sys_io.bind(cin=io.StringIO(), cout=io.StringIO())
     with pytest.raises(TestSignal):

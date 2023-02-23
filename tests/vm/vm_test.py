@@ -21,7 +21,7 @@ class MultiException(Exception):
         self.exceptions = exceptions
 
 
-def _cleanup_paths(pathnames: T.List[str]) -> T.Generator[None, None, None]:
+def _cleanup_paths(pathnames: T.List[str]):
     exceptions = []
     for pathname in pathnames:
         path = Path(pathname)
@@ -41,22 +41,10 @@ def _cleanup_paths(pathnames: T.List[str]) -> T.Generator[None, None, None]:
 @pytest.mark.parametrize(
     "input_file,expected",
     [
-        (
-            """tests\\test_samples\\file_assembler\\include_bin_1\\ab.al""",
-            b"\xab\x01\x02\x03\x04",
-        ),
-        (
-            """tests\\test_samples\\file_assembler\\include_bin_2\\a\\ab.al""",
-            b"\xab\x01\x02\x03\x04",
-        ),
-        (
-            """tests\\test_samples\\file_assembler\\include_text_1\\ab.al""",
-            b"\xab\x01\x02\x03\x04",
-        ),
-        (
-            """tests\\test_samples\\file_assembler\\include_text_once_1\\ab.al""",
-            b"\xab\x01\x02\x03\x04",
-        ),
+        ("""tests\\test_samples\\file_assembler\\include_bin_1\\ab.al""", b"\xab\x01\x02\x03\x04"),
+        ("""tests\\test_samples\\file_assembler\\include_bin_2\\a\\ab.al""", b"\xab\x01\x02\x03\x04"),
+        ("""tests\\test_samples\\file_assembler\\include_text_1\\ab.al""", b"\xab\x01\x02\x03\x04"),
+        ("""tests\\test_samples\\file_assembler\\include_text_once_1\\ab.al""", b"\xab\x01\x02\x03\x04"),
     ],
 )
 def test_vm_assemble(input_file: str, expected: bytes):
@@ -76,12 +64,7 @@ def test_vm_assemble(input_file: str, expected: bytes):
         _cleanup_paths([input_file_variant.object_filename, input_file_variant.debug_filename])
 
 
-@pytest.mark.parametrize(
-    "input_file,expected",
-    [
-        ("""tests\\test_samples\\vm\\hello_world_1\\hello_world.al""", "hello world!"),
-    ],
-)
+@pytest.mark.parametrize("input_file,expected", [("""tests\\test_samples\\vm\\hello_world_1\\hello_world.al""", "hello world!")])
 def test_vm_pipeline(input_file: str, expected: str):
     cin = io.StringIO()
     cout = io.StringIO()
@@ -98,3 +81,6 @@ def test_vm_pipeline(input_file: str, expected: str):
         assert cout.getvalue() == expected
     finally:
         _cleanup_paths([input_file_variant.object_filename, input_file_variant.debug_filename])
+
+
+# TODO: more tests to get all sys_io vectors
