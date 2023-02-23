@@ -27,13 +27,7 @@ class SysIO:
         def _nop(*args, **kwargs):
             pass
 
-        self.sys_vector = {
-            PTOPz: _nop,
-            PTOPi: _nop,
-            PTOPx: _nop,
-            PREG: _nop,
-            PMEM: _nop,
-        }
+        self.sys_vector = {PTOPz: _nop, PTOPi: _nop, PTOPx: _nop, PREG: _nop, PMEM: _nop}
 
     def bind(self, cin: T.Optional[T.TextIO] = None, cout: T.Optional[T.TextIO] = None):
         if cin is not None:
@@ -41,13 +35,16 @@ class SysIO:
         if cout is not None:
             self.cout = cout
 
-        self.sys_vector = {
-            PTOPz: partial(print_top_z, cin=self.cin, cout=self.cout, max_zstrlen=self.max_zstrlen),
-            PTOPi: partial(print_top_z, cin=self.cin, cout=self.cout, max_zstrlen=self.max_zstrlen),
-            PTOPx: partial(print_top_z, cin=self.cin, cout=self.cout, max_zstrlen=self.max_zstrlen),
-            PREG: partial(print_top_z, cin=self.cin, cout=self.cout, max_zstrlen=self.max_zstrlen),
-            PMEM: partial(print_top_z, cin=self.cin, cout=self.cout, max_zstrlen=self.max_zstrlen),
-        }
+        if self.cout is not None and self.cin is not None:
+            self.sys_vector = {
+                PTOPz: partial(print_top_z, cin=self.cin, cout=self.cout, max_zstrlen=self.max_zstrlen),
+                PTOPi: partial(print_top_z, cin=self.cin, cout=self.cout, max_zstrlen=self.max_zstrlen),
+                PTOPx: partial(print_top_z, cin=self.cin, cout=self.cout, max_zstrlen=self.max_zstrlen),
+                PREG: partial(print_top_z, cin=self.cin, cout=self.cout, max_zstrlen=self.max_zstrlen),
+                PMEM: partial(print_top_z, cin=self.cin, cout=self.cout, max_zstrlen=self.max_zstrlen),
+            }
+        else:
+            raise RuntimeError("Binding SysIO failed: ensure cin and cout are both supplied.")
 
 
 def print_top_z(r: Registers, m: Memory, cin: T.TextIO, cout: T.TextIO, max_zstrlen: int) -> None:

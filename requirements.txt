@@ -1,4 +1,5 @@
-pytest
-black
-ipython
 -e src
+black
+pyright
+pytest
+pytest-asyncio

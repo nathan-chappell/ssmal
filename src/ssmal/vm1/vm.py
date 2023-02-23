@@ -63,4 +63,3 @@ class VM:
                 self.processor.advance()
         except HaltSignal:
             pass
-

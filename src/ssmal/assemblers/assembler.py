@@ -5,9 +5,11 @@ from ssmal.processors.opcodes import opcode_map
 from ssmal.assemblers.token import Token
 from ssmal.assemblers.errors import UnexpectedTokenError
 
+TByteOrder = T.Literal["little", "big"]
+
 
 class Assembler:
-    byteorder: T.Literal["little", "big"] = "little"
+    byteorder: TByteOrder = "little"
     encoding: T.Literal["ascii", "latin1"] = "ascii"
 
     buffer: io.BytesIO
@@ -74,10 +76,7 @@ class Assembler:
                 if t0.value == ".def":
                     self.symbol_table[self.get_symbol(t1)] = self.get_bytes(t2)
                 elif t0.value == ".repeat":
-                    self.emit(
-                        T.cast(int, self.get_repeated_value(t1)) * self.get_bytes(t2),
-                        t0,
-                    )
+                    self.emit(T.cast(int, self.get_repeated_value(t1)) * self.get_bytes(t2), t0)
                 else:
                     raise UnexpectedTokenError(t0, "Error processing directive.")
 
@@ -100,7 +99,7 @@ class Assembler:
     def get_address(self, token: Token) -> int:
         return self._get_int_value(token)
 
-    def get_byteorder(self, token: Token) -> T.Literal["little", "big"]:
+    def get_byteorder(self, token: Token) -> TByteOrder:
         result = self._get_str_value(token)
         if result in ("little", "big"):
             return result
