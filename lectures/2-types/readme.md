@@ -12,24 +12,53 @@ Some languages offer the ability to read, and even modify, information about typ
 
 TODO: come up with a "framework" for demonstrating the type systems I want to show...
 
-curry-howard
+## Simple Types
 
-* Basic definitions, problems (checking, inference)
-* Mathematical theory of simple types (trees, functions over strings)
-* Technical and intersting aspects of typing in python
-* Some theoretical / conceptualization of the interesting typing issues
-* *BONUS* Complexity, Decidability
-
-## Polymorphism
-* ad-hoc and dependent types
-* subtyping
-* virtual methods and the coproduct
+* definition, usage in python, checking, inference
+* implicational fragment of predicate logic
+* __WARNING: MATH__ Types as Trees
 
 ## Recursive Types
-* basics...
 
+* definition, usage in python, checking, inference
+* typing the Y-Combinator
+* __WARNING: MATH__ Recursive-types as Trees, regular-languages
 
+## Subtype-Polymorphism
 
+### Nominal Subtyping
+
+* inheritance + transitivity
+* definition, usage in python, checking, inference
+
+### Structural Subtyping
+
+* *ducktyping*
+* definition, usage in python, checking, inference
+
+## Generalized Type Systems
+
+Functions are of the `kind`: `value -> value`
+
+Other `kinds` include:
+* `value -> Type` - think of overloaded functions
+* `Type -> Type` - think of generic containers
+* `Type -> value` is less interesting, but we can encode computation into the type system...
+
+### Ad-hoc Polymorphism
+
+* `value -> Type`
+* definition, usage in python, checking, inference
+* overloads, dependent-types
+* first-order logic
+
+### Parametric Polymorphism
+
+* `Type -> Type`
+* definition, usage in python, checking, inference
+* overloads, dependent-types
+* second-order logic
+* typing the Y-Combinator
 
 # Assignment:
 
