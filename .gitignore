@@ -15,3 +15,7 @@ src/ssmal.egg-info
 # binary files from demo
 demo/**/*.bin
 demo/**/*.ssmdebug.json
+
+# test artifacts
+coverage.xml
+.coverage

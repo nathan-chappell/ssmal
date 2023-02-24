@@ -1,6 +1,7 @@
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
+addopts = "--cov=ssmal --cov-report xml"
 
 [tool.black]
 line-length = 140

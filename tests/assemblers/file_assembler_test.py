@@ -3,6 +3,7 @@ from typing import List, Dict
 import pytest
 
 from ssmal.assemblers.file_assembler import FileAssembler
+from ssmal.assemblers.errors import UnexpectedTokenError
 
 
 @pytest.mark.parametrize(
@@ -18,3 +19,16 @@ def test_assembler(input_file: str, expected: bytes):
     assembler = FileAssembler()
     assembler.assemble_file(input_file)
     assert assembler.buffer.getvalue()[0 : len(expected)] == expected
+
+
+@pytest.mark.parametrize(
+    "input_file,error_type",
+    [
+        ("""tests\\test_samples\\file_assembler\\unexpected_token\\include_arg.al""", UnexpectedTokenError),
+        ("""tests\\test_samples\\file_assembler\\unexpected_token\\filename.al""", UnexpectedTokenError),
+    ],
+)
+def test_assembler_error(input_file: str, error_type: type):
+    assembler = FileAssembler()
+    with pytest.raises(error_type):
+        assembler.assemble_file(input_file)
