@@ -41,10 +41,10 @@ def _cleanup_paths(pathnames: T.List[str]):
 @pytest.mark.parametrize(
     "input_file,expected",
     [
-        ("""tests\\test_samples\\file_assembler\\include_bin_1\\ab.al""", b"\xab\x01\x02\x03\x04"),
-        ("""tests\\test_samples\\file_assembler\\include_bin_2\\a\\ab.al""", b"\xab\x01\x02\x03\x04"),
-        ("""tests\\test_samples\\file_assembler\\include_text_1\\ab.al""", b"\xab\x01\x02\x03\x04"),
-        ("""tests\\test_samples\\file_assembler\\include_text_once_1\\ab.al""", b"\xab\x01\x02\x03\x04"),
+        ("""tests\\ssmal\\test_samples\\file_assembler\\include_bin_1\\ab.al""", b"\xab\x01\x02\x03\x04"),
+        ("""tests\\ssmal\\test_samples\\file_assembler\\include_bin_2\\a\\ab.al""", b"\xab\x01\x02\x03\x04"),
+        ("""tests\\ssmal\\test_samples\\file_assembler\\include_text_1\\ab.al""", b"\xab\x01\x02\x03\x04"),
+        ("""tests\\ssmal\\test_samples\\file_assembler\\include_text_once_1\\ab.al""", b"\xab\x01\x02\x03\x04"),
     ],
 )
 def test_vm_assemble(input_file: str, expected: bytes):
@@ -64,7 +64,7 @@ def test_vm_assemble(input_file: str, expected: bytes):
         _cleanup_paths([input_file_variant.object_filename, input_file_variant.debug_filename])
 
 
-@pytest.mark.parametrize("input_file,expected", [("""tests\\test_samples\\vm\\hello_world_1\\hello_world.al""", "hello world!")])
+@pytest.mark.parametrize("input_file,expected", [("""tests\\ssmal\\test_samples\\vm\\hello_world_1\\hello_world.al""", "hello world!")])
 def test_vm_pipeline(input_file: str, expected: str):
     cin = io.StringIO()
     cout = io.StringIO()
