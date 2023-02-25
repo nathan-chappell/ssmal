@@ -67,14 +67,14 @@ $Commands = @(
         Message = 'Formatting failed.', "Run 'black .' to fix.";
     }
     @{ 
-        Command = 'pyright';
-        Module  = 'pyright';
-        Message = 'Type checking failed.', 'Fix all issues and re-run command.';
-    }
-    @{ 
         Command = 'pytest';
         Module  = 'pytest';
         Message = 'Regression tests failed.', 'Fix all issues and re-run command.';
+    }
+    @{ 
+        Command = 'pyright';
+        Module  = 'pyright';
+        Message = 'Type checking failed.', 'Fix all issues and re-run command.';
     }
 )
 

@@ -1,7 +1,7 @@
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
-addopts = "--cov=ssmal --cov-report xml"
+addopts = ["--cov=ssmal", "--cov-report=xml"]
 
 [tool.black]
 line-length = 140
@@ -9,3 +9,21 @@ skip-magic-trailing-comma = true
 
 [tool.pyright]
 include = ["src/ssmal", "tests"]
+strictListInference = true
+strictDictionaryInference = true
+strictSetInference = true
+strictParameterNoneValue = false
+reportUnusedVariable = "warning"
+reportDuplicateImport = "warning"
+reportWildcardImportFromLibrary = "warning"
+reportUntypedNamedTuple = "error"
+reportPrivateUsage = "warning"
+reportIncompatibleMethodOverride = "warning"
+reportIncompatibleVariableOverride = "warning"
+# reportMissingSuperCall = "error"
+reportUninitializedInstanceVariable = "warning"
+reportUnnecessaryCast = "information"
+reportUnnecessaryComparison = "information"
+reportUnnecessaryContains = "information"
+reportAssertAlwaysTrue = "information"
+reportUnnecessaryTypeIgnoreComment = "information"
