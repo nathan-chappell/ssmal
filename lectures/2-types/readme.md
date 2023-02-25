@@ -61,19 +61,33 @@ This set the stage for the typing tools that followed.
 * **PEP 498, formatted string literals.**
 * **PEP 526, syntax for variable annotations.**
 
+#### [What’s New In Python 3.7. 27-Jun-2018](https://docs.python.org/3.6/whatsnew/3.6.html)
+
+* **PEP 553, the new breakpoint() function.**
+* **PEP 557 – Data Classes**
+* **PEP 560, core support for typing module and generic types.**
+* **PEP 563, postponed evaluation of type annotations.**
+
+#### [What’s New In Python 3.8. 14-Oct-2019](https://docs.python.org/3.6/whatsnew/3.6.html)
+
+* **PEP 570 – Python Positional-Only Parameters**
+* **PEP 572 – Assignment Expressions.** (These made Guido quit BDIC)
+
+#### [What’s New In Python 3.9. 5-Oct-2020](https://docs.python.org/3.6/whatsnew/3.6.html)
+
+* **PEP 585 – Type Hinting Generics In Standard Collections**
+* **PEP 593 - flexible function and variable annotations;**
+
+#### [What’s New In Python 3.10. 4-Oct-2021](https://docs.python.org/3.6/whatsnew/3.6.html)
+
+* **PEP 604 - Allow writing union types as X | Y**
+* **PEP 612 - Parameter Specification Variables**
+* **PEP 613 - Explicit Type Aliases**
+* **PEP 647 - User-Defined Type Guards**
+
 #### **Today**
 
-We can look at the git repo for pyright, and see
 
-```
-commit 60c76da87d85a24d4b06009eae224d0363349f44
-Author: Microsoft GitHub User <msftgits@microsoft.com>
-Date:   Mon Mar 11 20:38:47 2019 -0700
-
-    Initial commit
-```
-
-And at *PyPi* to find that it's initial release was *Jun 20, 2021*.
 
 # 
 
