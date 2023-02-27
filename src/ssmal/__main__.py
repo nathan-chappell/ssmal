@@ -19,11 +19,11 @@ if args.machine == "vm1":
 else:
     raise Exception(f"Uknown machine specified: {args.machine}")
 if args.compile:
-    if not filename.endswith(InputFileVariant.suffix_map.assembler_file_suffix):
+    if not filename.endswith(InputFileVariant.assembler_file_suffix):
         raise RuntimeError(f"{filename} does not look like a ssmal assembler file - missing .al extension")
     vm.assemble(filename)
 elif args.run:
-    if not filename.endswith(InputFileVariant.suffix_map.object_file_suffix):
+    if not filename.endswith(InputFileVariant.object_file_suffix):
         raise RuntimeError(f"{filename} does not look like a ssmal object file - missing .bin extension")
     vm.run(filename)
 else:

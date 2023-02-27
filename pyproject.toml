@@ -1,10 +1,37 @@
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
+addopts = ["--cov=ssmal", "--cov=simpletypes", "--cov-report=xml"]
 
 [tool.black]
 line-length = 140
 skip-magic-trailing-comma = true
+extend-exclude = "samples"
+
+[tool.coverage.report]
+exclude_lines = ['raise', 'pass', 'pragma: no cover']
+
+[tool.coverage.run]
+# NOTE: we are omitting debug for now, we should still test it eventually
+omit = ["**/__main__.py", "src/ssmal/debug/*"]
 
 [tool.pyright]
-include = ["src/ssmal", "tests"]
+include = ["src/ssmal", "src/simpletypes", "tests"]
+strictListInference = true
+strictDictionaryInference = true
+strictSetInference = true
+strictParameterNoneValue = false
+reportUnusedVariable = "warning"
+reportDuplicateImport = "warning"
+reportWildcardImportFromLibrary = "warning"
+reportUntypedNamedTuple = "error"
+reportPrivateUsage = "warning"
+reportIncompatibleMethodOverride = "warning"
+reportIncompatibleVariableOverride = "warning"
+# reportMissingSuperCall = "error"
+reportUninitializedInstanceVariable = "warning"
+reportUnnecessaryCast = "information"
+reportUnnecessaryComparison = "information"
+reportUnnecessaryContains = "information"
+reportAssertAlwaysTrue = "information"
+reportUnnecessaryTypeIgnoreComment = "information"
