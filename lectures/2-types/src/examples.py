@@ -9,21 +9,28 @@ import typing as T
 # Generics, Covariance, Contravariance, and a recursive type!
 """
 
-TLeaf = T.TypeVar('TLeaf')
+TLeaf = T.TypeVar("TLeaf")
 # TLeaf = T.TypeVar('TLeaf', covariant=True)
 # TLeaf = T.TypeVar('TLeaf', contravariant=True)
 
-NatList = T.Union[None, T.Tuple[int, 'NatList']]
+NatList = T.Union[None, T.Tuple[int, "NatList"]]
 
-x: NatList = (1,(2,None))
+x: NatList = (1, (2, None))
+
 
 class Tree(T.Generic[TLeaf]):
-    left: T.Optional['Tree[TLeaf]'] = None
-    right: T.Optional['Tree[TLeaf]'] = None
+    left: T.Optional["Tree[TLeaf]"] = None
+    right: T.Optional["Tree[TLeaf]"] = None
     value: T.Optional[TLeaf] = None
 
-class Base: ...
-class Derived(Base): ...
+
+class Base:
+    ...
+
+
+class Derived(Base):
+    ...
+
 
 tbase: Tree[Base] = Tree()
 tderived: Tree[Derived] = Tree()
@@ -32,6 +39,7 @@ tderived: Tree[Derived] = Tree()
 # tderived = tbase
 
 # Most straight-forward OOP recursive type...
+
 
 class ListNode:
     value: int
@@ -42,21 +50,23 @@ class ListNode:
         self.next = next
 
     @staticmethod
-    def demo_create() -> 'ListNode':
+    def demo_create() -> "ListNode":
         return ListNode(1, ListNode(2, None))
 
 
 # Notice difference with:
 
-TListNode = None | tuple[int, 'TListNode']
+TListNode = None | tuple[int, "TListNode"]
+
 
 def demo_t_list_node():
     t_list_node: TListNode
-    t_list_node = (1,(2,None))
+    t_list_node = (1, (2, None))
 
     # what about this?
     t_list_node = None
     list_node: ListNode = None
+
 
 #############
 #############
@@ -72,7 +82,8 @@ def demo_t_list_node():
 #############
 #############
 
-NodeType = T.TypeVar('NodeType')
+NodeType = T.TypeVar("NodeType")
+
 
 class GenericListNode(T.Generic[NodeType]):
     value: NodeType
@@ -85,10 +96,11 @@ class GenericListNode(T.Generic[NodeType]):
     @staticmethod
     def demo_create(t: NodeType) -> GenericListNode[NodeType]:
         # mypy catches this
-        result = GenericListNode('foo', GenericListNode(2, None))
+        result = GenericListNode("foo", GenericListNode(2, None))
         return result
 
-TGenericNodeList = None | tuple[NodeType, 'TGenericNodeList[NodeType]']
+
+TGenericNodeList = None | tuple[NodeType, "TGenericNodeList[NodeType]"]
 
 
 def demo_t_generic_list_node():
@@ -98,8 +110,8 @@ def demo_t_generic_list_node():
     # what about this?
     t_list_node = None
     # list_node: GenericListNode[int] = None
-    r = GenericListNode[int].demo_create('foo')
-    r = GenericListNode[object].demo_create('foo')
+    r = GenericListNode[int].demo_create("foo")
+    r = GenericListNode[object].demo_create("foo")
 
 
-l: list[int] = list[int](['foo','bar'])
+l: list[int] = list[int](["foo", "bar"])

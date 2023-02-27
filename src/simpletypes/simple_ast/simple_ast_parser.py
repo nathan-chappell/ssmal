@@ -122,7 +122,7 @@ def parse_Program(module: ast.Module) -> N.Program:
 
 # TODO: module interaface...
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     import argparse
     import pprint
     import sys
