@@ -57,6 +57,12 @@ class VariableDef(Statement):
     type: TypeName
 
 
+# @dataclass
+# class TypeAlias(Statement):
+#     name: Identifier
+#     value: Expression
+
+
 @dataclass
 class Program(SimpleAstNodeBase):
     statements: list[Statement]

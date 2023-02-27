@@ -101,12 +101,17 @@ def parse_VariableDef(ann_assign: ast.AnnAssign) -> N.Statement:
     # fmt: on
 
 
+# def parse_TypeAlias(ann_assign: ast.AnnAssign) -> N.Statement:
+# Maybe in the future...
+
+
 def parse_Program(module: ast.Module) -> N.Program:
     body: list[N.Statement] = []
     # fmt: off
     for node in module.body:
         match node:
-            case ast.AnnAssign():           body.append(parse_VariableDef(node))
+            case ast.AnnAssign(value=None): body.append(parse_VariableDef(node))
+            # case ast.AnnAssign(annotation=ast.Name(id='type')): body.append(parse_TypeAlias(node))
             case ast.Assign():              body.append(parse_AssignmentStmt(node))
             case ast.ClassDef():            body.append(parse_ClassDef(node))
             case ast.FunctionDef():         body.append(parse_FunctionDef(node))
@@ -114,17 +119,19 @@ def parse_Program(module: ast.Module) -> N.Program:
     # fmt: on
     return N.Program(body)
 
+
 # TODO: module interaface...
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import argparse
     import pprint
     import sys
+
     argument_parser = argparse.ArgumentParser()
-    argument_parser.add_argument('filename')
+    argument_parser.add_argument("filename")
 
     args = argument_parser.parse_args(sys.argv[1:])
     with open(args.filename) as f:
         source_code = f.read()
-        program = parse_Program(compile(source_code, args.filename, 'exec', ast.PyCF_ONLY_AST))
+        program = parse_Program(compile(source_code, args.filename, "exec", ast.PyCF_ONLY_AST))
         pprint.pprint(program)
