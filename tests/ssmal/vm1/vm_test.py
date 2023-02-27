@@ -58,7 +58,7 @@ def test_vm_assemble(input_file: str, expected: bytes):
         with open(input_file_variant.debug_filename, "rt") as f:
             debug_info = json.load(f)
             assert debug_info["version"] == "0.0"
-            symbol_table = {byte: Token(**token) for byte, token in debug_info["source_map"].items()}
+            _symbol_table = {byte: Token(**token) for byte, token in debug_info["source_map"].items()}
             # I guess for now just assert no error occurs here...
     finally:
         _cleanup_paths([input_file_variant.object_filename, input_file_variant.debug_filename])

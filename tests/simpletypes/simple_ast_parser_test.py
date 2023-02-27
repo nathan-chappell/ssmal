@@ -2,9 +2,20 @@ import ast
 import pytest
 
 import simpletypes
+from simpletypes.simple_ast.simple_ast_nodes import (
+    AssignmentStmt,
+    CallExpr,
+    ClassDef,
+    FunctionDef,
+    Identifier,
+    IdentifierExpr,
+    Program,
+    TypeName,
+    ValueExpr,
+    VariableDef,
+)
 
 from simpletypes.simple_ast.simple_ast_parser import parse_Program
-from simpletypes.simple_ast.simple_ast_nodes import *
 
 _I = Identifier
 _T = TypeName

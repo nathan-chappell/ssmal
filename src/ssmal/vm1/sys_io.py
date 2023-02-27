@@ -38,10 +38,10 @@ class SysIO:
         if self.cout is not None and self.cin is not None:
             self.sys_vector = {
                 PTOPz: partial(print_top_z, cin=self.cin, cout=self.cout, max_zstrlen=self.max_zstrlen),
-                PTOPi: partial(print_top_z, cin=self.cin, cout=self.cout, max_zstrlen=self.max_zstrlen),
-                PTOPx: partial(print_top_z, cin=self.cin, cout=self.cout, max_zstrlen=self.max_zstrlen),
-                PREG: partial(print_top_z, cin=self.cin, cout=self.cout, max_zstrlen=self.max_zstrlen),
-                PMEM: partial(print_top_z, cin=self.cin, cout=self.cout, max_zstrlen=self.max_zstrlen),
+                PTOPi: partial(print_top_i, cin=self.cin, cout=self.cout, max_zstrlen=self.max_zstrlen),
+                PTOPx: partial(print_top_x, cin=self.cin, cout=self.cout, max_zstrlen=self.max_zstrlen),
+                PREG: partial(print_registers, cin=self.cin, cout=self.cout, max_zstrlen=self.max_zstrlen),
+                PMEM: partial(print_memory, cin=self.cin, cout=self.cout, max_zstrlen=self.max_zstrlen),
             }
         else:
             raise RuntimeError("Binding SysIO failed: ensure cin and cout are both supplied.")
@@ -68,7 +68,7 @@ def print_registers(r: Registers, m: Memory, cin: T.TextIO, cout: T.TextIO, max_
     cout.write(str(r))
 
 
-def print_memory(r: Registers, m: Memory, cin: T.TextIO, cout: T.TextIO, max_zstrlen: int) -> None:
+def print_memory(r: Registers, m: Memory, cin: T.TextIO, cout: T.TextIO, max_zstrlen: int) -> None:  # pragma: no cover
     start = m.load(r.SP - 8, 4)
     count = m.load(r.SP - 4, 4)
     cout.write("\n".join(hexdump_bytes(m.load_bytes(start, count))))
