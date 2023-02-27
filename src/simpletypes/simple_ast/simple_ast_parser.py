@@ -6,15 +6,11 @@ import typing as T
 import simpletypes.simple_ast.simple_ast_nodes as N
 
 
-def _get_ast(filename: str | Path):
-    with open(filename, "r") as f:
-        return compile(f.read(), str(filename), "exec", ast.PyCF_ONLY_AST)
-
-
-def _get_identifier(node: ast.Name | None) -> N.IdentifierExpr:
+def _get_identifier(node: ast.Name | None) -> N.Identifier:
     # fmt: off
     match node:
-        case ast.Name():      return N.IdentifierExpr(T.cast(N.Identifier, node.id))
+        # case ast.Name():      return N.IdentifierExpr(T.cast(N.Identifier, node.id))
+        case ast.Name():      return T.cast(N.Identifier, node.id)
         case _: raise UnexpectedNode(node)
     # fmt: on
 
@@ -24,11 +20,11 @@ def _get_typename(node: ast.Constant | ast.Name | ast.expr | None) -> N.TypeName
     # fmt: off
     match node:
         case ast.Constant():
-            if isinstance(node.value, str):
-                typename = node.value
-            else:
-                raise UnexpectedNode(node, 'must supply string for type constants')
-        case ast.Name(): typename = _get_identifier(node).identifier
+            match node.value:
+                case str(): typename = node.value
+                case None: typename = 'None'
+                case _: raise UnexpectedNode(node, 'must supply string for type constants')
+        case ast.Name(): typename = _get_identifier(node)
         case _: raise UnexpectedNode(node)
     # fmt: on
     return T.cast(N.TypeName, typename)
@@ -51,7 +47,7 @@ class UnexpectedNode(ParseException):
 def parse_CallExpr(call: ast.Call) -> N.CallExpr:
     # fmt: off
     match call.func:
-        case ast.Name():        function_name = _get_identifier(call.func).identifier
+        case ast.Name():        function_name = _get_identifier(call.func)
         case _: raise UnexpectedNode(call)
     # fmt: on
 
@@ -63,7 +59,7 @@ def parse_CallExpr(call: ast.Call) -> N.CallExpr:
 def parse_Expression(expr: ast.expr) -> N.Expression:
     # fmt: off
     match expr:
-        case ast.Name():        return _get_identifier(expr)
+        case ast.Name():        return N.IdentifierExpr(_get_identifier(expr))
         case ast.Constant():    return _get_value(expr)
         case ast.Call():        return parse_CallExpr(expr)
         case _: raise UnexpectedNode(expr)
@@ -77,7 +73,7 @@ def parse_AssignmentStmt(ann_assign: ast.Assign) -> N.Statement:
     value = parse_Expression(ann_assign.value)
     # fmt: off
     match target:
-        case ast.Name():        return N.AssignmentStmt(_get_identifier(target).identifier, value)
+        case ast.Name():        return N.AssignmentStmt(_get_identifier(target), value)
         case _: raise UnexpectedNode(ann_assign)
     # fmt: on
 
@@ -100,7 +96,7 @@ def parse_VariableDef(ann_assign: ast.AnnAssign) -> N.Statement:
     type_name = _get_typename(ann_assign.annotation)
     # fmt: off
     match ann_assign.target:
-        case ast.Name(): return N.VariableDef(_get_identifier(ann_assign.target).identifier, type_name)
+        case ast.Name(): return N.VariableDef(_get_identifier(ann_assign.target), type_name)
         case _: raise UnexpectedNode(ann_assign)
     # fmt: on
 
@@ -117,3 +113,18 @@ def parse_Program(module: ast.Module) -> N.Program:
             case _: raise UnexpectedNode(node, 'check your grammar')
     # fmt: on
     return N.Program(body)
+
+# TODO: module interaface...
+
+if __name__ == '__main__':
+    import argparse
+    import pprint
+    import sys
+    argument_parser = argparse.ArgumentParser()
+    argument_parser.add_argument('filename')
+
+    args = argument_parser.parse_args(sys.argv[1:])
+    with open(args.filename) as f:
+        source_code = f.read()
+        program = parse_Program(compile(source_code, args.filename, 'exec', ast.PyCF_ONLY_AST))
+        pprint.pprint(program)
