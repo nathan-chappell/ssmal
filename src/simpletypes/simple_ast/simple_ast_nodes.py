@@ -1,7 +1,8 @@
+import typing as T
 from dataclasses import dataclass
 
-TypeName = str
-Identifier = str
+Identifier = T.NewType("Identifier", str)
+TypeName = T.NewType("TypeName", str)
 
 
 class SimpleAstNodeBase:
@@ -17,15 +18,25 @@ class Expression(SimpleAstNodeBase):
 
 
 @dataclass
+class IdentifierExpr(Expression):
+    identifier: Identifier
+
+
+@dataclass
+class ValueExpr(Expression):
+    value: str | int
+
+
+@dataclass
 class CallExpr(Expression):
     function_name: Identifier
-    arguments: list["Identifier | CallExpr"]
+    arguments: list[Expression]
 
 
 @dataclass
 class AssignmentStmt(Statement):
     target_variable: Identifier
-    value: Identifier | CallExpr
+    value: Expression
 
 
 @dataclass
