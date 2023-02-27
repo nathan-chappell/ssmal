@@ -80,12 +80,12 @@ def parse_AssignmentStmt(ann_assign: ast.Assign) -> N.Statement:
 
 def parse_ClassDef(class_def: ast.ClassDef) -> N.Statement:
     name = T.cast(N.TypeName, class_def.name)
-    bases = tuple(_get_typename(base) for base in class_def.bases)
+    bases = list(_get_typename(base) for base in class_def.bases)
     return N.ClassDef(name, bases)
 
 
 def parse_FunctionDef(function_def: ast.FunctionDef) -> N.Statement:
-    parameter_types = tuple(_get_typename(arg.annotation) for arg in function_def.args.args)
+    parameter_types = list(_get_typename(arg.annotation) for arg in function_def.args.args)
     return_type = _get_typename(function_def.returns)
     return N.FunctionDef(parameter_types, return_type)
 

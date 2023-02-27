@@ -42,12 +42,12 @@ class AssignmentStmt(Statement):
 @dataclass
 class ClassDef(Statement):
     name: TypeName
-    bases: tuple[TypeName]
+    bases: list[TypeName]
 
 
 @dataclass
 class FunctionDef(Statement):
-    parameter_types: tuple[TypeName]
+    parameter_types: list[TypeName]
     return_type: TypeName
 
 
@@ -65,4 +65,4 @@ class VariableDef(Statement):
 
 @dataclass
 class Program(SimpleAstNodeBase):
-    statements: list[Statement]
+    statements: T.Sequence[Statement]
