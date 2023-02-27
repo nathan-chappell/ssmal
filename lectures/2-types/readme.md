@@ -2,15 +2,15 @@
 
 ## Overview
 
-Practically speaking, a *type* is metadata associated to a variable or parameter in a program.
-Proper use of *type annotations* and a *type checker* can help ensure program correctness.
-Different *type systems* have different expressive power - some are even turing complete.
-Some tools are capable of *type inference,* which can reduce tedious and error prone coding practices.
-Some languages offer the ability to read, and even modify, information about types *at runtime.*  Such techniques are broadly called *reflection.*
+* Practically speaking, a *type* is metadata associated to a variable or parameter in a program.
+* Proper use of *type annotations* and a *type checker* can help ensure program correctness.
+* Different *type systems* have different expressive power - some are even turing complete.
+* Some tools are capable of *type inference,* which can reduce tedious and error prone coding practices.
+* Some languages offer the ability to read, and even modify, information about types *at runtime.*  Such techniques are broadly called *reflection.*
 
 * Examples...
 
-### History
+## History
 
 #### [PEP 3107 – Function Annotations. 02-Dec-2006](https://peps.python.org/pep-3107/)
 
@@ -58,32 +58,32 @@ This set the stage for the typing tools that followed.
 
 #### [What’s New In Python 3.6. 23-Dec-2016](https://docs.python.org/3.6/whatsnew/3.6.html)
 
-* **PEP 498, formatted string literals.**
-* **PEP 526, syntax for variable annotations.**
+* **[PEP-498](https://peps.python.org/pep-0498) - formatted string literals.**
+* **[PEP-526](https://peps.python.org/pep-0526) - syntax for variable annotations.**
 
 #### [What’s New In Python 3.7. 27-Jun-2018](https://docs.python.org/3.6/whatsnew/3.6.html)
 
-* **PEP 553, the new breakpoint() function.**
-* **PEP 557 – Data Classes**
-* **PEP 560, core support for typing module and generic types.**
-* **PEP 563, postponed evaluation of type annotations.**
+* **[PEP-553](https://peps.python.org/pep-0553) - the new breakpoint() function.**
+* **[PEP-557](https://peps.python.org/pep-0557) - Data Classes**
+* **[PEP-560](https://peps.python.org/pep-0560) - core support for typing module and generic types.**
+* **[PEP-563](https://peps.python.org/pep-0563) - postponed evaluation of type annotations.**
 
 #### [What’s New In Python 3.8. 14-Oct-2019](https://docs.python.org/3.6/whatsnew/3.6.html)
 
-* **PEP 570 – Python Positional-Only Parameters**
-* **PEP 572 – Assignment Expressions.** (These made Guido quit BDIC)
+* **[PEP-570](https://peps.python.org/pep-0570) - Python Positional-Only Parameters**
+* **[PEP-572](https://peps.python.org/pep-0572) - Assignment Expressions.** (These made Guido quit BDIC)
 
 #### [What’s New In Python 3.9. 5-Oct-2020](https://docs.python.org/3.6/whatsnew/3.6.html)
 
-* **PEP 585 – Type Hinting Generics In Standard Collections**
-* **PEP 593 - flexible function and variable annotations;**
+* **[PEP-585](https://peps.python.org/pep-0585) - Type Hinting Generics In Standard Collections**
+* **[PEP-593](https://peps.python.org/pep-0593) - flexible function and variable annotations;**
 
 #### [What’s New In Python 3.10. 4-Oct-2021](https://docs.python.org/3.6/whatsnew/3.6.html)
 
-* **PEP 604 - Allow writing union types as X | Y**
-* **PEP 612 - Parameter Specification Variables**
-* **PEP 613 - Explicit Type Aliases**
-* **PEP 647 - User-Defined Type Guards**
+* **[PEP-604](https://peps.python.org/pep-0604) - Allow writing union types as X | Y**
+* **[PEP-612](https://peps.python.org/pep-0612) - Parameter Specification Variables**
+* **[PEP-613](https://peps.python.org/pep-0613) - Explicit Type Aliases**
+* **[PEP-647](https://peps.python.org/pep-0647) - User-Defined Type Guards**
 
 #### **Today**
 

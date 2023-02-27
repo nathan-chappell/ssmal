@@ -14,7 +14,6 @@ class Assembler:
 
     buffer: io.BytesIO
     source_map: T.Dict[int, Token]
-    included_files: T.Set[str]
     symbol_table: T.Dict[str, bytes]
     tokens: T.List[Token]
 
@@ -75,8 +74,8 @@ class Assembler:
                 t2 = self.eat_token()
                 if t0.value == ".def":
                     self.symbol_table[self.get_symbol(t1)] = self.get_bytes(t2)
-                elif t0.value == ".repeat":
-                    self.emit(T.cast(int, self.get_repeated_value(t1)) * self.get_bytes(t2), t0)
+                # elif t0.value == ".repeat":
+                #     self.emit(T.cast(int, self.get_repeated_value(t1)) * self.get_bytes(t2), t0)
                 else:
                     raise UnexpectedTokenError(t0, "Error processing directive.")
 
@@ -108,18 +107,15 @@ class Assembler:
 
     def get_bytes(self, token: Token) -> bytes:
         if token.type == "xint":
-            return int(token.value, 16).to_bytes(4, self.byteorder)  # type: ignore
+            return int(token.value, 16).to_bytes(4, self.byteorder)
         elif token.type == "dint":
-            return int(token.value).to_bytes(4, self.byteorder)  # type: ignore
+            return int(token.value).to_bytes(4, self.byteorder)
         elif token.type == "bstr":
             return bytes.fromhex(token.value[1:-1])
         elif token.type == "zstr":
             return bytes(token.value[1:-1], self.encoding) + b"\x00"
         else:
             raise UnexpectedTokenError(token, "xint, dint, bstr, zstr")
-
-    def get_count(self, token: Token) -> int:
-        return self._get_int_value(token)
 
     def get_encoding(self, token: Token) -> T.Literal["ascii", "latin1"]:
         result = self._get_str_value(token)
@@ -128,19 +124,19 @@ class Assembler:
         else:
             raise UnexpectedTokenError(token, '"ascii", "latin1"')
 
-    def get_repeated_value(self, token: Token) -> T.Union[int, str, bytes]:
-        if token.type == "xint":
-            return int(token.value, 16)
-        elif token.type == "dint":
-            return int(token.value)
-        elif token.type == "bstr":
-            return bytes(token.value[1:-1], self.encoding)
-        elif token.type == "zstr":
-            return token.value[1:-1]
-        elif token.type == "id":
-            return self.symbol_table[token.value]
-        else:
-            raise UnexpectedTokenError(token, "xint, dint, bstr, zstr, id")
+    # def get_repeated_value(self, token: Token) -> T.Union[int, str, bytes]:
+    #     if token.type == "xint":
+    #         return int(token.value, 16)
+    #     elif token.type == "dint":
+    #         return int(token.value)
+    #     elif token.type == "bstr":
+    #         return bytes(token.value[1:-1], self.encoding)
+    #     elif token.type == "zstr":
+    #         return token.value[1:-1]
+    #     elif token.type == "id":
+    #         return self.symbol_table[token.value]
+    #     else:
+    #         raise UnexpectedTokenError(token, "xint, dint, bstr, zstr, id")
 
     def get_symbol(self, token: Token) -> str:
         if token.type == "id":

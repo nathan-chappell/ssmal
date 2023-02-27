@@ -41,10 +41,10 @@ def _cleanup_paths(pathnames: T.List[str]):
 @pytest.mark.parametrize(
     "input_file,expected",
     [
-        ("""tests\\test_samples\\file_assembler\\include_bin_1\\ab.al""", b"\xab\x01\x02\x03\x04"),
-        ("""tests\\test_samples\\file_assembler\\include_bin_2\\a\\ab.al""", b"\xab\x01\x02\x03\x04"),
-        ("""tests\\test_samples\\file_assembler\\include_text_1\\ab.al""", b"\xab\x01\x02\x03\x04"),
-        ("""tests\\test_samples\\file_assembler\\include_text_once_1\\ab.al""", b"\xab\x01\x02\x03\x04"),
+        ("""tests\\ssmal\\samples\\file_assembler\\include_bin_1\\ab.al""", b"\xab\x01\x02\x03\x04"),
+        ("""tests\\ssmal\\samples\\file_assembler\\include_bin_2\\a\\ab.al""", b"\xab\x01\x02\x03\x04"),
+        ("""tests\\ssmal\\samples\\file_assembler\\include_text_1\\ab.al""", b"\xab\x01\x02\x03\x04"),
+        ("""tests\\ssmal\\samples\\file_assembler\\include_text_once_1\\ab.al""", b"\xab\x01\x02\x03\x04"),
     ],
 )
 def test_vm_assemble(input_file: str, expected: bytes):
@@ -58,13 +58,13 @@ def test_vm_assemble(input_file: str, expected: bytes):
         with open(input_file_variant.debug_filename, "rt") as f:
             debug_info = json.load(f)
             assert debug_info["version"] == "0.0"
-            symbol_table = {byte: Token(**token) for byte, token in debug_info["source_map"].items()}
+            _symbol_table = {byte: Token(**token) for byte, token in debug_info["source_map"].items()}
             # I guess for now just assert no error occurs here...
     finally:
         _cleanup_paths([input_file_variant.object_filename, input_file_variant.debug_filename])
 
 
-@pytest.mark.parametrize("input_file,expected", [("""tests\\test_samples\\vm\\hello_world_1\\hello_world.al""", "hello world!")])
+@pytest.mark.parametrize("input_file,expected", [("""tests\\ssmal\\samples\\vm\\hello_world_1\\hello_world.al""", "hello world!")])
 def test_vm_pipeline(input_file: str, expected: str):
     cin = io.StringIO()
     cout = io.StringIO()
