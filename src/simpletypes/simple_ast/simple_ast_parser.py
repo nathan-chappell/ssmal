@@ -82,7 +82,7 @@ def parse_ClassDef(class_def: ast.ClassDef) -> N.Statement:
     bases = list(_get_typename(base) for base in class_def.bases)
     if len(bases) > 1:
         raise UnexpectedNode(class_def, "Multiple base classes not supported.")
-    return N.ClassDef(name, bases[0])
+    return N.ClassDef(name, bases[0] if len(bases) == 1 else None)
 
 
 def parse_FunctionDef(function_def: ast.FunctionDef) -> N.Statement:
@@ -120,20 +120,3 @@ def parse_Program(module: ast.Module) -> N.Program:
             case _: raise UnexpectedNode(node, 'check your grammar')
     # fmt: on
     return N.Program(body)
-
-
-# TODO: module interaface...
-
-if __name__ == "__main__":  # pragma: no cover
-    import argparse
-    import pprint
-    import sys
-
-    argument_parser = argparse.ArgumentParser()
-    argument_parser.add_argument("filename")
-
-    args = argument_parser.parse_args(sys.argv[1:])
-    with open(args.filename) as f:
-        source_code = f.read()
-        program = parse_Program(compile(source_code, args.filename, "exec", ast.PyCF_ONLY_AST))
-        pprint.pprint(program)

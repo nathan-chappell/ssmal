@@ -1,3 +1,5 @@
+from typing import cast
+
 from dataclasses import dataclass
 import simpletypes.simple_ast.simple_ast_nodes as N
 
@@ -9,7 +11,7 @@ class TypeError(Exception):
 @dataclass
 class InheritanceGraphNode:
     name: N.TypeName
-    base: None | "InheritanceGraphNode" = None
+    base: "None | InheritanceGraphNode" = None
 
     def is_subtype_of(self, other_type_name: N.TypeName) -> bool:
         if self.name == other_type_name:
@@ -38,8 +40,8 @@ class TypeChecker:
 
     def is_subtype_of(self, type: N.TypeName | N.FunctionDef, super_type: N.TypeName | N.FunctionDef) -> bool:
         match [type, super_type]:
-            case [N.TypeName(_type), N.TypeName(_super_type)]:
-                return self.classes[_type].is_subtype_of(_super_type)
+            case [str(_type), str(_super_type)]:
+                return self.classes[cast(N.TypeName, _type)].is_subtype_of(cast(N.TypeName, _super_type))
             case [
                 N.FunctionDef(parameter_types=_parameter_types, return_type=_return_type),
                 N.FunctionDef(parameter_types=_super_parameter_types, return_type=_super_return_type),
@@ -67,7 +69,7 @@ class TypeChecker:
             case N.ValueExpr(value=int()):
                 return _int
             case N.ValueExpr(value=str()):
-                return _int
+                return _str
             case N.ValueExpr():
                 raise TypeError(f"Uknown value type: {type(expression.value)}", expression)
 
@@ -76,7 +78,7 @@ class TypeChecker:
             case N.CallExpr(function_name=function_name, arguments=arguments):
                 function_def = self.identifiers[function_name]
                 match function_def:
-                    case N.TypeName():
+                    case str():
                         raise TypeError(f"Attempted to call variable: {function_name}", expression)
                     case N.FunctionDef(parameter_types=parameter_types, return_type=return_type):
                         argument_types = [self.get_type(argument) for argument in arguments]
@@ -117,3 +119,4 @@ class TypeChecker:
                     raise TypeError(f"Variable {statement.name} already defined.", statement)
                 case N.FunctionDef(name=name):
                     self.identifiers[name] = statement
+        return True
