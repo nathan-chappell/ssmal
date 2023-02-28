@@ -1,7 +1,7 @@
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
-addopts = ["--cov=ssmal", "--cov=simpletypes", "--cov-report=xml"]
+addopts = ["--cov=ssmal", "--cov=simpletypes", "--cov=simpledi", "--cov-report=xml"]
 
 [tool.black]
 line-length = 140
