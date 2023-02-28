@@ -12,5 +12,5 @@ from ssmal.util.get_chunks import get_chunks
         (b"0123456789", 3, [b"012", b"345", b"678", b"9\x00\x00"]),
     ],
 )
-def test_get_chunks(_bytes: bytes, size: int, expected: T.List[bytes]):
+def test_get_chunks(_bytes: bytes, size: int, expected: list[bytes]):
     assert list(get_chunks(_bytes, size=size)) == expected

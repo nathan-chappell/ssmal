@@ -54,8 +54,13 @@ class DebuggerCommand:
 
 class Debugger:
     processor: Processor
-    halt_signal: HaltSignal
-    breakpoints: T.Set[int]
+    halt_signal: HaltSignal | None = None
+    breakpoints: set[int]
+
+    def __init__(self) -> None:
+        self.processor = Processor()
+        self.breakpoints = set[int]()
+
 
     def run(self):
         while True:
@@ -74,7 +79,7 @@ class Debugger:
 
     def on_break(self):
         self.write_message(self.processor.registers)
-        command = self.read_command()
+        _command = self.read_command()
 
     def write_message(self, any: T.Any):
         print(any)

@@ -13,7 +13,7 @@ TLeaf = T.TypeVar("TLeaf")
 # TLeaf = T.TypeVar('TLeaf', covariant=True)
 # TLeaf = T.TypeVar('TLeaf', contravariant=True)
 
-NatList = T.Union[None, T.Tuple[int, "NatList"]]
+NatList = None | T.Tuple[int, "NatList"]
 
 x: NatList = (1, (2, None))
 

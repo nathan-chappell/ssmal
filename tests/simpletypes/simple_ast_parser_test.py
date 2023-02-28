@@ -21,7 +21,7 @@ _I = Identifier
 _T = TypeName
 
 
-_expected_classes = Program(statements=[ClassDef(name=_T("B"), bases=[]), ClassDef(name=_T("D"), bases=[_T("B")])])
+_expected_classes = Program(statements=[ClassDef(name=_T("B")), ClassDef(name=_T("D"), base=_T("B"))])
 _expected_functions = Program(
     statements=[
         FunctionDef(parameter_types=[_T("int")], return_type=_T("str")),

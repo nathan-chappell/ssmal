@@ -13,13 +13,13 @@ class Assembler:
     encoding: T.Literal["ascii", "latin1"] = "ascii"
 
     buffer: io.BytesIO
-    source_map: T.Dict[int, Token]
-    symbol_table: T.Dict[str, bytes]
-    tokens: T.List[Token]
+    source_map: dict[int, Token]
+    symbol_table: dict[str, bytes]
+    tokens: list[Token]
 
     _index: int
 
-    def __init__(self, tokens: T.List[Token]):
+    def __init__(self, tokens: list[Token]):
         self.buffer = io.BytesIO()
         self.source_map = {}
         self.symbol_table = {v.__name__.lower(): k for k, v in opcode_map.items()}
@@ -124,7 +124,7 @@ class Assembler:
         else:
             raise UnexpectedTokenError(token, '"ascii", "latin1"')
 
-    # def get_repeated_value(self, token: Token) -> T.Union[int, str, bytes]:
+    # def get_repeated_value(self, token: Token) -> int | str | bytes
     #     if token.type == "xint":
     #         return int(token.value, 16)
     #     elif token.type == "dint":

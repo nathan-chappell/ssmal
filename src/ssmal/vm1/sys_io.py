@@ -19,7 +19,7 @@ PMEM = 4  # dump memory
 class SysIO:
     cin: T.Optional[T.TextIO] = None
     cout: T.Optional[T.TextIO] = None
-    sys_vector: T.Dict[int, TOp]
+    sys_vector: dict[int, TOp]
 
     max_zstrlen: int = 0x100
 
