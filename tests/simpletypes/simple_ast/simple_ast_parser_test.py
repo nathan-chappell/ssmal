@@ -1,22 +1,8 @@
 import ast
 import pytest
 
-import simpletypes
-from simpletypes.simple_ast.simple_ast_nodes import (
-    AssignmentStmt,
-    CallExpr,
-    ClassDef,
-    FunctionDef,
-    Identifier,
-    IdentifierExpr,
-    Program,
-    TypeName,
-    ValueExpr,
-    VariableDef,
-)
-
+from simpletypes.simple_ast.simple_ast_nodes import Program
 from simpletypes.simple_ast.simple_ast_parser import parse_Program
-
 from tests.simpletypes.simple_ast.samples_asts_generated import (
     classes_expected,
     expressions_expected,
