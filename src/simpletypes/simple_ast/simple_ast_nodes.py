@@ -42,11 +42,12 @@ class AssignmentStmt(Statement):
 @dataclass
 class ClassDef(Statement):
     name: TypeName
-    bases: list[TypeName]
+    base: TypeName | None = None
 
 
 @dataclass
 class FunctionDef(Statement):
+    name: Identifier
     parameter_types: list[TypeName]
     return_type: TypeName
 

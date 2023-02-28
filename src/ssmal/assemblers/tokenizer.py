@@ -3,7 +3,7 @@ import typing as T
 
 from ssmal.assemblers.token import Token
 
-_tokens: T.List[T.Tuple[str, str]] = [
+_tokens: list[T.Tuple[str, str]] = [
     ("id", r"[a-zA-Z_][a-zA-Z_0-9.]*"),
     ("dir", r"\.[a-zA-Z][a-zA-Z_0-9]*"),
     ("xint", r"0x[0-9]+"),

@@ -14,14 +14,14 @@ from ssmal.vm1.vm import VM, VmConfig
 
 
 class MultiException(Exception):
-    exceptions: T.List[Exception]
+    exceptions: list[Exception]
 
-    def __init__(self, exceptions: T.List[Exception], *args: object) -> None:
+    def __init__(self, exceptions: list[Exception], *args: object) -> None:
         super().__init__(*args)
         self.exceptions = exceptions
 
 
-def _cleanup_paths(pathnames: T.List[str]):
+def _cleanup_paths(pathnames: list[str]):
     exceptions = []
     for pathname in pathnames:
         path = Path(pathname)

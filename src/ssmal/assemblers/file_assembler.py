@@ -8,8 +8,8 @@ from ssmal.assemblers.token import Token
 from ssmal.assemblers.tokenizer import tokenize
 
 TFileName = str
-TByteCache = T.Dict[TFileName, bytes]
-TTokenCache = T.Dict[TFileName, T.List[Token]]
+TByteCache = dict[TFileName, bytes]
+TTokenCache = dict[TFileName, list[Token]]
 
 
 def _insert(l1: list, i: int, l2: list):
@@ -42,7 +42,7 @@ class FileAssembler(Assembler):
         for token in tokenize(text):
             yield replace(token, filename=filename)
 
-    def _insert_tokens(self, tokens: T.List[Token]):
+    def _insert_tokens(self, tokens: list[Token]):
         self.tokens = _insert(self.tokens, self._index, tokens)
 
     def _already_include(self, filename: str) -> bool:

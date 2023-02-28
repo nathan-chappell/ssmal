@@ -10,9 +10,9 @@ TOp = T.Callable[[Registers, Memory], None]
 
 class Processor:
     memory: Memory
-    opcode_map: T.Dict[bytes, TOp]
+    opcode_map: dict[bytes, TOp]
     registers: Registers
-    sys_vector: T.Dict[int, TOp]
+    sys_vector: dict[int, TOp]
 
     def __init__(self) -> None:
         self.memory = Memory()

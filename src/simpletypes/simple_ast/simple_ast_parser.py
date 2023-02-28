@@ -9,8 +9,7 @@ import simpletypes.simple_ast.simple_ast_nodes as N
 def _get_identifier(node: ast.Name | None) -> N.Identifier:
     # fmt: off
     match node:
-        # case ast.Name():      return N.IdentifierExpr(T.cast(N.Identifier, node.id))
-        case ast.Name():      return T.cast(N.Identifier, node.id)
+        case ast.Name(): return N.Identifier(node.id)
         case _: raise UnexpectedNode(node)
     # fmt: on
 
@@ -27,7 +26,7 @@ def _get_typename(node: ast.Constant | ast.Name | ast.expr | None) -> N.TypeName
         case ast.Name(): typename = _get_identifier(node)
         case _: raise UnexpectedNode(node)
     # fmt: on
-    return T.cast(N.TypeName, typename)
+    return N.TypeName(typename)
 
 
 def _get_value(node: ast.Constant) -> N.ValueExpr:
@@ -47,7 +46,7 @@ class UnexpectedNode(ParseException):
 def parse_CallExpr(call: ast.Call) -> N.CallExpr:
     # fmt: off
     match call.func:
-        case ast.Name():        function_name = _get_identifier(call.func)
+        case ast.Name(): function_name = _get_identifier(call.func)
         case _: raise UnexpectedNode(call)
     # fmt: on
 
@@ -73,21 +72,24 @@ def parse_AssignmentStmt(ann_assign: ast.Assign) -> N.Statement:
     value = parse_Expression(ann_assign.value)
     # fmt: off
     match target:
-        case ast.Name():        return N.AssignmentStmt(_get_identifier(target), value)
+        case ast.Name(): return N.AssignmentStmt(_get_identifier(target), value)
         case _: raise UnexpectedNode(ann_assign)
     # fmt: on
 
 
 def parse_ClassDef(class_def: ast.ClassDef) -> N.Statement:
-    name = T.cast(N.TypeName, class_def.name)
+    name = N.TypeName(class_def.name)
     bases = list(_get_typename(base) for base in class_def.bases)
-    return N.ClassDef(name, bases)
+    if len(bases) > 1:
+        raise UnexpectedNode(class_def, "Multiple base classes not supported.")
+    return N.ClassDef(name, bases[0] if len(bases) == 1 else None)
 
 
 def parse_FunctionDef(function_def: ast.FunctionDef) -> N.Statement:
+    name = function_def.name
     parameter_types = list(_get_typename(arg.annotation) for arg in function_def.args.args)
     return_type = _get_typename(function_def.returns)
-    return N.FunctionDef(parameter_types, return_type)
+    return N.FunctionDef(N.Identifier(name), parameter_types, return_type)
 
 
 def parse_VariableDef(ann_assign: ast.AnnAssign) -> N.Statement:
@@ -120,18 +122,6 @@ def parse_Program(module: ast.Module) -> N.Program:
     return N.Program(body)
 
 
-# TODO: module interaface...
-
-if __name__ == "__main__":  # pragma: no cover
-    import argparse
-    import pprint
-    import sys
-
-    argument_parser = argparse.ArgumentParser()
-    argument_parser.add_argument("filename")
-
-    args = argument_parser.parse_args(sys.argv[1:])
-    with open(args.filename) as f:
-        source_code = f.read()
-        program = parse_Program(compile(source_code, args.filename, "exec", ast.PyCF_ONLY_AST))
-        pprint.pprint(program)
+def parse(text: str) -> N.Program:
+    _ast = ast.parse(text)
+    return parse_Program(_ast)
