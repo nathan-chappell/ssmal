@@ -61,7 +61,6 @@ class Debugger:
         self.processor = Processor()
         self.breakpoints = set[int]()
 
-
     def run(self):
         while True:
             try:
