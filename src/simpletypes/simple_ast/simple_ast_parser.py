@@ -120,3 +120,8 @@ def parse_Program(module: ast.Module) -> N.Program:
             case _: raise UnexpectedNode(node, 'check your grammar')
     # fmt: on
     return N.Program(body)
+
+
+def parse(text: str) -> N.Program:
+    _ast = ast.parse(text)
+    return parse_Program(_ast)

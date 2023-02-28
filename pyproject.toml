@@ -17,6 +17,7 @@ omit = ["**/__main__.py", "src/ssmal/debug/*"]
 
 [tool.pyright]
 include = ["src/ssmal", "src/simpletypes", "tests"]
+exclude = ["**/samples"]
 strictListInference = true
 strictDictionaryInference = true
 strictSetInference = true
