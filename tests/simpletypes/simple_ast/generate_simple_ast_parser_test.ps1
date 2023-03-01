@@ -1,5 +1,5 @@
 
-$output = '.\tests\simpletypes\simple_ast\samples_asts_generated.py'
+$output = '.\tests\simpletypes\simple_ast\generated_simple_ast_parser_test.py'
 
 @'
 import ast
