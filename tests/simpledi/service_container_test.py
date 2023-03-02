@@ -5,8 +5,6 @@ import pytest
 
 from simpledi.service_container import ServiceLifetime, ServiceContainer, ServiceContainerException
 
-class Foo:
-    bar: int
 
 @dataclass
 class Scoped1:
