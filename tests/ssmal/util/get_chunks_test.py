@@ -1,4 +1,3 @@
-import typing as T
 import pytest
 
 from ssmal.util.get_chunks import get_chunks

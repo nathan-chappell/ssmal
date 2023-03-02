@@ -1,16 +1,16 @@
-import typing as T
 import io
+from typing import Literal
 
 from ssmal.processors.opcodes import opcode_map
 from ssmal.assemblers.token import Token
 from ssmal.assemblers.errors import UnexpectedTokenError
 
-TByteOrder = T.Literal["little", "big"]
+TByteOrder = Literal["little", "big"]
 
 
 class Assembler:
     byteorder: TByteOrder = "little"
-    encoding: T.Literal["ascii", "latin1"] = "ascii"
+    encoding: Literal["ascii", "latin1"] = "ascii"
 
     buffer: io.BytesIO
     source_map: dict[int, Token]
@@ -75,7 +75,7 @@ class Assembler:
                 if t0.value == ".def":
                     self.symbol_table[self.get_symbol(t1)] = self.get_bytes(t2)
                 # elif t0.value == ".repeat":
-                #     self.emit(T.cast(int, self.get_repeated_value(t1)) * self.get_bytes(t2), t0)
+                #     self.emit(cast(int, self.get_repeated_value(t1)) * self.get_bytes(t2), t0)
                 else:
                     raise UnexpectedTokenError(t0, "Error processing directive.")
 
@@ -117,7 +117,7 @@ class Assembler:
         else:
             raise UnexpectedTokenError(token, "xint, dint, bstr, zstr")
 
-    def get_encoding(self, token: Token) -> T.Literal["ascii", "latin1"]:
+    def get_encoding(self, token: Token) -> Literal["ascii", "latin1"]:
         result = self._get_str_value(token)
         if result in ("ascii", "latin1"):
             return result

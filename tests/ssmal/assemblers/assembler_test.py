@@ -1,5 +1,3 @@
-from typing import List, Dict
-
 import pytest
 
 from ssmal.assemblers.token import Token
@@ -37,7 +35,7 @@ def test_assembler(input: str, expected: bytes):
         (""" .goto 0x1234 """, {"current_position": 0x1234}),
     ],
 )
-def test_assembler_directives(input: str, expected: Dict[str, str]):
+def test_assembler_directives(input: str, expected: dict[str, str]):
     tokens = list(tokenize(input))
     assembler = Assembler(tokens)
     assembler.assemble()

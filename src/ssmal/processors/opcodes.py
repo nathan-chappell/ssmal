@@ -1,4 +1,4 @@
-from typing import Dict, Callable
+from typing import Callable
 
 from ssmal.components.memory import Memory
 from ssmal.components.registers import Registers
@@ -11,7 +11,7 @@ import ssmal.instructions.sys as sys_op
 
 SYS_BYTE = b"\x80"
 
-opcode_map: Dict[bytes, Callable[[Registers, Memory], None]] = {
+opcode_map: dict[bytes, Callable[[Registers, Memory], None]] = {
     # processor ops
     b"\x00": p_op.NOP,
     b"\x01": p_op.DBG,

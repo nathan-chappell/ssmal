@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from pathlib import Path
 import ast
-import typing as T
+
 
 import simpletypes.simple_ast.simple_ast_nodes as N
 

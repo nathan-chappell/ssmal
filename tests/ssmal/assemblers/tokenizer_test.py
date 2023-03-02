@@ -1,5 +1,3 @@
-from typing import List
-
 import pytest
 
 from ssmal.assemblers.token import Token
@@ -30,6 +28,6 @@ T = Token
         ),
     ],
 )
-def test_tokenizer(input: str, expected: List[Token]):
+def test_tokenizer(input: str, expected: list[Token]):
     tokens = list(tokenize(input))
     assert tokens == expected

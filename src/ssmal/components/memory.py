@@ -1,5 +1,5 @@
-import typing as T
 from io import BufferedIOBase, BytesIO
+from typing import Literal
 
 
 class Memory:
@@ -8,7 +8,7 @@ class Memory:
     def __init__(self, size=2**8):
         self.buffer = BytesIO(b"\x00" * size)
 
-    def load(self, address: int, size: T.Literal[1, 2, 4] = 4) -> int:
+    def load(self, address: int, size: Literal[1, 2, 4] = 4) -> int:
         _bytes = self.load_bytes(address, size)
         return int.from_bytes(_bytes, "little", signed=True)
 

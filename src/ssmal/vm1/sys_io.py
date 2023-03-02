@@ -1,6 +1,7 @@
 import io
-import typing as T
+
 from functools import partial
+from typing import Optional, TextIO
 
 from ssmal.components.memory import Memory
 from ssmal.components.registers import Registers
@@ -17,8 +18,8 @@ PMEM = 4  # dump memory
 
 
 class SysIO:
-    cin: T.Optional[T.TextIO] = None
-    cout: T.Optional[T.TextIO] = None
+    cin: Optional[TextIO] = None
+    cout: Optional[TextIO] = None
     sys_vector: dict[int, TOp]
 
     max_zstrlen: int = 0x100
@@ -29,7 +30,7 @@ class SysIO:
 
         self.sys_vector = {PTOPz: _nop, PTOPi: _nop, PTOPx: _nop, PREG: _nop, PMEM: _nop}
 
-    def bind(self, cin: T.Optional[T.TextIO] = None, cout: T.Optional[T.TextIO] = None):
+    def bind(self, cin: Optional[TextIO] = None, cout: Optional[TextIO] = None):
         if cin is not None:
             self.cin = cin
         if cout is not None:
@@ -47,28 +48,28 @@ class SysIO:
             raise RuntimeError("Binding SysIO failed: ensure cin and cout are both supplied.")
 
 
-def print_top_z(r: Registers, m: Memory, cin: T.TextIO, cout: T.TextIO, max_zstrlen: int) -> None:
+def print_top_z(r: Registers, m: Memory, cin: TextIO, cout: TextIO, max_zstrlen: int) -> None:
     start = m.load(r.SP - 4, 4)
     buffer = m.load_bytes(start, max_zstrlen)
     _bytes = buffer[0 : buffer.find(0)]
     cout.write(ascii_safe_encode(_bytes))
 
 
-def print_top_i(r: Registers, m: Memory, cin: T.TextIO, cout: T.TextIO, max_zstrlen: int) -> None:
+def print_top_i(r: Registers, m: Memory, cin: TextIO, cout: TextIO, max_zstrlen: int) -> None:
     i = m.load(r.SP - 4, 4)
     cout.write(f"{i}")
 
 
-def print_top_x(r: Registers, m: Memory, cin: T.TextIO, cout: T.TextIO, max_zstrlen: int) -> None:
+def print_top_x(r: Registers, m: Memory, cin: TextIO, cout: TextIO, max_zstrlen: int) -> None:
     i = m.load(r.SP - 4, 4)
     cout.write(f"0x{i:08x}")
 
 
-def print_registers(r: Registers, m: Memory, cin: T.TextIO, cout: T.TextIO, max_zstrlen: int) -> None:
+def print_registers(r: Registers, m: Memory, cin: TextIO, cout: TextIO, max_zstrlen: int) -> None:
     cout.write(str(r))
 
 
-def print_memory(r: Registers, m: Memory, cin: T.TextIO, cout: T.TextIO, max_zstrlen: int) -> None:  # pragma: no cover
+def print_memory(r: Registers, m: Memory, cin: TextIO, cout: TextIO, max_zstrlen: int) -> None:  # pragma: no cover
     start = m.load(r.SP - 8, 4)
     count = m.load(r.SP - 4, 4)
     cout.write("\n".join(hexdump_bytes(m.load_bytes(start, count))))

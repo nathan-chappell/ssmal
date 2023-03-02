@@ -3,25 +3,25 @@
 """
 from __future__ import annotations
 
-import typing as T
+from typing import Generic, Optional, TypeVar
 
 """
 # Generics, Covariance, Contravariance, and a recursive type!
 """
 
-TLeaf = T.TypeVar("TLeaf")
-# TLeaf = T.TypeVar('TLeaf', covariant=True)
-# TLeaf = T.TypeVar('TLeaf', contravariant=True)
+TLeaf = TypeVar("TLeaf")
+# TLeaf = TypeVar('TLeaf', covariant=True)
+# TLeaf = TypeVar('TLeaf', contravariant=True)
 
-NatList = None | T.Tuple[int, "NatList"]
+NatList = None | tuple[int, "NatList"]
 
 x: NatList = (1, (2, None))
 
 
-class Tree(T.Generic[TLeaf]):
-    left: T.Optional["Tree[TLeaf]"] = None
-    right: T.Optional["Tree[TLeaf]"] = None
-    value: T.Optional[TLeaf] = None
+class Tree(Generic[TLeaf]):
+    left: Optional[Tree[TLeaf]] = None
+    right: Optional[Tree[TLeaf]] = None
+    value: Optional[TLeaf] = None
 
 
 class Base:
@@ -50,7 +50,7 @@ class ListNode:
         self.next = next
 
     @staticmethod
-    def demo_create() -> "ListNode":
+    def demo_create() -> ListNode:
         return ListNode(1, ListNode(2, None))
 
 
@@ -82,10 +82,10 @@ def demo_t_list_node():
 #############
 #############
 
-NodeType = T.TypeVar("NodeType")
+NodeType = TypeVar("NodeType")
 
 
-class GenericListNode(T.Generic[NodeType]):
+class GenericListNode(Generic[NodeType]):
     value: NodeType
     next: None | GenericListNode[NodeType]
 

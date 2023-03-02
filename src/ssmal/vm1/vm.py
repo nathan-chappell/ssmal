@@ -1,10 +1,11 @@
 import json
 import io
-import typing as T
+
 import sys
 
 from dataclasses import dataclass, asdict
 from functools import partial
+from typing import TextIO
 
 from ssmal.assemblers.file_assembler import FileAssembler
 from ssmal.components.registers import Registers
@@ -16,8 +17,8 @@ from ssmal.vm1.sys_io import SysIO
 
 @dataclass
 class VmConfig:
-    cin: T.TextIO = sys.stdin
-    cout: T.TextIO = sys.stdout
+    cin: TextIO = sys.stdin
+    cout: TextIO = sys.stdout
     initial_registers: Registers = Registers()
 
 

@@ -1,9 +1,10 @@
 import re
-import typing as T
+from typing import Generator, Tuple
+
 
 from ssmal.assemblers.token import Token
 
-_tokens: list[T.Tuple[str, str]] = [
+_tokens: list[Tuple[str, str]] = [
     ("id", r"[a-zA-Z_][a-zA-Z_0-9.]*"),
     ("dir", r"\.[a-zA-Z][a-zA-Z_0-9]*"),
     ("xint", r"0x[0-9]+"),
@@ -15,7 +16,7 @@ _tokens: list[T.Tuple[str, str]] = [
 ]
 
 
-def tokenize(input: str) -> T.Generator[Token, None, None]:
+def tokenize(input: str) -> Generator[Token, None, None]:
     position = 0
     line = 0
     column = 0

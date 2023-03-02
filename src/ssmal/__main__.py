@@ -1,6 +1,6 @@
-import typing as T
 import argparse
 import sys
+from typing import cast
 
 from ssmal.util.input_file_variant import InputFileVariant
 from ssmal.vm1.vm import VM as VM1
@@ -12,7 +12,7 @@ parser.add_argument("-r", "--run", action="store_true")
 parser.add_argument("filename")
 args = parser.parse_args(sys.argv[1:])
 
-filename = T.cast(str, args.filename)
+filename = cast(str, args.filename)
 
 if args.machine == "vm1":
     vm = VM1()

@@ -1,10 +1,9 @@
-import typing as T
-
+from typing import Generator
 from ssmal.util.get_chunks import get_chunks
 from ssmal.util.ascii_safe_encode import ascii_safe_encode
 
 
-def hexdump_bytes(_bytes: bytes) -> T.Generator[str, None, None]:  # pragma: no cover
+def hexdump_bytes(_bytes: bytes) -> Generator[str, None, None]:  # pragma: no cover
     _size = 0x20
     for i, chunk in enumerate(get_chunks(_bytes, size=_size)):
         addr_str = f"{i * _size:04x}"

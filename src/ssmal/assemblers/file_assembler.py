@@ -1,6 +1,6 @@
-import typing as T
 from dataclasses import dataclass, replace
 from pathlib import Path
+from typing import Generator, cast
 
 from ssmal.assemblers.assembler import Assembler
 from ssmal.assemblers.errors import UnexpectedTokenError
@@ -36,7 +36,7 @@ class FileAssembler(Assembler):
         self._insert_tokens(list(self._tokenize(filename)))
         self.assemble()
 
-    def _tokenize(self, filename: str) -> T.Generator[Token, None, None]:
+    def _tokenize(self, filename: str) -> Generator[Token, None, None]:
         with open(filename, "r") as f:
             text = f.read()
         for token in tokenize(text):
@@ -49,7 +49,7 @@ class FileAssembler(Assembler):
         return filename in self._byte_cache or filename in self._token_cache
 
     def _include(self, settings: IncludeFileSettings, token: Token):
-        included_file_path = Path(T.cast(str, token.filename)).parent / settings.filename
+        included_file_path = Path(cast(str, token.filename)).parent / settings.filename
         included_file_fullname = str(included_file_path.resolve())
         if self._already_include(included_file_fullname) and settings.once:
             return

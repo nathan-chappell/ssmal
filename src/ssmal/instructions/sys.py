@@ -1,5 +1,5 @@
 import io
-import typing as T
+
 
 from ssmal.components.memory import Memory
 from ssmal.components.registers import Registers

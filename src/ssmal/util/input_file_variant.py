@@ -1,6 +1,3 @@
-import typing as T
-
-
 class InputFileVariant:
     assembler_file_suffix: str = ".al"
     object_file_suffix: str = ".bin"

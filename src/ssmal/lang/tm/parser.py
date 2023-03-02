@@ -56,13 +56,14 @@ def parse_binary_transitions(text: str) -> Generator[BinaryTransition, None, Non
             case _:
                 raise TmParseError(f"failed to parse {line=}")
 
-if __name__ == '__main__': # pragma: no cover
+
+if __name__ == "__main__":  # pragma: no cover
     import argparse
     import pprint
     import sys
 
     arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument('filename')
+    arg_parser.add_argument("filename")
 
     args = arg_parser.parse_args(sys.argv[1:])
 

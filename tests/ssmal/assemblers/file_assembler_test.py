@@ -1,5 +1,3 @@
-from typing import List, Dict
-
 import pytest
 
 from ssmal.assemblers.file_assembler import FileAssembler

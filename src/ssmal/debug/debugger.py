@@ -1,6 +1,7 @@
 from dataclasses import dataclass
-import typing as T
+
 import re
+from typing import Any, Literal, Optional
 
 from ssmal.processors.processor import Processor
 from ssmal.instructions.processor_signals import HaltSignal, DebugSignal
@@ -12,13 +13,13 @@ class DebugParseError(Exception):
 
 @dataclass
 class DebuggerCommand:
-    command: T.Literal["print", "breakpoint", "step"]
+    command: Literal["print", "breakpoint", "step"]
     argument: int = 0
 
     _command_regex = re.compile(r"^ *(?<command>p|print|b|breakpoint|s|step) *(?<argument>\d+)? *$")
 
     @classmethod
-    def fix_command(cls, command: str) -> T.Literal["print", "breakpoint", "step"]:
+    def fix_command(cls, command: str) -> Literal["print", "breakpoint", "step"]:
         # fmt: off
         if command == 'p':          return 'print'
         if command == 'print':      return 'print'
@@ -30,7 +31,7 @@ class DebuggerCommand:
         raise DebugParseError(f"invalid debugger command: {command}")
 
     @classmethod
-    def fix_argument(cls, argument: T.Optional[str]) -> int:
+    def fix_argument(cls, argument: Optional[str]) -> int:
         if argument is None:
             return 0
         try:
@@ -80,7 +81,7 @@ class Debugger:
         self.write_message(self.processor.registers)
         _command = self.read_command()
 
-    def write_message(self, any: T.Any):
+    def write_message(self, any: Any):
         print(any)
 
     def read_command(self):

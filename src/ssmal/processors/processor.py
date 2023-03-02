@@ -1,11 +1,10 @@
-import typing as T
-
+from typing import Callable
 from ssmal.components.memory import Memory
 from ssmal.components.registers import Registers
 from ssmal.instructions.processor_signals import SysSignal
 from ssmal.processors.opcodes import opcode_map
 
-TOp = T.Callable[[Registers, Memory], None]
+TOp = Callable[[Registers, Memory], None]
 
 
 class Processor:

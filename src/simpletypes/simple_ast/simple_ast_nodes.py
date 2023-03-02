@@ -1,8 +1,8 @@
-import typing as T
 from dataclasses import dataclass
+from typing import NewType, Sequence
 
-Identifier = T.NewType("Identifier", str)
-TypeName = T.NewType("TypeName", str)
+Identifier = NewType("Identifier", str)
+TypeName = NewType("TypeName", str)
 
 
 class SimpleAstNodeBase:
@@ -66,4 +66,4 @@ class VariableDef(Statement):
 
 @dataclass
 class Program(SimpleAstNodeBase):
-    statements: T.Sequence[Statement]
+    statements: Sequence[Statement]

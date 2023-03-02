@@ -1,5 +1,5 @@
-import typing as T
 from dataclasses import dataclass
+from typing import Optional
 
 
 @dataclass
@@ -8,4 +8,4 @@ class Token:
     value: str
     line: int
     column: int
-    filename: T.Optional[str] = None
+    filename: Optional[str] = None
