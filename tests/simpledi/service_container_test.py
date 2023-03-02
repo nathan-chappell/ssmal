@@ -1,9 +1,12 @@
+from __future__ import annotations
 from dataclasses import dataclass
 
 import pytest
 
 from simpledi.service_container import ServiceLifetime, ServiceContainer, ServiceContainerException
 
+class Foo:
+    bar: int
 
 @dataclass
 class Scoped1:

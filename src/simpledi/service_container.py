@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from enum import Enum
 from inspect import signature, Parameter
-from typing import TypeVar, Any
+from typing import TypeVar, Any, get_type_hints
 
 
 TService = TypeVar("TService")
@@ -50,6 +50,7 @@ class ServiceContainer:
 
         implementation = self.get_implementation(service)
         constructor = implementation.__init__
+        breakpoint()
         constructor_signature = signature(constructor)
         dependencies: dict[str, Any] = {}
         for parameter_name, parameter in list(constructor_signature.parameters.items()):
@@ -78,6 +79,7 @@ class ServiceContainer:
         elif parameter.annotation == Parameter.empty:
             raise ServiceContainerException(f"all service parameters require annotations", parameter)
         elif isinstance(parameter.annotation, str):
+            breakpoint()
             raise ServiceContainerException(f"all service parameters require NON-STRING annotations", parameter)
         else:
             return self.service_info[parameter.annotation]

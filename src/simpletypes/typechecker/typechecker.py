@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import cast
 
 from dataclasses import dataclass
@@ -11,7 +13,7 @@ class TypeError(Exception):
 @dataclass
 class InheritanceGraphNode:
     name: N.TypeName
-    base: "None | InheritanceGraphNode" = None
+    base: None | InheritanceGraphNode = None
 
     def is_subtype_of(self, other_type_name: N.TypeName) -> bool:
         if self.name == other_type_name:
