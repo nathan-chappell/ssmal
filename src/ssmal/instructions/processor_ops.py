@@ -6,4 +6,3 @@ from ssmal.instructions.processor_signals import HaltSignal, DebugSignal
 def DBG(r: Registers, m: Memory) -> None: raise DebugSignal(r,m)
 def HALT(r: Registers, m: Memory) -> None: raise HaltSignal(r,m)
 def NOP(r: Registers, m: Memory) -> None: return
-# fmt: onn
