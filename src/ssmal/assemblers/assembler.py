@@ -30,6 +30,10 @@ class Assembler:
     def current_position(self) -> int:
         return self.buffer.tell()
 
+    @property
+    def current_position_bytes(self) -> bytes:
+        return self.current_position.to_bytes(4, self.byteorder)
+
     def assemble(self):
         while self._index < len(self.tokens):
             self.advance()
@@ -46,6 +50,8 @@ class Assembler:
 
     def advance(self):
         token = self.eat_token()
+        if token.type == "label":
+            self.symbol_table[token.value] = self.current_position_bytes
         if token.type == "id":
             self.emit(self.symbol_table[self.get_symbol(token)], token)
         elif token.type in ("xint", "dint", "bstr", "zstr"):
@@ -61,7 +67,7 @@ class Assembler:
 
     def handle_directive(self, t0: Token):
         if t0.value == ".here":
-            self.emit(self.current_position.to_bytes(4, "little"), t0)
+            self.emit(self.current_position_bytes, t0)
         else:
             t1 = self.eat_token()
             if t0.value == ".byteorder":

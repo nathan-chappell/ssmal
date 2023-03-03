@@ -5,6 +5,7 @@ from typing import Generator, Tuple
 from ssmal.assemblers.token import Token
 
 _tokens: list[Tuple[str, str]] = [
+    ("label", r"[a-zA-Z_][a-zA-Z_0-9.]*:"),
     ("id", r"[a-zA-Z_][a-zA-Z_0-9.]*"),
     ("dir", r"\.[a-zA-Z][a-zA-Z_0-9]*"),
     ("xint", r"0x[0-9]+"),
