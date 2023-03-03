@@ -6,7 +6,7 @@ from ssmal.assemblers.token import Token
 
 _tokens: list[Tuple[str, str]] = [
     ("label", r"[a-zA-Z_][a-zA-Z_0-9.]*:"),
-    ("label-ref", r"\$[a-zA-Z_][a-zA-Z_0-9.]*:"),
+    ("label-ref", r"\$[a-zA-Z_][a-zA-Z_0-9.]*"),
     ("id", r"[a-zA-Z_][a-zA-Z_0-9.]*"),
     ("dir", r"\.[a-zA-Z][a-zA-Z_0-9]*"),
     ("xint", r"0x[0-9]+"),
@@ -41,3 +41,5 @@ def tokenize(input: str) -> Generator[Token, None, None]:
                     column += len(match[0])
                 # break to while loop
                 break
+        else:
+            raise Exception(f"Tokenizer failed at {position}: {input[max(0,position-10): position]}>>>{input[position: position + 10]}")

@@ -45,7 +45,7 @@ def parse_tm_transitions(text: str) -> Generator[TmTransition, None, None]:
                 "move_head": ("L" | "R" | "STAY") as move_head,
             }:
                 yield TmTransition(cur_state, cur_symbol, next_state, next_symbol, move_head)
-            case _:
+            case _: # pragma: no cover
                 raise TmParseError(f"failed to parse {line=}")
 
 

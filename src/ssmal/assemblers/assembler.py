@@ -55,17 +55,18 @@ class Assembler:
     def advance(self):
         token = self.eat_token()
         if token.type == "label":
-            _id = self._get_str_value(token)
-            if _id in self.labels:
-                self.labels[_id].address = self.current_position
+            label_name = token.value[:-1]
+            if label_name in self.labels:
+                self.labels[label_name].address = self.current_position
             else:
-                self.labels[_id] = Label(address=self.current_position, references=[], token=token)
-        if token.type == "label-ref":
-            _id = self._get_str_value(token)
-            if _id in self.labels:
-                self.labels[_id].references.append((self.current_position, token))
+                self.labels[label_name] = Label(address=self.current_position, references=[], token=token)
+        elif token.type == "label-ref":
+            label_name = token.value[1:]
+            if label_name in self.labels:
+                self.labels[label_name].references.append((self.current_position, token))
             else:
-                self.labels[_id] = Label(address=-1, references=[(self.current_position, token)], token=token)
+                self.labels[label_name] = Label(address=-1, references=[(self.current_position, token)], token=token)
+            self.emit(b'\xFF\xFF\xFF\xFF', token)
         elif token.type == "id":
             self.emit(self.symbol_table[self.get_symbol(token)], token)
         elif token.type in ("xint", "dint", "bstr", "zstr"):
@@ -77,7 +78,7 @@ class Assembler:
         elif token.type == "dir":
             self.handle_directive(token)
         else:
-            raise NotImplementedError()
+            raise UnexpectedTokenError(token, "Uknown token")
 
     def resolve_labels(self):
         for label in self.labels.values():

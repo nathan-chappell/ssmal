@@ -4,7 +4,7 @@ $output = '.\tests\ssmal\lang\tm\generated_parser_test.py'
 @'
 import pytest
 
-from ssmal.lang.tm.parser import parse_binary_transitions, BinaryTransition, TmParseError
+from ssmal.lang.tm.parser import parse_tm_transitions, TmTransition, TmParseError
 
 '@ > $output
 
@@ -35,11 +35,11 @@ $sampleNames | %{
 @'
     ],
 )
-def test_simple_ast_parser(filename: str, expected: list[BinaryTransition]):
+def test_simple_ast_parser(filename: str, expected: list[TmTransition]):
     with open(filename) as f:
         text = f.read()
-    binary_transitions = list(parse_binary_transitions(text))
-    assert binary_transitions == expected
+    tm_transitions = list(parse_tm_transitions(text))
+    assert tm_transitions == expected
 '@ >> $output
 
 Invoke-Expression "black $output"
