@@ -2,8 +2,9 @@ import io
 from typing import Literal
 
 from ssmal.processors.opcodes import opcode_map
+from ssmal.assemblers.errors import UnexpectedTokenError, UnresolvedLabelError
+from ssmal.assemblers.label import Label
 from ssmal.assemblers.token import Token
-from ssmal.assemblers.errors import UnexpectedTokenError
 
 TByteOrder = Literal["little", "big"]
 
@@ -13,6 +14,7 @@ class Assembler:
     encoding: Literal["ascii", "latin1"] = "ascii"
 
     buffer: io.BytesIO
+    labels: dict[str, Label]
     source_map: dict[int, Token]
     symbol_table: dict[str, bytes]
     tokens: list[Token]
@@ -21,6 +23,7 @@ class Assembler:
 
     def __init__(self, tokens: list[Token]):
         self.buffer = io.BytesIO()
+        self.labels = {}
         self.source_map = {}
         self.symbol_table = {v.__name__.lower(): k for k, v in opcode_map.items()}
         self.tokens = tokens
@@ -37,6 +40,7 @@ class Assembler:
     def assemble(self):
         while self._index < len(self.tokens):
             self.advance()
+        self.resolve_labels()
 
     def eat_token(self) -> Token:
         token = self.tokens[self._index]
@@ -51,8 +55,18 @@ class Assembler:
     def advance(self):
         token = self.eat_token()
         if token.type == "label":
-            self.symbol_table[token.value] = self.current_position_bytes
-        if token.type == "id":
+            _id = self._get_str_value(token)
+            if _id in self.labels:
+                self.labels[_id].address = self.current_position
+            else:
+                self.labels[_id] = Label(address=self.current_position, references=[], token=token)
+        if token.type == "label-ref":
+            _id = self._get_str_value(token)
+            if _id in self.labels:
+                self.labels[_id].references.append((self.current_position, token))
+            else:
+                self.labels[_id] = Label(address=-1, references=[(self.current_position, token)], token=token)
+        elif token.type == "id":
             self.emit(self.symbol_table[self.get_symbol(token)], token)
         elif token.type in ("xint", "dint", "bstr", "zstr"):
             self.emit(self.get_bytes(token), token)
@@ -64,6 +78,15 @@ class Assembler:
             self.handle_directive(token)
         else:
             raise NotImplementedError()
+
+    def resolve_labels(self):
+        for label in self.labels.values():
+            if label.address == -1:
+                raise UnresolvedLabelError(label)
+            _label_bytes = label.address.to_bytes(4, self.byteorder)
+            for address, token in label.references:
+                self.buffer.seek(address)
+                self.emit(_label_bytes, token)
 
     def handle_directive(self, t0: Token):
         if t0.value == ".here":

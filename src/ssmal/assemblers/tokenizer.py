@@ -6,10 +6,11 @@ from ssmal.assemblers.token import Token
 
 _tokens: list[Tuple[str, str]] = [
     ("label", r"[a-zA-Z_][a-zA-Z_0-9.]*:"),
+    ("label-ref", r"\$[a-zA-Z_][a-zA-Z_0-9.]*:"),
     ("id", r"[a-zA-Z_][a-zA-Z_0-9.]*"),
     ("dir", r"\.[a-zA-Z][a-zA-Z_0-9]*"),
     ("xint", r"0x[0-9]+"),
-    ("dint", r"[0-9]+"),
+    ("dint", r"-?[0-9]+"),
     ("bstr", r"'(''|[^'])*'"),
     ("zstr", r'"(\\\\|\\"|[^"])*"'),
     ("comment", r";[^\n]*"),

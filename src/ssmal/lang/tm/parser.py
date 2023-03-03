@@ -1,23 +1,15 @@
 import re
 
-from dataclasses import dataclass
-from typing import Literal, Generator
+from typing import Generator
+
+from ssmal.lang.tm.transtion import TmTransition
 
 
 class TmParseError(Exception):
     ...
 
 
-@dataclass
-class BinaryTransition:
-    cur_state: str
-    cur_symbol: Literal["0", "1", "2"]
-    next_state: str
-    next_symbol: Literal["0", "1", "2"]
-    move_head: Literal["L", "R", "STAY"]
-
-
-def get_lines(text: str) -> Generator[str, None, None]:
+def _get_lines(text: str) -> Generator[str, None, None]:
     for line in text.split("\n"):
         line = line.strip()
         if not line:
@@ -27,7 +19,7 @@ def get_lines(text: str) -> Generator[str, None, None]:
         yield line
 
 
-def parse_binary_transitions(text: str) -> Generator[BinaryTransition, None, None]:
+def parse_tm_transitions(text: str) -> Generator[TmTransition, None, None]:
     line_regex = re.compile(
         r"""
         (?P<cur_state>\w+)   #
@@ -42,7 +34,7 @@ def parse_binary_transitions(text: str) -> Generator[BinaryTransition, None, Non
     """,
         re.VERBOSE,
     )
-    for line in get_lines(text):
+    for line in _get_lines(text):
         line_match = line_regex.match(line)
         match line_match.groupdict() if line_match else None:
             case {
@@ -52,7 +44,7 @@ def parse_binary_transitions(text: str) -> Generator[BinaryTransition, None, Non
                 "next_symbol": ("0" | "1" | "2") as next_symbol,
                 "move_head": ("L" | "R" | "STAY") as move_head,
             }:
-                yield BinaryTransition(cur_state, cur_symbol, next_state, next_symbol, move_head)
+                yield TmTransition(cur_state, cur_symbol, next_state, next_symbol, move_head)
             case _:
                 raise TmParseError(f"failed to parse {line=}")
 
@@ -68,4 +60,4 @@ if __name__ == "__main__":  # pragma: no cover
     args = arg_parser.parse_args(sys.argv[1:])
 
     with open(args.filename) as f:
-        pprint.pprint(list(parse_binary_transitions(f.read())))
+        pprint.pprint(list(parse_tm_transitions(f.read())))
