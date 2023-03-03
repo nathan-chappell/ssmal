@@ -3,8 +3,9 @@ from typing import Literal
 
 from ssmal.processors.opcodes import opcode_map
 from ssmal.assemblers.errors import UnexpectedTokenError, UnresolvedLabelError
-from ssmal.assemblers.label import Label
+from ssmal.assemblers.resolvable import Resolvable
 from ssmal.assemblers.token import Token
+from ssmal.util.hexdump_bytes import hexdump_bytes
 
 TByteOrder = Literal["little", "big"]
 
@@ -12,14 +13,23 @@ TByteOrder = Literal["little", "big"]
 class Assembler:
     byteorder: TByteOrder = "little"
     encoding: Literal["ascii", "latin1"] = "ascii"
+    alignment = 0x20
 
     buffer: io.BytesIO
-    labels: dict[str, Label]
+    labels: dict[str, Resolvable]
     source_map: dict[int, Token]
     symbol_table: dict[str, bytes]
     tokens: list[Token]
+    # unresolved_symbols: dict[str, Resolvable] # this was not a good idea.
 
     _index: int
+
+    UNRESOLVED_ADDRESS_MARKER = -1
+
+    # UNRESOLVED_ADDRESS_BYTES = (-1).to_bytes(4, 'little')
+    @property
+    def unresolved_address_bytes(self) -> bytes:
+        return self.UNRESOLVED_ADDRESS_MARKER.to_bytes(4, self.byteorder, signed=True)
 
     def __init__(self, tokens: list[Token]):
         self.buffer = io.BytesIO()
@@ -27,6 +37,7 @@ class Assembler:
         self.source_map = {}
         self.symbol_table = {v.__name__.lower(): k for k, v in opcode_map.items()}
         self.tokens = tokens
+        # self.unresolved_symbols = {}
         self._index = 0
 
     @property
@@ -40,7 +51,8 @@ class Assembler:
     def assemble(self):
         while self._index < len(self.tokens):
             self.advance()
-        self.resolve_labels()
+        self._resolve_labels()
+        # self._resolve_symbols()
 
     def eat_token(self) -> Token:
         token = self.tokens[self._index]
@@ -52,23 +64,39 @@ class Assembler:
         for i in range(len(_bytes)):
             self.source_map[self.current_position + i] = token
 
+    def _update_resolvable(self, name: str, which_dict: Literal["labels"], action: Literal["ref", "def"], token: Token):
+        _dict: dict[str, Resolvable] = getattr(self, which_dict)
+        if action == "ref":
+            if name in _dict:
+                _dict[name].references.append((self.current_position, token))
+            else:
+                _dict[name] = Resolvable(address=self.UNRESOLVED_ADDRESS_MARKER, references=[(self.current_position, token)])
+        if action == "def":
+            if name in _dict and _dict[name].address != self.UNRESOLVED_ADDRESS_MARKER:
+                raise UnexpectedTokenError(token, "Label redefinition.")
+            elif name in _dict:
+                _dict[name].address = self.current_position
+                _dict[name].token = token
+            else:
+                _dict[name] = Resolvable(address=self.current_position, references=[], token=token)
+
     def advance(self):
         token = self.eat_token()
         if token.type == "label":
             label_name = token.value[:-1]
-            if label_name in self.labels:
-                self.labels[label_name].address = self.current_position
-            else:
-                self.labels[label_name] = Label(address=self.current_position, references=[], token=token)
+            self._update_resolvable(label_name, "labels", "def", token)
         elif token.type == "label-ref":
             label_name = token.value[1:]
-            if label_name in self.labels:
-                self.labels[label_name].references.append((self.current_position, token))
-            else:
-                self.labels[label_name] = Label(address=-1, references=[(self.current_position, token)], token=token)
-            self.emit(b'\xFF\xFF\xFF\xFF', token)
+            self._update_resolvable(label_name, "labels", "ref", token)
+            self.emit(self.unresolved_address_bytes, token)
         elif token.type == "id":
-            self.emit(self.symbol_table[self.get_symbol(token)], token)
+            _symbol = self.get_symbol(token)
+            if _symbol in self.symbol_table:
+                self.emit(self.symbol_table[_symbol], token)
+            else:
+                raise UnexpectedTokenError(token, f"Undefined symbol: {token.value}")
+                # self._update_resolvable(token.value, "unresolved_symbols", "ref", token)
+                # self.emit(self.UNRESOLVED_ADDRESS_BYTES, token)
         elif token.type in ("xint", "dint", "bstr", "zstr"):
             self.emit(self.get_bytes(token), token)
         elif token.type == "comment":
@@ -78,20 +106,36 @@ class Assembler:
         elif token.type == "dir":
             self.handle_directive(token)
         else:
-            raise UnexpectedTokenError(token, "Uknown token")
+            raise UnexpectedTokenError(token, "Unknown token")
 
-    def resolve_labels(self):
+    def _resolve_labels(self):
         for label in self.labels.values():
             if label.address == -1:
                 raise UnresolvedLabelError(label)
             _label_bytes = label.address.to_bytes(4, self.byteorder)
             for address, token in label.references:
                 self.buffer.seek(address)
+                _cur_val = int.from_bytes(self.buffer.read(4), self.byteorder, signed=True)
+                if _cur_val != self.UNRESOLVED_ADDRESS_MARKER:
+                    raise Exception("Double-resolution", label)
+                self.buffer.seek(address)
                 self.emit(_label_bytes, token)
+
+    # def _resolve_symbols(self):
+    #     for symbol in self.unresolved_symbols.values():
+    #         if symbol.token is None:
+    #             raise UnresolvedLabelError(symbol)
+    #         _symbol_bytes = self.symbol_table[symbol.token.value]
+    #         for address, token in symbol.references:
+    #             self.buffer.seek(address)
+    #             self.emit(_symbol_bytes, token)
 
     def handle_directive(self, t0: Token):
         if t0.value == ".here":
             self.emit(self.current_position_bytes, t0)
+        elif t0.value == ".align":
+            _bytes_to_alignment = b'\x00' * (self.alignment - self.current_position % self.alignment)
+            self.emit(_bytes_to_alignment, t0)
         else:
             t1 = self.eat_token()
             if t0.value == ".byteorder":
@@ -103,7 +147,12 @@ class Assembler:
             else:
                 t2 = self.eat_token()
                 if t0.value == ".def":
-                    self.symbol_table[self.get_symbol(t1)] = self.get_bytes(t2)
+                    _symbol = self.get_symbol(t1)
+                    if _symbol in self.symbol_table:
+                        raise UnexpectedTokenError(t1, "Symbol redefinition.")
+                    self.symbol_table[_symbol] = self.get_bytes(t2)
+                    # if _symbol in self.unresolved_symbols:
+                    #     self.unresolved_symbols[_symbol].token = t1
                 # elif t0.value == ".repeat":
                 #     self.emit(cast(int, self.get_repeated_value(t1)) * self.get_bytes(t2), t0)
                 else:
@@ -139,7 +188,7 @@ class Assembler:
         if token.type == "xint":
             return int(token.value, 16).to_bytes(4, self.byteorder)
         elif token.type == "dint":
-            return int(token.value).to_bytes(4, self.byteorder)
+            return int(token.value).to_bytes(4, self.byteorder, signed=True)
         elif token.type == "bstr":
             return bytes.fromhex(token.value[1:-1])
         elif token.type == "zstr":

@@ -1,4 +1,4 @@
-from ssmal.assemblers.label import Label
+from ssmal.assemblers.resolvable import Resolvable
 from ssmal.assemblers.token import Token
 
 
@@ -17,8 +17,9 @@ class UnexpectedTokenError(AssemblerError):
 
 
 class UnresolvedLabelError(AssemblerError):
-    label: Label
+    label: Resolvable
 
-    def __init__(self, label: Label):
+    def __init__(self, label: Resolvable, *args):
+        super().__init__(*args)
         self.label = label
         super().__init__(f"Unresolved label: {label.token}")

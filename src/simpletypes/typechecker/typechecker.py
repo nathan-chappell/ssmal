@@ -64,7 +64,7 @@ class TypeChecker:
     def get_type(self, expression: N.Expression) -> N.TypeName | N.FunctionDef:
         match expression:
             case N.IdentifierExpr(identifier=identifier) if identifier not in self.identifiers:
-                raise TypeError(f"Uknown {identifier=}", expression)
+                raise TypeError(f"Unknown {identifier=}", expression)
             case N.IdentifierExpr(identifier=identifier) if identifier in self.identifiers:
                 return self.identifiers[identifier]
 
@@ -73,10 +73,10 @@ class TypeChecker:
             case N.ValueExpr(value=str()):
                 return _str
             case N.ValueExpr():
-                raise TypeError(f"Uknown value type: {type(expression.value)}", expression)
+                raise TypeError(f"Unknown value type: {type(expression.value)}", expression)
 
             case N.CallExpr(function_name=function_name) if function_name not in self.identifiers:
-                raise TypeError(f"Uknown function: {function_name}", expression)
+                raise TypeError(f"Unknown function: {function_name}", expression)
             case N.CallExpr(function_name=function_name, arguments=arguments):
                 function_def = self.identifiers[function_name]
                 match function_def:

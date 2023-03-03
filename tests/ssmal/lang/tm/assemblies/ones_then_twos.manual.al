@@ -18,11 +18,14 @@ reading_ones:
     ; B points to position on tape
     ldab addi -1
         ; if 0
-        brni $SUCCESS
+        brni $reading_ones_case_0
         ; if 1
         brzi $reading_ones_case_1
         ; else
         bri $reading_ones_case_2
+    
+    reading_ones_case_0:
+        bri SUCCESS
 
     reading_ones_case_1:
         ; restore b

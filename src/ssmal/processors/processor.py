@@ -1,7 +1,7 @@
 from typing import Callable
 from ssmal.components.memory import Memory
 from ssmal.components.registers import Registers
-from ssmal.instructions.processor_signals import SysSignal
+from ssmal.instructions.processor_signals import SysSignal, TrapSignal
 from ssmal.processors.opcodes import opcode_map
 
 TOp = Callable[[Registers, Memory], None]
@@ -19,8 +19,13 @@ class Processor:
         self.registers = Registers()
         self.sys_vector = {}
 
-    def advance(self):
-        op = self.opcode_map[self.memory.load_bytes(self.registers.IP, 1)]
+    def advance(self, trace=False):
+        try:
+            op = self.opcode_map[self.memory.load_bytes(self.registers.IP, 1)]
+            if trace:
+                print(f' op: {op.__name__}')
+        except KeyError as e:
+            raise TrapSignal(self.registers, self.memory, *e.args)
         try:
             op(self.registers, self.memory)
         except SysSignal:

@@ -1,0 +1,2287 @@
+{
+  "version": "0.0",
+  "labels": {
+    "reading_ones:": "00000000",
+    "reading_ones_case_0:": "00000020",
+    "reading_ones_case_1:": "00000040",
+    "reading_ones_case_2:": "00000060",
+    "FAIL:": "00000160",
+    "reading_twos:": "000000a0",
+    "reading_twos_case_0:": "000000c0",
+    "reading_twos_case_1:": "000000e0",
+    "reading_twos_case_2:": "00000100",
+    "SUCCESS:": "000001a0",
+    "fail_message:": "00000180",
+    "success_message:": "000001c0"
+  },
+  "source_map": {
+    "1": {
+      "type": "id",
+      "value": "swpab",
+      "line": 3,
+      "column": 4,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "2": {
+      "type": "id",
+      "value": "psha",
+      "line": 3,
+      "column": 10,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "3": {
+      "type": "id",
+      "value": "swpab",
+      "line": 3,
+      "column": 15,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "4": {
+      "type": "id",
+      "value": "ldab",
+      "line": 5,
+      "column": 4,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "5": {
+      "type": "id",
+      "value": "addi",
+      "line": 5,
+      "column": 9,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "9": {
+      "type": "dint",
+      "value": "-1",
+      "line": 5,
+      "column": 14,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "10": {
+      "type": "id",
+      "value": "brni",
+      "line": 7,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "11": {
+      "type": "dint",
+      "value": "-1",
+      "line": 5,
+      "column": 14,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "12": {
+      "type": "dint",
+      "value": "-1",
+      "line": 5,
+      "column": 14,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "14": {
+      "type": "label-ref",
+      "value": "$reading_ones_case_0",
+      "line": 7,
+      "column": 13,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "15": {
+      "type": "label-ref",
+      "value": "$reading_ones_case_0",
+      "line": 7,
+      "column": 13,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "16": {
+      "type": "label-ref",
+      "value": "$reading_ones_case_0",
+      "line": 7,
+      "column": 13,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "17": {
+      "type": "label-ref",
+      "value": "$reading_ones_case_0",
+      "line": 7,
+      "column": 13,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "19": {
+      "type": "label-ref",
+      "value": "$reading_ones_case_1",
+      "line": 9,
+      "column": 13,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "20": {
+      "type": "label-ref",
+      "value": "$reading_ones_case_1",
+      "line": 9,
+      "column": 13,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "21": {
+      "type": "label-ref",
+      "value": "$reading_ones_case_1",
+      "line": 9,
+      "column": 13,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "22": {
+      "type": "label-ref",
+      "value": "$reading_ones_case_1",
+      "line": 9,
+      "column": 13,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "24": {
+      "type": "label-ref",
+      "value": "$reading_ones_case_2",
+      "line": 11,
+      "column": 12,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "25": {
+      "type": "label-ref",
+      "value": "$reading_ones_case_2",
+      "line": 11,
+      "column": 12,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "26": {
+      "type": "label-ref",
+      "value": "$reading_ones_case_2",
+      "line": 11,
+      "column": 12,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "27": {
+      "type": "label-ref",
+      "value": "$reading_ones_case_2",
+      "line": 11,
+      "column": 12,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "32": {
+      "type": "dir",
+      "value": ".align",
+      "line": 12,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "33": {
+      "type": "id",
+      "value": "popa",
+      "line": 16,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "34": {
+      "type": "id",
+      "value": "swpab",
+      "line": 16,
+      "column": 13,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "35": {
+      "type": "id",
+      "value": "ldai",
+      "line": 18,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "36": {
+      "type": "dir",
+      "value": ".align",
+      "line": 12,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "37": {
+      "type": "dir",
+      "value": ".align",
+      "line": 12,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "38": {
+      "type": "dir",
+      "value": ".align",
+      "line": 12,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "39": {
+      "type": "dint",
+      "value": "0",
+      "line": 18,
+      "column": 13,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "40": {
+      "type": "id",
+      "value": "stab",
+      "line": 18,
+      "column": 15,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "41": {
+      "type": "id",
+      "value": "swpab",
+      "line": 20,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "42": {
+      "type": "id",
+      "value": "addi",
+      "line": 20,
+      "column": 14,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "46": {
+      "type": "dint",
+      "value": "1",
+      "line": 20,
+      "column": 19,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "47": {
+      "type": "id",
+      "value": "swpab",
+      "line": 20,
+      "column": 21,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "48": {
+      "type": "id",
+      "value": "bri",
+      "line": 22,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "49": {
+      "type": "dint",
+      "value": "1",
+      "line": 20,
+      "column": 19,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "52": {
+      "type": "label-ref",
+      "value": "$FAIL",
+      "line": 22,
+      "column": 12,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "53": {
+      "type": "label-ref",
+      "value": "$FAIL",
+      "line": 22,
+      "column": 12,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "54": {
+      "type": "label-ref",
+      "value": "$FAIL",
+      "line": 22,
+      "column": 12,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "55": {
+      "type": "label-ref",
+      "value": "$FAIL",
+      "line": 22,
+      "column": 12,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "64": {
+      "type": "dir",
+      "value": ".align",
+      "line": 22,
+      "column": 18,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "65": {
+      "type": "id",
+      "value": "popa",
+      "line": 26,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "66": {
+      "type": "id",
+      "value": "swpab",
+      "line": 26,
+      "column": 13,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "67": {
+      "type": "id",
+      "value": "ldai",
+      "line": 28,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "68": {
+      "type": "dir",
+      "value": ".align",
+      "line": 22,
+      "column": 18,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "69": {
+      "type": "dir",
+      "value": ".align",
+      "line": 22,
+      "column": 18,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "70": {
+      "type": "dir",
+      "value": ".align",
+      "line": 22,
+      "column": 18,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "71": {
+      "type": "dint",
+      "value": "0",
+      "line": 28,
+      "column": 13,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "72": {
+      "type": "id",
+      "value": "stab",
+      "line": 28,
+      "column": 15,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "73": {
+      "type": "id",
+      "value": "swpab",
+      "line": 30,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "74": {
+      "type": "id",
+      "value": "addi",
+      "line": 30,
+      "column": 14,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "75": {
+      "type": "dir",
+      "value": ".align",
+      "line": 22,
+      "column": 18,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "78": {
+      "type": "dint",
+      "value": "1",
+      "line": 30,
+      "column": 19,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "79": {
+      "type": "id",
+      "value": "swpab",
+      "line": 30,
+      "column": 21,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "80": {
+      "type": "id",
+      "value": "bri",
+      "line": 32,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "81": {
+      "type": "dint",
+      "value": "1",
+      "line": 30,
+      "column": 19,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "84": {
+      "type": "label-ref",
+      "value": "$reading_ones",
+      "line": 32,
+      "column": 12,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "85": {
+      "type": "label-ref",
+      "value": "$reading_ones",
+      "line": 32,
+      "column": 12,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "86": {
+      "type": "label-ref",
+      "value": "$reading_ones",
+      "line": 32,
+      "column": 12,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "87": {
+      "type": "label-ref",
+      "value": "$reading_ones",
+      "line": 32,
+      "column": 12,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "96": {
+      "type": "dir",
+      "value": ".align",
+      "line": 32,
+      "column": 26,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "97": {
+      "type": "id",
+      "value": "popa",
+      "line": 36,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "98": {
+      "type": "id",
+      "value": "swpab",
+      "line": 36,
+      "column": 13,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "99": {
+      "type": "id",
+      "value": "ldai",
+      "line": 38,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "100": {
+      "type": "dir",
+      "value": ".align",
+      "line": 32,
+      "column": 26,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "101": {
+      "type": "dir",
+      "value": ".align",
+      "line": 32,
+      "column": 26,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "102": {
+      "type": "dir",
+      "value": ".align",
+      "line": 32,
+      "column": 26,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "103": {
+      "type": "dint",
+      "value": "0",
+      "line": 38,
+      "column": 13,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "104": {
+      "type": "id",
+      "value": "stab",
+      "line": 38,
+      "column": 15,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "105": {
+      "type": "id",
+      "value": "swpab",
+      "line": 40,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "106": {
+      "type": "id",
+      "value": "addi",
+      "line": 40,
+      "column": 14,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "107": {
+      "type": "dir",
+      "value": ".align",
+      "line": 32,
+      "column": 26,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "110": {
+      "type": "dint",
+      "value": "1",
+      "line": 40,
+      "column": 19,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "111": {
+      "type": "id",
+      "value": "swpab",
+      "line": 40,
+      "column": 21,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "112": {
+      "type": "id",
+      "value": "bri",
+      "line": 42,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "113": {
+      "type": "dint",
+      "value": "1",
+      "line": 40,
+      "column": 19,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "116": {
+      "type": "label-ref",
+      "value": "$reading_twos",
+      "line": 42,
+      "column": 12,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "117": {
+      "type": "label-ref",
+      "value": "$reading_twos",
+      "line": 42,
+      "column": 12,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "118": {
+      "type": "label-ref",
+      "value": "$reading_twos",
+      "line": 42,
+      "column": 12,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "119": {
+      "type": "label-ref",
+      "value": "$reading_twos",
+      "line": 42,
+      "column": 12,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "128": {
+      "type": "dir",
+      "value": ".align",
+      "line": 42,
+      "column": 26,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "129": {
+      "type": "dir",
+      "value": ".align",
+      "line": 42,
+      "column": 26,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "130": {
+      "type": "dir",
+      "value": ".align",
+      "line": 42,
+      "column": 26,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "131": {
+      "type": "dir",
+      "value": ".align",
+      "line": 42,
+      "column": 26,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "132": {
+      "type": "dir",
+      "value": ".align",
+      "line": 42,
+      "column": 26,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "133": {
+      "type": "dir",
+      "value": ".align",
+      "line": 42,
+      "column": 26,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "134": {
+      "type": "dir",
+      "value": ".align",
+      "line": 42,
+      "column": 26,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "135": {
+      "type": "dir",
+      "value": ".align",
+      "line": 42,
+      "column": 26,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "136": {
+      "type": "dir",
+      "value": ".align",
+      "line": 42,
+      "column": 26,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "137": {
+      "type": "dir",
+      "value": ".align",
+      "line": 42,
+      "column": 26,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "138": {
+      "type": "dir",
+      "value": ".align",
+      "line": 42,
+      "column": 26,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "139": {
+      "type": "dir",
+      "value": ".align",
+      "line": 42,
+      "column": 26,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "160": {
+      "type": "dir",
+      "value": ".align",
+      "line": 44,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "161": {
+      "type": "id",
+      "value": "swpab",
+      "line": 47,
+      "column": 4,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "162": {
+      "type": "id",
+      "value": "psha",
+      "line": 47,
+      "column": 10,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "163": {
+      "type": "id",
+      "value": "swpab",
+      "line": 47,
+      "column": 15,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "164": {
+      "type": "id",
+      "value": "ldab",
+      "line": 49,
+      "column": 4,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "165": {
+      "type": "id",
+      "value": "addi",
+      "line": 49,
+      "column": 9,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "166": {
+      "type": "dir",
+      "value": ".align",
+      "line": 44,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "167": {
+      "type": "dir",
+      "value": ".align",
+      "line": 44,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "168": {
+      "type": "dir",
+      "value": ".align",
+      "line": 44,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "169": {
+      "type": "dint",
+      "value": "-1",
+      "line": 49,
+      "column": 14,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "170": {
+      "type": "id",
+      "value": "brni",
+      "line": 51,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "171": {
+      "type": "dint",
+      "value": "-1",
+      "line": 49,
+      "column": 14,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "172": {
+      "type": "dint",
+      "value": "-1",
+      "line": 49,
+      "column": 14,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "173": {
+      "type": "dir",
+      "value": ".align",
+      "line": 44,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "174": {
+      "type": "label-ref",
+      "value": "$reading_twos_case_0",
+      "line": 51,
+      "column": 13,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "175": {
+      "type": "label-ref",
+      "value": "$reading_twos_case_0",
+      "line": 51,
+      "column": 13,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "176": {
+      "type": "label-ref",
+      "value": "$reading_twos_case_0",
+      "line": 51,
+      "column": 13,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "177": {
+      "type": "label-ref",
+      "value": "$reading_twos_case_0",
+      "line": 51,
+      "column": 13,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "178": {
+      "type": "dir",
+      "value": ".align",
+      "line": 44,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "179": {
+      "type": "label-ref",
+      "value": "$reading_twos_case_1",
+      "line": 53,
+      "column": 13,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "180": {
+      "type": "label-ref",
+      "value": "$reading_twos_case_1",
+      "line": 53,
+      "column": 13,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "181": {
+      "type": "label-ref",
+      "value": "$reading_twos_case_1",
+      "line": 53,
+      "column": 13,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "182": {
+      "type": "label-ref",
+      "value": "$reading_twos_case_1",
+      "line": 53,
+      "column": 13,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "183": {
+      "type": "dir",
+      "value": ".align",
+      "line": 44,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "184": {
+      "type": "label-ref",
+      "value": "$reading_twos_case_2",
+      "line": 55,
+      "column": 12,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "185": {
+      "type": "label-ref",
+      "value": "$reading_twos_case_2",
+      "line": 55,
+      "column": 12,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "186": {
+      "type": "label-ref",
+      "value": "$reading_twos_case_2",
+      "line": 55,
+      "column": 12,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "187": {
+      "type": "label-ref",
+      "value": "$reading_twos_case_2",
+      "line": 55,
+      "column": 12,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "188": {
+      "type": "dir",
+      "value": ".align",
+      "line": 44,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "189": {
+      "type": "dir",
+      "value": ".align",
+      "line": 44,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "190": {
+      "type": "dir",
+      "value": ".align",
+      "line": 44,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "191": {
+      "type": "dir",
+      "value": ".align",
+      "line": 44,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "192": {
+      "type": "dir",
+      "value": ".align",
+      "line": 56,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "193": {
+      "type": "id",
+      "value": "popa",
+      "line": 60,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "194": {
+      "type": "id",
+      "value": "swpab",
+      "line": 60,
+      "column": 13,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "195": {
+      "type": "id",
+      "value": "ldai",
+      "line": 62,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "196": {
+      "type": "dir",
+      "value": ".align",
+      "line": 56,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "197": {
+      "type": "dir",
+      "value": ".align",
+      "line": 56,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "198": {
+      "type": "dir",
+      "value": ".align",
+      "line": 56,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "199": {
+      "type": "dint",
+      "value": "0",
+      "line": 62,
+      "column": 13,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "200": {
+      "type": "id",
+      "value": "stab",
+      "line": 62,
+      "column": 15,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "201": {
+      "type": "id",
+      "value": "swpab",
+      "line": 64,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "202": {
+      "type": "id",
+      "value": "addi",
+      "line": 64,
+      "column": 14,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "206": {
+      "type": "dint",
+      "value": "1",
+      "line": 64,
+      "column": 19,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "207": {
+      "type": "id",
+      "value": "swpab",
+      "line": 64,
+      "column": 21,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "208": {
+      "type": "id",
+      "value": "bri",
+      "line": 66,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "209": {
+      "type": "dint",
+      "value": "1",
+      "line": 64,
+      "column": 19,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "212": {
+      "type": "label-ref",
+      "value": "$SUCCESS",
+      "line": 66,
+      "column": 12,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "213": {
+      "type": "label-ref",
+      "value": "$SUCCESS",
+      "line": 66,
+      "column": 12,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "214": {
+      "type": "label-ref",
+      "value": "$SUCCESS",
+      "line": 66,
+      "column": 12,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "215": {
+      "type": "label-ref",
+      "value": "$SUCCESS",
+      "line": 66,
+      "column": 12,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "224": {
+      "type": "dir",
+      "value": ".align",
+      "line": 66,
+      "column": 21,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "225": {
+      "type": "id",
+      "value": "popa",
+      "line": 70,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "226": {
+      "type": "id",
+      "value": "swpab",
+      "line": 70,
+      "column": 13,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "227": {
+      "type": "id",
+      "value": "ldai",
+      "line": 72,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "228": {
+      "type": "dir",
+      "value": ".align",
+      "line": 66,
+      "column": 21,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "229": {
+      "type": "dir",
+      "value": ".align",
+      "line": 66,
+      "column": 21,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "230": {
+      "type": "dir",
+      "value": ".align",
+      "line": 66,
+      "column": 21,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "231": {
+      "type": "dint",
+      "value": "0",
+      "line": 72,
+      "column": 13,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "232": {
+      "type": "id",
+      "value": "stab",
+      "line": 72,
+      "column": 15,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "233": {
+      "type": "id",
+      "value": "swpab",
+      "line": 74,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "234": {
+      "type": "id",
+      "value": "addi",
+      "line": 74,
+      "column": 14,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "235": {
+      "type": "dir",
+      "value": ".align",
+      "line": 66,
+      "column": 21,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "238": {
+      "type": "dint",
+      "value": "1",
+      "line": 74,
+      "column": 19,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "239": {
+      "type": "id",
+      "value": "swpab",
+      "line": 74,
+      "column": 21,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "240": {
+      "type": "id",
+      "value": "bri",
+      "line": 76,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "241": {
+      "type": "dint",
+      "value": "1",
+      "line": 74,
+      "column": 19,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "244": {
+      "type": "label-ref",
+      "value": "$FAIL",
+      "line": 76,
+      "column": 12,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "245": {
+      "type": "label-ref",
+      "value": "$FAIL",
+      "line": 76,
+      "column": 12,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "246": {
+      "type": "label-ref",
+      "value": "$FAIL",
+      "line": 76,
+      "column": 12,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "247": {
+      "type": "label-ref",
+      "value": "$FAIL",
+      "line": 76,
+      "column": 12,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "256": {
+      "type": "dir",
+      "value": ".align",
+      "line": 76,
+      "column": 18,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "257": {
+      "type": "id",
+      "value": "popa",
+      "line": 80,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "258": {
+      "type": "id",
+      "value": "swpab",
+      "line": 80,
+      "column": 13,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "259": {
+      "type": "id",
+      "value": "ldai",
+      "line": 82,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "260": {
+      "type": "dir",
+      "value": ".align",
+      "line": 76,
+      "column": 18,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "261": {
+      "type": "dir",
+      "value": ".align",
+      "line": 76,
+      "column": 18,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "262": {
+      "type": "dir",
+      "value": ".align",
+      "line": 76,
+      "column": 18,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "263": {
+      "type": "dint",
+      "value": "0",
+      "line": 82,
+      "column": 13,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "264": {
+      "type": "id",
+      "value": "stab",
+      "line": 82,
+      "column": 15,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "265": {
+      "type": "id",
+      "value": "swpab",
+      "line": 84,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "266": {
+      "type": "id",
+      "value": "addi",
+      "line": 84,
+      "column": 14,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "267": {
+      "type": "dir",
+      "value": ".align",
+      "line": 76,
+      "column": 18,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "270": {
+      "type": "dint",
+      "value": "1",
+      "line": 84,
+      "column": 19,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "271": {
+      "type": "id",
+      "value": "swpab",
+      "line": 84,
+      "column": 21,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "272": {
+      "type": "id",
+      "value": "bri",
+      "line": 86,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "273": {
+      "type": "dint",
+      "value": "1",
+      "line": 84,
+      "column": 19,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "276": {
+      "type": "label-ref",
+      "value": "$reading_twos",
+      "line": 86,
+      "column": 12,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "277": {
+      "type": "label-ref",
+      "value": "$reading_twos",
+      "line": 86,
+      "column": 12,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "278": {
+      "type": "label-ref",
+      "value": "$reading_twos",
+      "line": 86,
+      "column": 12,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "279": {
+      "type": "label-ref",
+      "value": "$reading_twos",
+      "line": 86,
+      "column": 12,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "288": {
+      "type": "dir",
+      "value": ".align",
+      "line": 86,
+      "column": 26,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "289": {
+      "type": "dir",
+      "value": ".align",
+      "line": 86,
+      "column": 26,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "290": {
+      "type": "dir",
+      "value": ".align",
+      "line": 86,
+      "column": 26,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "291": {
+      "type": "dir",
+      "value": ".align",
+      "line": 86,
+      "column": 26,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "292": {
+      "type": "dir",
+      "value": ".align",
+      "line": 86,
+      "column": 26,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "293": {
+      "type": "dir",
+      "value": ".align",
+      "line": 86,
+      "column": 26,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "294": {
+      "type": "dir",
+      "value": ".align",
+      "line": 86,
+      "column": 26,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "295": {
+      "type": "dir",
+      "value": ".align",
+      "line": 86,
+      "column": 26,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "296": {
+      "type": "dir",
+      "value": ".align",
+      "line": 86,
+      "column": 26,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "297": {
+      "type": "dir",
+      "value": ".align",
+      "line": 86,
+      "column": 26,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "298": {
+      "type": "dir",
+      "value": ".align",
+      "line": 86,
+      "column": 26,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "299": {
+      "type": "dir",
+      "value": ".align",
+      "line": 86,
+      "column": 26,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "320": {
+      "type": "dir",
+      "value": ".align",
+      "line": 88,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "321": {
+      "type": "dir",
+      "value": ".align",
+      "line": 88,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "322": {
+      "type": "dir",
+      "value": ".align",
+      "line": 88,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "323": {
+      "type": "dir",
+      "value": ".align",
+      "line": 88,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "324": {
+      "type": "dir",
+      "value": ".align",
+      "line": 88,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "325": {
+      "type": "dir",
+      "value": ".align",
+      "line": 88,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "326": {
+      "type": "dir",
+      "value": ".align",
+      "line": 88,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "327": {
+      "type": "dir",
+      "value": ".align",
+      "line": 88,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "328": {
+      "type": "dir",
+      "value": ".align",
+      "line": 88,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "329": {
+      "type": "dir",
+      "value": ".align",
+      "line": 88,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "330": {
+      "type": "dir",
+      "value": ".align",
+      "line": 88,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "331": {
+      "type": "dir",
+      "value": ".align",
+      "line": 88,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "332": {
+      "type": "dir",
+      "value": ".align",
+      "line": 88,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "333": {
+      "type": "dir",
+      "value": ".align",
+      "line": 88,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "334": {
+      "type": "dir",
+      "value": ".align",
+      "line": 88,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "335": {
+      "type": "dir",
+      "value": ".align",
+      "line": 88,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "336": {
+      "type": "dir",
+      "value": ".align",
+      "line": 88,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "337": {
+      "type": "dir",
+      "value": ".align",
+      "line": 88,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "338": {
+      "type": "dir",
+      "value": ".align",
+      "line": 88,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "339": {
+      "type": "dir",
+      "value": ".align",
+      "line": 88,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "340": {
+      "type": "dir",
+      "value": ".align",
+      "line": 88,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "341": {
+      "type": "dir",
+      "value": ".align",
+      "line": 88,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "342": {
+      "type": "dir",
+      "value": ".align",
+      "line": 88,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "343": {
+      "type": "dir",
+      "value": ".align",
+      "line": 88,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "344": {
+      "type": "dir",
+      "value": ".align",
+      "line": 88,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "345": {
+      "type": "dir",
+      "value": ".align",
+      "line": 88,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "346": {
+      "type": "dir",
+      "value": ".align",
+      "line": 88,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "347": {
+      "type": "dir",
+      "value": ".align",
+      "line": 88,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "348": {
+      "type": "dir",
+      "value": ".align",
+      "line": 88,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "349": {
+      "type": "dir",
+      "value": ".align",
+      "line": 88,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "350": {
+      "type": "dir",
+      "value": ".align",
+      "line": 88,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "351": {
+      "type": "dir",
+      "value": ".align",
+      "line": 88,
+      "column": 8,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "352": {
+      "type": "dir",
+      "value": ".align",
+      "line": 89,
+      "column": 0,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "353": {
+      "type": "id",
+      "value": "ldai",
+      "line": 91,
+      "column": 4,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "354": {
+      "type": "dir",
+      "value": ".align",
+      "line": 89,
+      "column": 0,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "355": {
+      "type": "dir",
+      "value": ".align",
+      "line": 89,
+      "column": 0,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "356": {
+      "type": "dir",
+      "value": ".align",
+      "line": 89,
+      "column": 0,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "357": {
+      "type": "label-ref",
+      "value": "$fail_message",
+      "line": 91,
+      "column": 9,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "358": {
+      "type": "label-ref",
+      "value": "$fail_message",
+      "line": 91,
+      "column": 9,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "359": {
+      "type": "label-ref",
+      "value": "$fail_message",
+      "line": 91,
+      "column": 9,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "360": {
+      "type": "label-ref",
+      "value": "$fail_message",
+      "line": 91,
+      "column": 9,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "361": {
+      "type": "dir",
+      "value": ".align",
+      "line": 89,
+      "column": 0,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "362": {
+      "type": "dir",
+      "value": ".align",
+      "line": 89,
+      "column": 0,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "363": {
+      "type": "dint",
+      "value": "0",
+      "line": 93,
+      "column": 9,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "364": {
+      "type": "id",
+      "value": "sys",
+      "line": 94,
+      "column": 4,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "365": {
+      "type": "id",
+      "value": "halt",
+      "line": 95,
+      "column": 4,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "366": {
+      "type": "dint",
+      "value": "0",
+      "line": 93,
+      "column": 9,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "367": {
+      "type": "dir",
+      "value": ".align",
+      "line": 89,
+      "column": 0,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "368": {
+      "type": "dir",
+      "value": ".align",
+      "line": 89,
+      "column": 0,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "369": {
+      "type": "dir",
+      "value": ".align",
+      "line": 89,
+      "column": 0,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "370": {
+      "type": "dir",
+      "value": ".align",
+      "line": 89,
+      "column": 0,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "371": {
+      "type": "dir",
+      "value": ".align",
+      "line": 89,
+      "column": 0,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "372": {
+      "type": "dir",
+      "value": ".align",
+      "line": 89,
+      "column": 0,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "373": {
+      "type": "dir",
+      "value": ".align",
+      "line": 89,
+      "column": 0,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "374": {
+      "type": "dir",
+      "value": ".align",
+      "line": 89,
+      "column": 0,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "375": {
+      "type": "dir",
+      "value": ".align",
+      "line": 89,
+      "column": 0,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "376": {
+      "type": "dir",
+      "value": ".align",
+      "line": 89,
+      "column": 0,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "377": {
+      "type": "dir",
+      "value": ".align",
+      "line": 89,
+      "column": 0,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "378": {
+      "type": "dir",
+      "value": ".align",
+      "line": 89,
+      "column": 0,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "379": {
+      "type": "dir",
+      "value": ".align",
+      "line": 89,
+      "column": 0,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "380": {
+      "type": "dir",
+      "value": ".align",
+      "line": 89,
+      "column": 0,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "381": {
+      "type": "dir",
+      "value": ".align",
+      "line": 89,
+      "column": 0,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "382": {
+      "type": "dir",
+      "value": ".align",
+      "line": 89,
+      "column": 0,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "383": {
+      "type": "dir",
+      "value": ".align",
+      "line": 89,
+      "column": 0,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "384": {
+      "type": "dir",
+      "value": ".align",
+      "line": 96,
+      "column": 4,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "385": {
+      "type": "dir",
+      "value": ".align",
+      "line": 96,
+      "column": 4,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "386": {
+      "type": "dir",
+      "value": ".align",
+      "line": 96,
+      "column": 4,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "387": {
+      "type": "dir",
+      "value": ".align",
+      "line": 96,
+      "column": 4,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "388": {
+      "type": "dir",
+      "value": ".align",
+      "line": 96,
+      "column": 4,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "389": {
+      "type": "zstr",
+      "value": "\"FAIL\"",
+      "line": 97,
+      "column": 18,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "390": {
+      "type": "zstr",
+      "value": "\"FAIL\"",
+      "line": 97,
+      "column": 18,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "391": {
+      "type": "zstr",
+      "value": "\"FAIL\"",
+      "line": 97,
+      "column": 18,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "392": {
+      "type": "zstr",
+      "value": "\"FAIL\"",
+      "line": 97,
+      "column": 18,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "393": {
+      "type": "zstr",
+      "value": "\"FAIL\"",
+      "line": 97,
+      "column": 18,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "394": {
+      "type": "dir",
+      "value": ".align",
+      "line": 96,
+      "column": 4,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "395": {
+      "type": "dir",
+      "value": ".align",
+      "line": 96,
+      "column": 4,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "396": {
+      "type": "dir",
+      "value": ".align",
+      "line": 96,
+      "column": 4,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "397": {
+      "type": "dir",
+      "value": ".align",
+      "line": 96,
+      "column": 4,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "398": {
+      "type": "dir",
+      "value": ".align",
+      "line": 96,
+      "column": 4,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "399": {
+      "type": "dir",
+      "value": ".align",
+      "line": 96,
+      "column": 4,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "400": {
+      "type": "dir",
+      "value": ".align",
+      "line": 96,
+      "column": 4,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "401": {
+      "type": "dir",
+      "value": ".align",
+      "line": 96,
+      "column": 4,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "402": {
+      "type": "dir",
+      "value": ".align",
+      "line": 96,
+      "column": 4,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "416": {
+      "type": "dir",
+      "value": ".align",
+      "line": 99,
+      "column": 0,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "417": {
+      "type": "id",
+      "value": "ldai",
+      "line": 101,
+      "column": 4,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "418": {
+      "type": "dir",
+      "value": ".align",
+      "line": 99,
+      "column": 0,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "419": {
+      "type": "dir",
+      "value": ".align",
+      "line": 99,
+      "column": 0,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "420": {
+      "type": "dir",
+      "value": ".align",
+      "line": 99,
+      "column": 0,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "421": {
+      "type": "label-ref",
+      "value": "$success_message",
+      "line": 101,
+      "column": 9,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "422": {
+      "type": "label-ref",
+      "value": "$success_message",
+      "line": 101,
+      "column": 9,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "423": {
+      "type": "label-ref",
+      "value": "$success_message",
+      "line": 101,
+      "column": 9,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "424": {
+      "type": "label-ref",
+      "value": "$success_message",
+      "line": 101,
+      "column": 9,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "425": {
+      "type": "dir",
+      "value": ".align",
+      "line": 99,
+      "column": 0,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "426": {
+      "type": "dir",
+      "value": ".align",
+      "line": 99,
+      "column": 0,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "427": {
+      "type": "dint",
+      "value": "0",
+      "line": 103,
+      "column": 9,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "428": {
+      "type": "id",
+      "value": "sys",
+      "line": 104,
+      "column": 4,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "429": {
+      "type": "id",
+      "value": "halt",
+      "line": 105,
+      "column": 4,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "430": {
+      "type": "dint",
+      "value": "0",
+      "line": 103,
+      "column": 9,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "431": {
+      "type": "dir",
+      "value": ".align",
+      "line": 99,
+      "column": 0,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "432": {
+      "type": "dir",
+      "value": ".align",
+      "line": 99,
+      "column": 0,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "433": {
+      "type": "dir",
+      "value": ".align",
+      "line": 99,
+      "column": 0,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "434": {
+      "type": "dir",
+      "value": ".align",
+      "line": 99,
+      "column": 0,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "435": {
+      "type": "dir",
+      "value": ".align",
+      "line": 99,
+      "column": 0,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "436": {
+      "type": "dir",
+      "value": ".align",
+      "line": 99,
+      "column": 0,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "437": {
+      "type": "dir",
+      "value": ".align",
+      "line": 99,
+      "column": 0,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "438": {
+      "type": "dir",
+      "value": ".align",
+      "line": 99,
+      "column": 0,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "439": {
+      "type": "dir",
+      "value": ".align",
+      "line": 99,
+      "column": 0,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "440": {
+      "type": "dir",
+      "value": ".align",
+      "line": 99,
+      "column": 0,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "441": {
+      "type": "dir",
+      "value": ".align",
+      "line": 99,
+      "column": 0,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "442": {
+      "type": "dir",
+      "value": ".align",
+      "line": 99,
+      "column": 0,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "448": {
+      "type": "dir",
+      "value": ".align",
+      "line": 106,
+      "column": 4,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "449": {
+      "type": "dir",
+      "value": ".align",
+      "line": 106,
+      "column": 4,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "450": {
+      "type": "dir",
+      "value": ".align",
+      "line": 106,
+      "column": 4,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "451": {
+      "type": "dir",
+      "value": ".align",
+      "line": 106,
+      "column": 4,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "452": {
+      "type": "dir",
+      "value": ".align",
+      "line": 106,
+      "column": 4,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "453": {
+      "type": "dir",
+      "value": ".align",
+      "line": 106,
+      "column": 4,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "454": {
+      "type": "dir",
+      "value": ".align",
+      "line": 106,
+      "column": 4,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "455": {
+      "type": "dir",
+      "value": ".align",
+      "line": 106,
+      "column": 4,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "456": {
+      "type": "zstr",
+      "value": "\"SUCCESS\"",
+      "line": 107,
+      "column": 21,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "457": {
+      "type": "zstr",
+      "value": "\"SUCCESS\"",
+      "line": 107,
+      "column": 21,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "458": {
+      "type": "zstr",
+      "value": "\"SUCCESS\"",
+      "line": 107,
+      "column": 21,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "459": {
+      "type": "zstr",
+      "value": "\"SUCCESS\"",
+      "line": 107,
+      "column": 21,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "460": {
+      "type": "zstr",
+      "value": "\"SUCCESS\"",
+      "line": 107,
+      "column": 21,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "461": {
+      "type": "zstr",
+      "value": "\"SUCCESS\"",
+      "line": 107,
+      "column": 21,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "462": {
+      "type": "zstr",
+      "value": "\"SUCCESS\"",
+      "line": 107,
+      "column": 21,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "463": {
+      "type": "zstr",
+      "value": "\"SUCCESS\"",
+      "line": 107,
+      "column": 21,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "464": {
+      "type": "dir",
+      "value": ".align",
+      "line": 106,
+      "column": 4,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "465": {
+      "type": "dir",
+      "value": ".align",
+      "line": 106,
+      "column": 4,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    },
+    "466": {
+      "type": "dir",
+      "value": ".align",
+      "line": 106,
+      "column": 4,
+      "filename": "tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.al"
+    }
+  }
+}

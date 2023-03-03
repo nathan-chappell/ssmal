@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from ssmal.assemblers.token import Token
 
 @dataclass
-class Label:
+class Resolvable:
     address: int
     references: list[tuple[int, Token]]
-    token: Token
+    token: Token | None = None
