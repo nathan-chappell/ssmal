@@ -7,9 +7,12 @@ import pytest
 from ssmal.assemblers.tokenizer import tokenize
 from ssmal.assemblers.assembler import Assembler
 from ssmal.components.memory import MonitoredWrite
+from ssmal.lang.tm.loader import TmLoader
 from ssmal.lang.tm.parser import parse_tm_transitions
 from ssmal.lang.tm.compiler import TmCompiler, TransitionCompiler
 from ssmal.processors.processor import Processor
+from ssmal.util.ascii_safe_encode import ascii_safe_encode
+from ssmal.util.hexdump_bytes import hexdump_bytes
 from ssmal.util.writer.tm_assembler_writer import TmAssemblerWriter
 
 
@@ -25,11 +28,7 @@ first_one 2 FAIL 0 R
 
 ones 0 FAIL 0 R
 ones 1 ones 0 R
-ones 2 first_two 0 R
-
-first_two 0 FAIL 0 R
-first_two 1 FAIL 0 R
-first_two 2 twos 0 R
+ones 2 twos 0 R
 
 twos 0 SUCCESS 0 R
 twos 1 FAIL 0 R
@@ -40,34 +39,38 @@ twos 2 twos 0 R
     compiler = TmCompiler()
     compiler.compile(transitions)
     print(compiler.assembly)
+
     assembler = Assembler(list(tokenize(compiler.assembly)))
     assembler.assemble()
-    object_bytes = assembler.buffer.getvalue()
+    text_bytes = assembler.buffer.getvalue()
+
     p = Processor()
     p.log.setLevel(logging.DEBUG)
-    p.log.debug(f"Object length length: {len(object_bytes)}")
-    p.memory.store_bytes(0, object_bytes)
-    p.memory.dump()
-    p.registers.SP = len(object_bytes) + 4
-    end_of_stack = p.registers.SP + 0x20
-    p.registers.B = end_of_stack
+    p.log.debug(f"Object length length: {len(text_bytes)}")
 
-    for i, val in enumerate(input):
-        INT_SIZE = 4
-        p.memory.store(end_of_stack + i * INT_SIZE, val)
+    data_bytes = b"".join(x.to_bytes(4, "little") for x in input)
 
-    _result: str | None = None
+    tm_loader = TmLoader(text_bytes=text_bytes, data_bytes=data_bytes)
+    # tm_loader.log.setLevel(logging.DEBUG)
+    tm_loader.load_program(p)
+
+    # p.memory.dump()
 
     class HeardResult(Exception):
-        ...
+        zstr: str
+
+        def __init__(self, zstr: str, *args: object) -> None:
+            super().__init__(*args)
+            self.zstr = zstr
 
     def _listen_result(*args, **kwargs) -> None:
-        nonlocal _result
-        _p = p
-        # _result = str(p.memory.load_bytes(p.registers.A, len(expected)), "ascii")
-        breakpoint()
-        _result = str(p.memory.load_bytes(p.registers.SP, 4), "ascii")
-        raise HeardResult()
+        _bytes = p.memory.load_bytes(p.memory.load(p.registers.SP - 4), 100)
+        _bytes = _bytes[:_bytes.index(b'\x00')]
+        _result = ascii_safe_encode(_bytes)
+        if "SUCCESS" in _result or "FAIL" in _result:
+            raise HeardResult(_result)
+        else:
+            print(_result)
 
     p.sys_vector[0] = _listen_result
 
@@ -76,5 +79,5 @@ twos 2 twos 0 R
             p.advance()
         else:
             assert False
-    except HeardResult:
-        assert _result == expected
+    except HeardResult as result:
+        assert result.zstr == expected

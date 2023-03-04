@@ -41,7 +41,7 @@ def test_mem_monitor():
     r1 = (3, 7)
     a1, b1 = 1, (2).to_bytes(4, "little")
     a2, b2 = 5, b"\xcc\xdd"
-    m.watch_region(*r1)
+    m.monitor(*r1)
 
     try:
         m.store_bytes(0, b"\x00")

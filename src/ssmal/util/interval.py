@@ -5,6 +5,8 @@ from dataclasses import dataclass
 
 @dataclass
 class Interval:
+    """Half open on the right."""
+
     l: int
     r: int
 
@@ -26,7 +28,7 @@ class Interval:
 
     def __bool__(self) -> bool:
         """Not Empty"""
-        return self.l <= self.r
+        return self.l < self.r
 
     def __contains__(self, x: int) -> bool:
-        return self.l <= x and x <= self.r
+        return self.l <= x and x < self.r

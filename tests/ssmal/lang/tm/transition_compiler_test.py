@@ -39,7 +39,7 @@ def test_transition_compiler():
     p.memory.store(0x104, 1)
     p.memory.store(0x108, 2)
 
-    p.memory.watch_region(0x100, 0x10c)
+    p.memory.monitor(0x100, 0x10c)
     try:
         for _ in range(100): p.advance()
     except MonitoredWrite as monitor:

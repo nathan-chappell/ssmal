@@ -20,10 +20,13 @@ class TransitionCompiler:
         # fmt: off
         (self.tm_assembler_writer
             .label_state(self.cur_state)
+            .write_line(f"ldai ${self.cur_state}_name psha ldai 0 sys popa")
             .indent()
                 .save_B()
                 .three_way_switch(self.cur_state)
-                .newline())
+                .newline()
+                .label(f'{self.cur_state}_name').write_line(f' "{self.cur_state}"')
+        )
         for case in self.cases:
             missing_cases.remove(case.cur_symbol)
             # fmt: off

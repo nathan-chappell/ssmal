@@ -16,7 +16,7 @@ class MonitoredWrite(Exception):
 
 
 class Memory:
-    buffer: BufferedIOBase
+    buffer: BytesIO
     monitored_regions: list[Interval]
 
     def __init__(self, size=2**8):
@@ -49,10 +49,8 @@ class Memory:
         else:
             finish_write()
 
-    def dump(self, start=0, end=0x200):  # pragma: no cover
-        count = end - start
-        assert 0 <= count
-        print("\n".join(hexdump_bytes(self.load_bytes(start, count), start)))
+    def dump(self):  # pragma: no cover
+        print("\n".join(hexdump_bytes(self.buffer.getvalue())))
 
-    def watch_region(self, start: int, end: int):
+    def monitor(self, start: int, end: int):
         self.monitored_regions.append(Interval(start, end))

@@ -129,7 +129,7 @@ class VM:
         self.processor.memory.store_bytes(0, _program_bytes)
         self.processor.memory.store_bytes(_end_of_stack, _input_bytes)
         self.processor.memory.store(_end_of_input, 0)  # probably not strictly necessary...
-        self.processor.memory.watch_region(0, _end_of_program)
+        self.processor.memory.monitor(0, _end_of_program)
         self.processor.registers.SP = _end_of_program
         self.processor.registers.B = _beginning_of_input
 
