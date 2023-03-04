@@ -1,5 +1,6 @@
 from pprint import pprint
 import logging
+from typing import Literal
 
 import pytest
 
@@ -12,60 +13,68 @@ from ssmal.processors.processor import Processor
 from ssmal.util.writer.tm_assembler_writer import TmAssemblerWriter
 
 
-def test_transition_compiler():
+@pytest.mark.parametrize("input, expected", [([1, 2], "SUCCESS")])
+def test_compiler(input: list[int], expected: str):
     tm_text = """
-    A 1 B 2 R
-    A 2 B 0 R
+# ones_then_twos
+# read 1+ 2+
+
+first_one 0 FAIL 0 R
+first_one 1 ones 0 R
+first_one 2 FAIL 0 R
+
+ones 0 FAIL 0 R
+ones 1 ones 0 R
+ones 2 first_two 0 R
+
+first_two 0 FAIL 0 R
+first_two 1 FAIL 0 R
+first_two 2 twos 0 R
+
+twos 0 SUCCESS 0 R
+twos 1 FAIL 0 R
+twos 2 twos 0 R
+
 """
-    tm_assembler_writer = TmAssemblerWriter()
     transitions = list(parse_tm_transitions(tm_text))
-    compiler = TransitionCompiler(tm_assembler_writer, "A", transitions)
-    compiler.compile_transition()
-    (tm_assembler_writer
-        .newline().write_line('.goto  0xe0').label_state('B')
-        .goto('A').comment("gangster")
-    )
-    print(tm_assembler_writer.text)
-    assembler = Assembler(list(tokenize(tm_assembler_writer.text)))
+    compiler = TmCompiler()
+    compiler.compile(transitions)
+    print(compiler.assembly)
+    assembler = Assembler(list(tokenize(compiler.assembly)))
     assembler.assemble()
+    object_bytes = assembler.buffer.getvalue()
     p = Processor()
     p.log.setLevel(logging.DEBUG)
-    p.memory.store_bytes(0, assembler.buffer.getvalue())
+    p.log.debug(f"Object length length: {len(object_bytes)}")
+    p.memory.store_bytes(0, object_bytes)
     p.memory.dump()
-    p.registers.SP = 0x60
-    p.registers.B = 0x100
-    
-    p.memory.store(0x100, 1)
-    p.memory.store(0x104, 1)
-    p.memory.store(0x108, 2)
+    p.registers.SP = len(object_bytes) + 4
+    end_of_stack = p.registers.SP + 0x20
+    p.registers.B = end_of_stack
 
-    p.memory.watch_region(0x100, 0x10c)
-    try:
-        for _ in range(100): p.advance()
-    except MonitoredWrite as monitor:
-        assert p.memory.load(0x100) == 1
-        monitor.finish_write()
-        assert p.memory.load(0x100) == 2
-    else:
-        assert False, "expected a monitor"
-    
-    try:
-        for _ in range(100): p.advance()
-    except MonitoredWrite as monitor:
-        assert p.memory.load(0x100) == 2
-        assert p.memory.load(0x104) == 1
-        monitor.finish_write()
-        assert p.memory.load(0x104) == 2
-    else:
-        assert False, "expected a monitor"
+    for i, val in enumerate(input):
+        INT_SIZE = 4
+        p.memory.store(end_of_stack + i * INT_SIZE, val)
+
+    _result: str | None = None
+
+    class HeardResult(Exception):
+        ...
+
+    def _listen_result(*args, **kwargs) -> None:
+        nonlocal _result
+        _p = p
+        # _result = str(p.memory.load_bytes(p.registers.A, len(expected)), "ascii")
+        breakpoint()
+        _result = str(p.memory.load_bytes(p.registers.SP, 4), "ascii")
+        raise HeardResult()
+
+    p.sys_vector[0] = _listen_result
 
     try:
-        for _ in range(100): p.advance()
-    except MonitoredWrite as monitor:
-        assert p.memory.load(0x100) == 2
-        assert p.memory.load(0x104) == 2
-        assert p.memory.load(0x108) == 2
-        monitor.finish_write()
-        assert p.memory.load(0x108) == 0
-    else:
-        assert False, "expected a monitor"
+        for _ in range(100):
+            p.advance()
+        else:
+            assert False
+    except HeardResult:
+        assert _result == expected

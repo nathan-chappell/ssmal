@@ -15,6 +15,11 @@ def test_and():
     assert not (i2 & i3)
 
 
+def test_or():
+    i1 = Interval(1, 2)
+    i2 = Interval(3, 4)
+    assert (i1 | i2) == Interval(1,4)
+
 def test_in():
     i1 = Interval(0, 3)
     assert 1 in i1
