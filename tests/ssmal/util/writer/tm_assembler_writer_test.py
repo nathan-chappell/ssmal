@@ -35,17 +35,18 @@ def test_three_way_switch(head: int):
     tm_assembler_writer = TmAssemblerWriter()
     # fmt: off
     (tm_assembler_writer
+        .label_state(_state)
         .three_way_switch(_state)
         .write_line(f".goto {_case_0}").label_case(_state, '0').indent().write_line('"CASE_0"').dedent()
         .write_line(f".goto {_case_1}").label_case(_state, '1').indent().write_line('"CASE_1"').dedent()
         .write_line(f".goto {_case_2}").label_case(_state, '2').indent().write_line('"CASE_2"').dedent())
     # fmt: on
-    # print(tm_assembler_writer.text)
+    print(tm_assembler_writer.text)
     assembler = Assembler(list(tokenize(tm_assembler_writer.text)))
     assembler.assemble()
     p = Processor()
     p.memory.store_bytes(0, assembler.buffer.getvalue())
-    # p.memory.dump()
+    p.memory.dump()
     p.registers.B = 0x60
     p.memory.store(0x60, head)
     p.advance(steps=2)

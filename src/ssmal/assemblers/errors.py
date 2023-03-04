@@ -22,4 +22,4 @@ class UnresolvedLabelError(AssemblerError):
     def __init__(self, label: Resolvable, *args):
         super().__init__(*args)
         self.label = label
-        super().__init__(f"Unresolved label: {label.token}")
+        super().__init__(f"Unresolved label: {label}")

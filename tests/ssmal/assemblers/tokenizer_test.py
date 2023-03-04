@@ -11,6 +11,7 @@ T = Token
     [
         ("", []),
         ("id.ef", [T("id", "id.ef", 0, 0)]),
+        (".goto 0xe0", [T("dir", ".goto", 0, 0), T("xint", "0xe0", 0, 6)]),
         (
             "id.ef .dir 123 0x123 'foo ''bar' \"foo \\\"bar\" ; ;comment \n meow",
             # fmt: off

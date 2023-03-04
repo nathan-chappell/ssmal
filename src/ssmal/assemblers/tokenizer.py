@@ -9,7 +9,7 @@ _tokens: list[Tuple[str, str]] = [
     ("label-ref", r"\$[a-zA-Z_][a-zA-Z_0-9.]*"),
     ("id", r"[a-zA-Z_][a-zA-Z_0-9.]*"),
     ("dir", r"\.[a-zA-Z][a-zA-Z_0-9]*"),
-    ("xint", r"0x[0-9]+"),
+    ("xint", r"0x[0-9a-fA-F]+"),
     ("dint", r"-?[0-9]+"),
     ("bstr", r"'(''|[^'])*'"),
     ("zstr", r'"(\\\\|\\"|[^"])*"'),

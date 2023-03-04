@@ -20,6 +20,7 @@ class TransitionCompiler:
         self.cases = cases
 
     def compile_transition(self) -> TmAssemblerWriter:
+        missing_cases: set[Literal["0", "1", "2"]] = {"0", "1", "2"}
         # fmt: off
         (self.tm_assembler_writer
             .label_state(self.cur_state)
@@ -28,6 +29,7 @@ class TransitionCompiler:
                 .three_way_switch(self.cur_state)
                 .newline())
         for case in self.cases:
+            missing_cases.remove(case.cur_symbol)
             # fmt: off
             (self.tm_assembler_writer
             .label_case(self.cur_state, case.cur_symbol)
@@ -38,6 +40,8 @@ class TransitionCompiler:
                 .goto(case.next_state)
                 .align()
             .dedent())
+        for case in missing_cases:
+            self.tm_assembler_writer.label_case(self.cur_state, case)
         return (
             self.tm_assembler_writer
             .dedent()

@@ -49,6 +49,10 @@ class LineWriter:
     def write_line(self: Self, *texts: str) -> Self:
         return self.write(*texts).newline()
 
+    def pad_to_column(self: Self, column: int, padding=" ") -> Self:
+        self._current_line += padding * (max(0, column - len(self._current_line)))
+        return self
+
     def compile_lines(self):
         self.newline()
         for line in self.lines:

@@ -2,9 +2,10 @@ import json
 import io
 
 import sys
+import logging
 
 from dataclasses import dataclass, asdict
-from functools import partial
+from pprint import pprint
 from typing import TextIO
 
 from ssmal.assemblers.file_assembler import FileAssembler
@@ -15,6 +16,8 @@ from ssmal.processors.processor import Processor
 from ssmal.util.hexdump_bytes import hexdump_bytes
 from ssmal.util.input_file_variant import InputFileVariant
 from ssmal.vm1.sys_io import SysIO
+
+log = logging.getLogger(__name__)
 
 
 def _ensure_input_file_variant(_input_file: str | InputFileVariant) -> InputFileVariant:
@@ -36,6 +39,7 @@ class VM:
     config: VmConfig
     processor: Processor
     sys_io: SysIO
+    log = log
 
     DEBUG_INFO_VERSION = "0.0"
     OBJECT_FILE_EXT = "bin"
@@ -74,36 +78,36 @@ class VM:
             f.write(tm_compiler.assembly)
 
     def _start(self):
-        from pprint import pprint
+        if self.config.trace:
+            self.log.setLevel(logging.DEBUG)
 
         _MAX_STEPS = 100
 
+        self.log.debug("PROCESSOR START")
+        self.log.debug(self.processor.registers)
         if self.config.trace:
-            print("\n".join(hexdump_bytes(self.processor.memory.load_bytes(0, 0x100))))
-            pprint(self.processor.registers)
+            self.log.debug("\n" + "\n".join(hexdump_bytes(self.processor.memory.load_bytes(0, 0x100))))
         try:
             # while True:
             for _ in range(_MAX_STEPS):
-                self.processor.advance(self.config.trace)
-                if self.config.trace:
-                    pprint(self.processor.registers)
+                self.processor.advance()
+                self.log.debug(self.processor.registers)
         except HaltSignal:
             if self.config.trace:
                 print("RECEIVED HALT")
                 pprint(self.processor.registers)
-                # no: fmt
-                import ipdb
-
-                ipdb.set_trace()
+                # fmt: off
+                import ipdb; ipdb.set_trace()
+                ...
+                # fmt: on
             pass
         except Exception as e:
             if self.config.trace:
                 print(e)
-                # no: fmt
-                import ipdb
-
-                ipdb.set_trace()
+                # fmt: off
+                import ipdb; ipdb.set_trace()
                 ...
+                # fmt: on
 
         if self.config.trace:
             print("\n".join(hexdump_bytes(self.processor.memory.load_bytes(0, 0x100))))
@@ -125,7 +129,7 @@ class VM:
         self.processor.memory.store_bytes(0, _program_bytes)
         self.processor.memory.store_bytes(_end_of_stack, _input_bytes)
         self.processor.memory.store(_end_of_input, 0)  # probably not strictly necessary...
-        self.processor.memory.watch_region((0, _end_of_program))
+        self.processor.memory.watch_region(0, _end_of_program)
         self.processor.registers.SP = _end_of_program
         self.processor.registers.B = _beginning_of_input
 

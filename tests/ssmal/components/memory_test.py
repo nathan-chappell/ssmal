@@ -1,6 +1,6 @@
 import pytest
 
-from ssmal.components.memory import Memory
+from ssmal.components.memory import Memory, MonitoredWrite
 
 
 @pytest.mark.parametrize(
@@ -38,28 +38,33 @@ def test_mem_load_bytes(_bytes: bytes, address: int):
 def test_mem_monitor():
     m = Memory()
     m.store_bytes(0, b"\x01\x23\x45\x67\x89\xab\xcd\xef")
-    r1 = (0, 4)
+    r1 = (3, 7)
     a1, b1 = 1, (2).to_bytes(4, "little")
-    a2, b2 = 2, b"\xcc\xdd"
-    m.watch_region(r1)
-    _calls = 0
+    a2, b2 = 5, b"\xcc\xdd"
+    m.watch_region(*r1)
 
-    def handler(address: int, _bytes: bytes, region: tuple[int, int]):
-        nonlocal _calls
-        _calls += 1
-        if address == a1:
-            assert address == a1
-            assert _bytes == b1
-            assert region == r1
-        else:
-            assert address == a2
-            assert _bytes == b2
-            assert region == r1
+    try:
+        m.store_bytes(0, b"\x00")
+    except MonitoredWrite as monitor:
+        assert False, "region not monitored"
 
-    m.handle_write_to_monitored_region = handler
-    m.store(a1, 2)
-    m.store_bytes(a2, b2)
-    assert _calls == 2
+    try:
+        m.store(a1, 2)
+    except MonitoredWrite as monitor:
+        assert m.load(a1, signed=False) == 0x89674523
+        monitor.finish_write()
+        assert m.load(a1, signed=False) == 0x02
+    else:
+        assert False, "expected throw"
+
+    try:
+        m.store_bytes(a2, b2)
+    except MonitoredWrite as monitor:
+        assert m.load_bytes(a2, len(b2)) == b"\xab\xcd"
+        monitor.finish_write()
+        assert m.load_bytes(a2, len(b2)) == b2
+    else:
+        assert False, "expected throw"
 
 
 # def test_mem_err():

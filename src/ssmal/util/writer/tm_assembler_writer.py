@@ -38,7 +38,7 @@ class TmAssemblerWriter(AssemblerWriter):
         return self.write(f"ldai {value} stab").comment(f"write {value} to head")
 
     def move_head(self: Self, direction: Literal["L", "R", "STAY"]) -> Self:
-        i = {"L": -1, "R": 1, "STAY": 0}[direction]
+        i = {"L": -4, "R": 4, "STAY": 0}[direction]
         return self.write(f"swpab addi {i} swpab").comment(f"move {direction}")
 
     def goto(self: Self, next_state: str) -> Self:

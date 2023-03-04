@@ -12,7 +12,7 @@ class AssemblerWriter(LineWriter):
         return self.write(f"{name}:")
 
     def comment(self: Self, _comment: str) -> Self:
-        return self.write_line("; ", _comment)
+        return self.pad_to_column(30).write_line("; ", _comment)
 
     def align(self: Self) -> Self:
         return self.newline().write_line(".align")
