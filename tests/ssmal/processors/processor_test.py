@@ -4,7 +4,7 @@ from functools import partial
 from typing import Optional
 
 import pytest
-from ssmal.instructions.processor_signals import ProcessorSignal, SysSignal
+from ssmal.instructions.processor_signals import ProcessorSignal, SysSignal, TrapSignal
 
 from ssmal.processors.processor import Processor
 from ssmal.components.registers import Registers
@@ -114,4 +114,11 @@ def test_HALT():
     p = Processor()
     p.memory.store(0, 0x02)
     with pytest.raises(processor_ops.HaltSignal):
+        p.advance()
+
+
+def test_Trap():
+    p = Processor()
+    p.memory.store(0, 0xFF)
+    with pytest.raises(TrapSignal):
         p.advance()

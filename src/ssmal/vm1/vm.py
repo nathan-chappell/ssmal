@@ -71,7 +71,7 @@ class VM:
         tm_compiler = TmCompiler()
         tm_compiler.compile_file(input_file.tm_filename)
         with open(input_file.assembler_filename, "w") as f:
-            f.write(tm_compiler.assembly.getvalue())
+            f.write(tm_compiler.assembly)
 
     def _start(self):
         from pprint import pprint
@@ -92,13 +92,17 @@ class VM:
                 print("RECEIVED HALT")
                 pprint(self.processor.registers)
                 # no: fmt
-                import ipdb; ipdb.set_trace()
+                import ipdb
+
+                ipdb.set_trace()
             pass
         except Exception as e:
             if self.config.trace:
                 print(e)
                 # no: fmt
-                import ipdb; ipdb.set_trace()
+                import ipdb
+
+                ipdb.set_trace()
                 ...
 
         if self.config.trace:
@@ -121,7 +125,7 @@ class VM:
         self.processor.memory.store_bytes(0, _program_bytes)
         self.processor.memory.store_bytes(_end_of_stack, _input_bytes)
         self.processor.memory.store(_end_of_input, 0)  # probably not strictly necessary...
-        self.processor.memory.watch_region(0, _end_of_program)
+        self.processor.memory.watch_region((0, _end_of_program))
         self.processor.registers.SP = _end_of_program
         self.processor.registers.B = _beginning_of_input
 

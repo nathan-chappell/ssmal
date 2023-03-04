@@ -35,6 +35,33 @@ def test_mem_load_bytes(_bytes: bytes, address: int):
     assert m.load_bytes(address, len(_bytes)) == _bytes
 
 
+def test_mem_monitor():
+    m = Memory()
+    m.store_bytes(0, b"\x01\x23\x45\x67\x89\xab\xcd\xef")
+    r1 = (0, 4)
+    a1, b1 = 1, (2).to_bytes(4, "little")
+    a2, b2 = 2, b"\xcc\xdd"
+    m.watch_region(r1)
+    _calls = 0
+
+    def handler(address: int, _bytes: bytes, region: tuple[int, int]):
+        nonlocal _calls
+        _calls += 1
+        if address == a1:
+            assert address == a1
+            assert _bytes == b1
+            assert region == r1
+        else:
+            assert address == a2
+            assert _bytes == b2
+            assert region == r1
+
+    m.handle_write_to_monitored_region = handler
+    m.store(a1, 2)
+    m.store_bytes(a2, b2)
+    assert _calls == 2
+
+
 # def test_mem_err():
 #     m = Memory(8)
 #     with pytest.raises(Exception):

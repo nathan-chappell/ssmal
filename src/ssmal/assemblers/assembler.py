@@ -134,7 +134,7 @@ class Assembler:
         if t0.value == ".here":
             self.emit(self.current_position_bytes, t0)
         elif t0.value == ".align":
-            _bytes_to_alignment = b'\x00' * (self.alignment - self.current_position % self.alignment)
+            _bytes_to_alignment = b"\x00" * (self.alignment - self.current_position % self.alignment)
             self.emit(_bytes_to_alignment, t0)
         else:
             t1 = self.eat_token()

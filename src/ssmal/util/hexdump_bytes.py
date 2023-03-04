@@ -3,7 +3,7 @@ from ssmal.util.get_chunks import get_chunks
 from ssmal.util.ascii_safe_encode import ascii_safe_encode
 
 
-def hexdump_bytes(_bytes: bytes, start_offset = 0) -> Generator[str, None, None]:  # pragma: no cover
+def hexdump_bytes(_bytes: bytes, start_offset=0) -> Generator[str, None, None]:  # pragma: no cover
     _size = 0x20
     for i, chunk in enumerate(get_chunks(_bytes, size=_size)):
         addr_str = f"{i * _size + start_offset:04x}"

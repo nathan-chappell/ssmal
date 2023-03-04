@@ -24,7 +24,7 @@ elif args.machine == "tm":
     _input = cast(str | None, args.input)
     if _input is None:
         raise Exception(f"input is required for {args.machine=}")
-    if not re.match(r'[12]+', _input):
+    if not re.match(r"[12]+", _input):
         raise Exception(f"tm input must match [12]+")
     vm.compile_tm_lang(input_file)
     vm.assemble(input_file)

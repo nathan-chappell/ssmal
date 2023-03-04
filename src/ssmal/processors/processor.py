@@ -19,16 +19,17 @@ class Processor:
         self.registers = Registers()
         self.sys_vector = {}
 
-    def advance(self, trace=False):
-        try:
-            op = self.opcode_map[self.memory.load_bytes(self.registers.IP, 1)]
-            if trace:
-                print(f' op: {op.__name__}')
-        except KeyError as e:
-            raise TrapSignal(self.registers, self.memory, *e.args)
-        try:
-            op(self.registers, self.memory)
-        except SysSignal:
-            sys_op = self.sys_vector[self.registers.A]
-            sys_op(self.registers, self.memory)
-            self.registers.IP += 1
+    def advance(self, trace=False, steps=1):
+        for _ in range(steps):
+            try:
+                op = self.opcode_map[self.memory.load_bytes(self.registers.IP, 1)]
+                if trace:  # pragma: no cover
+                    print(f" op: {op.__name__}")
+            except KeyError as e:
+                raise TrapSignal(self.registers, self.memory, *e.args)
+            try:
+                op(self.registers, self.memory)
+            except SysSignal:
+                sys_op = self.sys_vector[self.registers.A]
+                sys_op(self.registers, self.memory)
+                self.registers.IP += 1
