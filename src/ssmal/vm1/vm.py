@@ -37,9 +37,12 @@ class VmConfig:
 
 class VM:
     config: VmConfig
+    file_assembler: FileAssembler
+    log = log
     processor: Processor
     sys_io: SysIO
-    log = log
+
+    max_steps = 500
 
     DEBUG_INFO_VERSION = "0.0"
     OBJECT_FILE_EXT = "bin"
@@ -50,6 +53,7 @@ class VM:
         self.processor = Processor()
         self.sys_io = SysIO()
         self.configure()
+        self.file_assembler = FileAssembler()
 
     def configure(self):
         self.sys_io.bind(cin=self.config.cin, cout=self.config.cout)
@@ -59,14 +63,16 @@ class VM:
     def assemble(self, _input_file: str | InputFileVariant):
         """assembles input_file and outputs to input_file.bin"""
         input_file = _ensure_input_file_variant(_input_file)
-        file_assembler = FileAssembler()
-        file_assembler.assemble_file(input_file.assembler_filename)
-        _bytes = file_assembler.buffer.getvalue()
+        self.file_assembler = FileAssembler()
+        self.file_assembler.assemble_file(input_file.assembler_filename)
+        _bytes = self.file_assembler.buffer.getvalue()
         with open(input_file.object_filename, "wb") as f:
             f.write(_bytes)
         with open(input_file.debug_filename, "w") as f:
-            _debug_info = {offset: asdict(token) for offset, token in file_assembler.source_map.items()}
-            _labels = {label.token.value: f"{label.address:08x}" for label in file_assembler.labels.values() if label.token is not None}
+            _debug_info = {offset: asdict(token) for offset, token in self.file_assembler.source_map.items()}
+            _labels = {
+                label.token.value: f"{label.address:08x}" for label in self.file_assembler.labels.values() if label.token is not None
+            }
             json.dump({"version": self.DEBUG_INFO_VERSION, "labels": _labels, "source_map": _debug_info}, f, indent=2)
 
     def compile_tm_lang(self, _input_file: str | InputFileVariant):
@@ -77,11 +83,11 @@ class VM:
         with open(input_file.assembler_filename, "w") as f:
             f.write(tm_compiler.assembly)
 
-    def _start(self):
+    def start(self):
         if self.config.trace:
             self.log.setLevel(logging.DEBUG)
 
-        _MAX_STEPS = 100
+        _MAX_STEPS = self.max_steps
 
         self.log.debug("PROCESSOR START")
         self.log.debug(self.processor.registers)
@@ -133,7 +139,7 @@ class VM:
         self.processor.registers.SP = _end_of_program
         self.processor.registers.B = _beginning_of_input
 
-        self._start()
+        self.start()
 
     def run(self, _input_file: str | InputFileVariant, initial_registers: Registers = Registers()):
         """runs input_file as binary"""
@@ -142,4 +148,4 @@ class VM:
             _program_bytes = f.read()
         self.processor.memory.store_bytes(0, _program_bytes)
 
-        self._start()
+        self.start()

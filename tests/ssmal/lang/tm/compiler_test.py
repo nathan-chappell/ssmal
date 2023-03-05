@@ -16,7 +16,19 @@ from ssmal.util.hexdump_bytes import hexdump_bytes
 from ssmal.util.writer.tm_assembler_writer import TmAssemblerWriter
 
 
-@pytest.mark.parametrize("input, expected", [([1, 2], "SUCCESS")])
+@pytest.mark.parametrize(
+    "input, expected",
+    [
+        ([1, 2], "SUCCESS"),
+        ([1, 1, 2], "SUCCESS"),
+        ([1, 1, 2, 2], "SUCCESS"),
+        ([], "FAIL"),
+        ([1], "FAIL"),
+        ([1, 1], "FAIL"),
+        ([1, 1, 2, 1], "FAIL"),
+        ([2], "FAIL"),
+    ],
+)
 def test_compiler(input: list[int], expected: str):
     tm_text = """
 # ones_then_twos
@@ -37,6 +49,7 @@ twos 2 twos 0 R
 """
     transitions = list(parse_tm_transitions(tm_text))
     compiler = TmCompiler()
+    compiler.debug = True
     compiler.compile(transitions)
     print(compiler.assembly)
 
@@ -65,7 +78,7 @@ twos 2 twos 0 R
 
     def _listen_result(*args, **kwargs) -> None:
         _bytes = p.memory.load_bytes(p.memory.load(p.registers.SP - 4), 100)
-        _bytes = _bytes[:_bytes.index(b'\x00')]
+        _bytes = _bytes[: _bytes.index(b"\x00")]
         _result = ascii_safe_encode(_bytes)
         if "SUCCESS" in _result or "FAIL" in _result:
             raise HeardResult(_result)
@@ -75,7 +88,7 @@ twos 2 twos 0 R
     p.sys_vector[0] = _listen_result
 
     try:
-        for _ in range(100):
+        for _ in range(105):
             p.advance()
         else:
             assert False

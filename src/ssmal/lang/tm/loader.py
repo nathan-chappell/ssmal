@@ -51,7 +51,7 @@ class TmLoader:
     def load_program(self, processor: Processor):
         sections = {section.name: section for section in self.sections}
         for section in sections.values():
-            self.log.debug(replace(section, data=b''))
+            self.log.debug(replace(section, data=b""))
             processor.memory.store_bytes(section.start, section.data)
             if section.monitor:
                 processor.memory.monitor(section.start, section.start + len(section.data))

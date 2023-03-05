@@ -1,5 +1,6 @@
 import json
 import io
+import logging
 
 
 from pathlib import Path
@@ -9,6 +10,7 @@ import pytest
 from ssmal.assemblers.token import Token
 from ssmal.components.registers import Registers
 from ssmal.instructions.processor_ops import HaltSignal
+from ssmal.lang.tm.loader import TmLoader
 from ssmal.util.input_file_variant import InputFileVariant
 from ssmal.vm1.vm import VM, VmConfig
 
@@ -81,6 +83,41 @@ def test_vm_pipeline(input_file: str, expected: str):
         assert cout.getvalue() == expected
     finally:
         _cleanup_paths([input_file_variant.object_filename, input_file_variant.debug_filename])
+
+
+@pytest.mark.parametrize(
+    "input_file_name,input,expected",
+    [
+        ("""tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.tm""", [1, 1, 2, 2], "SUCCESS"),
+        ("""tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.tm""", [1, 2, 2], "SUCCESS"),
+        ("""tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.tm""", [2], "SUCCESS"),
+        ("""tests\\ssmal\\lang\\tm\\samples\\ones_then_twos.tm""", [2, 1], "FAIL"),
+        ("""tests\\ssmal\\lang\\tm\\samples\\double_counter.tm""", [1, 1, 2, 1, 1, 2], "SUCCESS"),
+        ("""tests\\ssmal\\lang\\tm\\samples\\double_counter.tm""", [1, 1, 2, 2, 2, 1, 1, 2, 2, 2], "SUCCESS"),
+        ("""tests\\ssmal\\lang\\tm\\samples\\double_counter.tm""", [1, 2, 1, 2, 2], "FAIL"),
+    ],
+)
+def test_tm_pipeline(input_file_name: str, input: list[int], expected: str):
+    cin = io.StringIO()
+    cout = io.StringIO()
+    config = VmConfig(cin=cin, cout=cout, trace=False)
+    vm = VM(config=config)
+    input_file = InputFileVariant(input_file_name)
+    vm.compile_tm_lang(input_file)
+    vm.assemble(input_file)
+
+    data_bytes = b"".join(x.to_bytes(4, "little") for x in input)
+    tm_loader = TmLoader(text_bytes=vm.file_assembler.buffer.getvalue(), data_bytes=data_bytes)
+    tm_loader.load_program(vm.processor)
+
+    vm.processor.log.setLevel(logging.DEBUG)
+    vm.max_steps = 10000
+
+    try:
+        vm.start()
+        assert cout.getvalue()[-len(expected) :] == expected
+    finally:
+        _cleanup_paths([input_file.assembler_filename, input_file.object_filename, input_file.debug_filename])
 
 
 # TODO: more tests to get all sys_io vectors

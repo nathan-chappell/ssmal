@@ -18,7 +18,8 @@ def test_and():
 def test_or():
     i1 = Interval(1, 2)
     i2 = Interval(3, 4)
-    assert (i1 | i2) == Interval(1,4)
+    assert (i1 | i2) == Interval(1, 4)
+
 
 def test_in():
     i1 = Interval(0, 3)

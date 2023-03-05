@@ -21,10 +21,16 @@ def test_transition_compiler():
     transitions = list(parse_tm_transitions(tm_text))
     compiler = TransitionCompiler(tm_assembler_writer, "A", transitions)
     compiler.compile_transition()
+    # fmt: off
     (tm_assembler_writer
-        .newline().write_line('.goto  0xe0').label_state('B')
-        .goto('A').comment("gangster")
-    )
+        .newline()
+        .write_line(".goto  0xe0")
+        .label_state("B")
+        .indent()
+            .goto("A").comment("gangster")
+        .dedent()
+        .label_state("FAIL"))
+    # fmt: on
     print(tm_assembler_writer.text)
     assembler = Assembler(list(tokenize(tm_assembler_writer.text)))
     assembler.assemble()
@@ -34,23 +40,25 @@ def test_transition_compiler():
     p.memory.dump()
     p.registers.SP = 0x60
     p.registers.B = 0x100
-    
+
     p.memory.store(0x100, 1)
     p.memory.store(0x104, 1)
     p.memory.store(0x108, 2)
 
-    p.memory.monitor(0x100, 0x10c)
+    p.memory.monitor(0x100, 0x10C)
     try:
-        for _ in range(100): p.advance()
+        for _ in range(100):
+            p.advance()
     except MonitoredWrite as monitor:
         assert p.memory.load(0x100) == 1
         monitor.finish_write()
         assert p.memory.load(0x100) == 2
     else:
         assert False, "expected a monitor"
-    
+
     try:
-        for _ in range(100): p.advance()
+        for _ in range(100):
+            p.advance()
     except MonitoredWrite as monitor:
         assert p.memory.load(0x100) == 2
         assert p.memory.load(0x104) == 1
@@ -60,7 +68,8 @@ def test_transition_compiler():
         assert False, "expected a monitor"
 
     try:
-        for _ in range(100): p.advance()
+        for _ in range(100):
+            p.advance()
     except MonitoredWrite as monitor:
         assert p.memory.load(0x100) == 2
         assert p.memory.load(0x104) == 2

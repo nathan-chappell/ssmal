@@ -10,6 +10,7 @@ TOp = Callable[[Registers, Memory], None]
 
 log = logging.getLogger(__name__)
 
+
 class Processor:
     memory: Memory
     opcode_map: dict[bytes, TOp]

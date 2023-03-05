@@ -39,7 +39,8 @@ def test_mem_monitor():
     m = Memory()
     m.store_bytes(0, b"\x01\x23\x45\x67\x89\xab\xcd\xef")
     r1 = (3, 7)
-    a1, b1 = 1, (2).to_bytes(4, "little")
+    # a1, b1 = 1, (2).to_bytes(4, "little")
+    a1 = 1
     a2, b2 = 5, b"\xcc\xdd"
     m.monitor(*r1)
 

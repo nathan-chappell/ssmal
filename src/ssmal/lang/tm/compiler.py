@@ -10,6 +10,7 @@ from ssmal.util.writer.tm_assembler_writer import TmAssemblerWriter
 
 class TmCompiler:
     tm_assembler_writer: TmAssemblerWriter
+    debug: bool = False
 
     def __init__(self) -> None:
         self.tm_assembler_writer = TmAssemblerWriter()
@@ -40,6 +41,7 @@ class TmCompiler:
 
         for cur_state, transition_group in transitions_by_cur_state.items():
             transition_compiler = TransitionCompiler(self.tm_assembler_writer, cur_state, transition_group)
+            transition_compiler.debug = self.debug
             transition_compiler.compile_transition()
 
         self._write_builtins()

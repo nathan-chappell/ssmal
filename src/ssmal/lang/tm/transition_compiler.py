@@ -7,6 +7,7 @@ class TransitionCompiler:
     tm_assembler_writer: TmAssemblerWriter
     cur_state: str
     cases: list[TmTransition]
+    debug: bool = False
 
     def __init__(self, tm_assembler_writer: TmAssemblerWriter, cur_state: str, cases: list[TmTransition]) -> None:
         assert len(cases) > 0, "At least one case must be defined for a transition to compile"
@@ -15,12 +16,18 @@ class TransitionCompiler:
         self.cur_state = cur_state
         self.cases = cases
 
+    @property
+    def debug_line(self) -> str:
+        if self.debug:
+            return f"ldai ${self.cur_state}_name psha ldai 0 sys popa"
+        return ""
+
     def compile_transition(self) -> TmAssemblerWriter:
         missing_cases: set[Literal["0", "1", "2"]] = {"0", "1", "2"}
         # fmt: off
         (self.tm_assembler_writer
             .label_state(self.cur_state)
-            .write_line(f"ldai ${self.cur_state}_name psha ldai 0 sys popa")
+            .write_line(self.debug_line)
             .indent()
                 .save_B()
                 .three_way_switch(self.cur_state)
@@ -40,7 +47,14 @@ class TransitionCompiler:
                 .align()
             .dedent())
         for case in missing_cases:
-            self.tm_assembler_writer.label_case(self.cur_state, case)
+            (self.tm_assembler_writer
+                .label_case(self.cur_state, case)
+                .indent()
+                    .goto('FAIL').comment('default.')
+                    .align()
+                .dedent()
+                .newline()
+            )
         return (
             self.tm_assembler_writer
             .dedent()
