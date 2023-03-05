@@ -1,7 +1,7 @@
-import typing as T
+from typing import Generator
 
 
-def get_chunks(_bytes: bytes, size: int = 40) -> T.Generator[bytes, None, None]:
+def get_chunks(_bytes: bytes, size: int = 40) -> Generator[bytes, None, None]:
     n = len(_bytes) // size
     for i in range(n):
         yield _bytes[i * size : (i + 1) * size]

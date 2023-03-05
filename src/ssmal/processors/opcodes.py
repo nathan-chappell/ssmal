@@ -1,17 +1,19 @@
-from typing import Dict, Callable
+from typing import Callable
 
 from ssmal.components.memory import Memory
 from ssmal.components.registers import Registers
 
 import ssmal.instructions.arithmetic_ops as a_op
+import ssmal.instructions.branch_ops as b_op
 import ssmal.instructions.data_ops as d_op
 import ssmal.instructions.processor_ops as p_op
+import ssmal.instructions.register_ops as r_op
 import ssmal.instructions.stack_ops as s_op
 import ssmal.instructions.sys as sys_op
 
 SYS_BYTE = b"\x80"
 
-opcode_map: Dict[bytes, Callable[[Registers, Memory], None]] = {
+opcode_map: dict[bytes, Callable[[Registers, Memory], None]] = {
     # processor ops
     b"\x00": p_op.NOP,
     b"\x01": p_op.DBG,
@@ -45,4 +47,15 @@ opcode_map: Dict[bytes, Callable[[Registers, Memory], None]] = {
     b"\x35": s_op.RETN,
     # syscall - must be added later so that io can be put in...
     SYS_BYTE: sys_op.SYS,
+    # register ops
+    b"\x40": r_op.SWPAB,
+    b"\x41": r_op.SWPAI,
+    b"\x42": r_op.SWPAS,
+    # branch ops
+    b"\x50": b_op.BRi,
+    b"\x51": b_op.BRa,
+    b"\x52": b_op.BRZi,
+    b"\x53": b_op.BRNi,
+    b"\x54": b_op.BRZb,
+    b"\x55": b_op.BRNb,
 }

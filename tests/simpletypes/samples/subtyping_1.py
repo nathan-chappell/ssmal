@@ -1,0 +1,13 @@
+class B: ...
+class D(B): ...
+class DD(D): ...
+
+
+b: B
+d: DD
+x: int
+
+def f(b: B, d: D) -> int: ...
+
+b = d
+x = f(d, d)

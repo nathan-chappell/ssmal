@@ -12,30 +12,12 @@ def _pop(r: Registers, m: Memory) -> int:
     return m.load(r.SP)
 
 
-def PSHA(r: Registers, m: Memory) -> None:
-    r.IP += 1
-    _psh(r, m, r.A)
+# fmt: off
+def PSHA(r: Registers, m: Memory) -> None: r.IP += 1; _psh(r, m, r.A)
+def POPA(r: Registers, m: Memory) -> None: r.IP += 1; r.A = _pop(r, m)
 
+def CALi(r: Registers, m: Memory) -> None: _psh(r, m, r.IP + 5); r.IP = m.load(r.IP + 1)
+def CALA(r: Registers, m: Memory) -> None: _psh(r, m, r.IP + 1); r.IP = r.A
+def CAL_(r: Registers, m: Memory) -> None: _psh(r, m, r.IP + 1); r.IP = m.load(r.A)
 
-def POPA(r: Registers, m: Memory) -> None:
-    r.IP += 1
-    r.A = _pop(r, m)
-
-
-def CALi(r: Registers, m: Memory) -> None:
-    _psh(r, m, r.IP + 5)
-    r.IP = m.load(r.IP + 1)
-
-
-def CALA(r: Registers, m: Memory) -> None:
-    _psh(r, m, r.IP + 1)
-    r.IP = r.A
-
-
-def CAL_(r: Registers, m: Memory) -> None:
-    _psh(r, m, r.IP + 1)
-    r.IP = m.load(r.A)
-
-
-def RETN(r: Registers, m: Memory) -> None:
-    r.IP = _pop(r, m)
+def RETN(r: Registers, m: Memory) -> None: r.IP = _pop(r, m)

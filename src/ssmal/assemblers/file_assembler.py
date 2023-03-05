@@ -1,6 +1,6 @@
-import typing as T
 from dataclasses import dataclass, replace
 from pathlib import Path
+from typing import Generator, cast
 
 from ssmal.assemblers.assembler import Assembler
 from ssmal.assemblers.errors import UnexpectedTokenError
@@ -8,8 +8,8 @@ from ssmal.assemblers.token import Token
 from ssmal.assemblers.tokenizer import tokenize
 
 TFileName = str
-TByteCache = T.Dict[TFileName, bytes]
-TTokenCache = T.Dict[TFileName, T.List[Token]]
+TByteCache = dict[TFileName, bytes]
+TTokenCache = dict[TFileName, list[Token]]
 
 
 def _insert(l1: list, i: int, l2: list):
@@ -36,20 +36,20 @@ class FileAssembler(Assembler):
         self._insert_tokens(list(self._tokenize(filename)))
         self.assemble()
 
-    def _tokenize(self, filename: str) -> T.Generator[Token, None, None]:
+    def _tokenize(self, filename: str) -> Generator[Token, None, None]:
         with open(filename, "r") as f:
             text = f.read()
         for token in tokenize(text):
             yield replace(token, filename=filename)
 
-    def _insert_tokens(self, tokens: T.List[Token]):
+    def _insert_tokens(self, tokens: list[Token]):
         self.tokens = _insert(self.tokens, self._index, tokens)
 
     def _already_include(self, filename: str) -> bool:
         return filename in self._byte_cache or filename in self._token_cache
 
     def _include(self, settings: IncludeFileSettings, token: Token):
-        included_file_path = Path(T.cast(str, token.filename)).parent / settings.filename
+        included_file_path = Path(cast(str, token.filename)).parent / settings.filename
         included_file_fullname = str(included_file_path.resolve())
         if self._already_include(included_file_fullname) and settings.once:
             return

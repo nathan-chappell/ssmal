@@ -1,9 +1,10 @@
 import io
-import typing as T
+
 from functools import partial
+from typing import Optional
 
 import pytest
-from ssmal.instructions.processor_signals import ProcessorSignal, SysSignal
+from ssmal.instructions.processor_signals import ProcessorSignal, SysSignal, TrapSignal
 
 from ssmal.processors.processor import Processor
 from ssmal.components.registers import Registers
@@ -74,7 +75,7 @@ R = Registers
         ("RETN", b"\x35\x00\x00\x00", R(SP=4), None, R(IP=0x35, SP=0)),
     ],
 )
-def test_processor_generic(name: str, b0: bytes, r0: Registers, b1: T.Optional[bytes], r1: Registers):
+def test_processor_generic(name: str, b0: bytes, r0: Registers, b1: Optional[bytes], r1: Registers):
     p = Processor()
     p.memory.store_bytes(0, b0)
     p.registers = r0
@@ -113,4 +114,11 @@ def test_HALT():
     p = Processor()
     p.memory.store(0, 0x02)
     with pytest.raises(processor_ops.HaltSignal):
+        p.advance()
+
+
+def test_Trap():
+    p = Processor()
+    p.memory.store(0, 0xFF)
+    with pytest.raises(TrapSignal):
         p.advance()

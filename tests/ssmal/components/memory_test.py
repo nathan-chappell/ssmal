@@ -1,6 +1,6 @@
 import pytest
 
-from ssmal.components.memory import Memory
+from ssmal.components.memory import Memory, MonitoredWrite
 
 
 @pytest.mark.parametrize(
@@ -33,6 +33,39 @@ def test_mem_load_bytes(_bytes: bytes, address: int):
     m = Memory()
     m.store_bytes(address, _bytes)
     assert m.load_bytes(address, len(_bytes)) == _bytes
+
+
+def test_mem_monitor():
+    m = Memory()
+    m.store_bytes(0, b"\x01\x23\x45\x67\x89\xab\xcd\xef")
+    r1 = (3, 7)
+    # a1, b1 = 1, (2).to_bytes(4, "little")
+    a1 = 1
+    a2, b2 = 5, b"\xcc\xdd"
+    m.monitor(*r1)
+
+    try:
+        m.store_bytes(0, b"\x00")
+    except MonitoredWrite as monitor:
+        assert False, "region not monitored"
+
+    try:
+        m.store(a1, 2)
+    except MonitoredWrite as monitor:
+        assert m.load(a1, signed=False) == 0x89674523
+        monitor.finish_write()
+        assert m.load(a1, signed=False) == 0x02
+    else:
+        assert False, "expected throw"
+
+    try:
+        m.store_bytes(a2, b2)
+    except MonitoredWrite as monitor:
+        assert m.load_bytes(a2, len(b2)) == b"\xab\xcd"
+        monitor.finish_write()
+        assert m.load_bytes(a2, len(b2)) == b2
+    else:
+        assert False, "expected throw"
 
 
 # def test_mem_err():
