@@ -1,25 +1,32 @@
-from ssmal.lang.ssmalloc.ssmal_type import SsmalType, FIELD_SIZE
+from dataclasses import fields
+from ssmal.lang.ssmalloc.ssmal_type import SsmalType
 from ssmal.lang.ssmalloc.arena import Arena
+
+POINTER_SIZE = 4
 
 
 class SsmalRttiManager:
     arena: Arena
     loaded_types: list[str]
     max_types: int
+    method_impl_map: dict[str, int]
     type_heap: int = -1
+    type_cache: dict[str, SsmalType]
 
     def __init__(self, arena: Arena, max_types: int = 10):
         self.arena = arena
         self.loaded_types = []
         self.max_types = max_types
-        self.type_heap = arena.malloc(FIELD_SIZE * self.max_types)
+        self.method_impl_map = {}
+        self.type_heap = arena.malloc(POINTER_SIZE * self.max_types)
+        self.type_cache = {}
 
     def _heap_addr(self, index: int) -> int:
-        return self.type_heap + FIELD_SIZE * index
+        return self.type_heap + POINTER_SIZE * index
 
     def _heap_view(self, index: int) -> memoryview:
         _p = self._heap_addr(index)
-        return self.arena.view[_p : _p + FIELD_SIZE]
+        return self.arena.view[_p : _p + POINTER_SIZE]
 
     def _read_zstr(self, address: int) -> str:
         zstr = ""
@@ -29,17 +36,77 @@ class SsmalRttiManager:
             i += 1
         return zstr
 
+    def _construct_vtable(self, type: type, base: SsmalType | None) -> tuple[tuple[int, str]]:
+        type_name = type.__name__
+        virtual_method_names = set(name for name, method in type.__dict__.items() if "__" not in name and callable(method))
+        base_vtable: list[tuple[int, str]] = list(zip(base.vtable, base.vtable_names)) if base is not None else []
+        for i in range(len(base_vtable)):
+            base_method_name = base_vtable[i][1]
+            if base_method_name in virtual_method_names:
+                base_vtable[i] = (self.method_impl_map[f"{type_name}.{base_method_name}"], base_method_name)
+                virtual_method_names.remove(base_method_name)
+        return tuple(
+            base_vtable
+            + [
+                (self.method_impl_map[f"{type_name}.{virtual_method_name}"], virtual_method_name)
+                for virtual_method_name in virtual_method_names
+            ]
+        )
+
+    def from_type(self, type: type) -> SsmalType:
+        type_name = type.__name__
+        if type_name not in self.type_cache:
+            if type_name == "SsmalType":
+                raise NotImplementedError()
+                # self._type_cache[type_name] = SsmalType("ssmal_type", -1, 4, ["name", "base_type", "field_count", "field_names"])
+            elif type_name == "int":
+                raise NotImplementedError()
+                # self._type_cache[type_name] = SsmalType("int", -1, 1, ["value"])
+            bases = type.__bases__
+            if len(bases) > 1:
+                raise NotImplementedError("Multiple inheritance not supported")
+            elif len(bases) == 1 and bases[0] is not object:
+                base_type = self.from_type(bases[0])
+            else:
+                base_type = None
+            _vtable = self._construct_vtable(type, base_type)
+            field_names = tuple(f.name for f in fields(type))
+            field_count = len(field_names)
+
+            self.type_cache[type_name] = SsmalType(
+                base_type=base_type,
+                vtable_count=len(_vtable),
+                vtable=tuple(address for address, _ in _vtable),
+                vtable_names=tuple(name for _, name in _vtable),
+                name=type_name,
+                field_count=field_count,
+                field_names=field_names,
+            )
+
+        return self.type_cache[type_name]
+
     def compile_type(self, ssmal_type: SsmalType) -> bytes:
         if ssmal_type.base_type is not None:
             base_type_index = self.loaded_types.index(ssmal_type.base_type.name)
-            base_type_address = int.from_bytes(self._heap_view(base_type_index), "little", signed=True)
+            base_type_address = self._read_int(base_type_index)
         else:
             base_type_address = -1
-        _base_type_bytes = (base_type_address).to_bytes(4, "little", signed=True)
-        _field_count_bytes = (ssmal_type.field_count).to_bytes(4, "little", signed=True)
+        _base_type_bytes = base_type_address.to_bytes(4, "little", signed=True)
+        _vtable_count_bytes = ssmal_type.vtable_count.to_bytes(4, "little", signed=True)
+        _vtable_bytes = b"".join(pointer.to_bytes(4, "little", signed=True) for pointer in ssmal_type.vtable)
         _name_bytes = bytes(ssmal_type.name, "ascii") + b"\x00"
+        _field_count_bytes = (ssmal_type.field_count).to_bytes(4, "little", signed=True)
         _field_name_bytes = b"\x00".join(bytes(field_name, "ascii") for field_name in ssmal_type.field_names) + b"\x00\x00"
-        return _base_type_bytes + _field_count_bytes + _name_bytes + _field_name_bytes
+        # fmt: off
+        return (
+            _base_type_bytes
+            + _vtable_count_bytes
+            + _vtable_bytes
+            + _name_bytes
+            + _field_count_bytes
+            + _field_name_bytes
+        )
+        # fmt: on
 
     def store_type(self, ssmal_type: SsmalType):
         if len(self.loaded_types) == self.max_types:
@@ -52,25 +119,51 @@ class SsmalRttiManager:
         self.arena.view[address : address + len(_type_bytes)] = _type_bytes
         self.loaded_types.append(ssmal_type.name)
 
-    def load_type(self, type_name: str) -> SsmalType:
-        type_index = self.loaded_types.index(type_name)
-        type_address = int.from_bytes(self._heap_view(type_index), "little", signed=True)
-        _base_address = int.from_bytes(self.arena.view[type_address : type_address + FIELD_SIZE], "little", signed=True)
-        if _base_address != -1:
-            _base_name = self._read_zstr(_base_address + 2 * FIELD_SIZE)
-            base_type = self.load_type(_base_name)
+    def _read_int(self, address: int) -> int:
+        return int.from_bytes(self.arena.view[address : address + POINTER_SIZE], "little", signed=True)
+
+    def _read_name_list(self, address: int, count: int) -> tuple[str, ...]:
+        names: list[str] = []
+        for _ in range(count):
+            _field_name_address = address + sum(len(field_name) + 1 for field_name in names)
+            names.append(self._read_zstr(_field_name_address))
+        return tuple(names)
+
+    def load_type_from_address(self, type_address: int) -> SsmalType:
+        base_address = int.from_bytes(self.arena.view[type_address : type_address + POINTER_SIZE], "little", signed=True)
+        if base_address >= 0:
+            base_type = self.load_type_from_address(base_address)
         else:
             base_type = None
 
-        _field_count = int.from_bytes(self.arena.view[type_address + FIELD_SIZE : type_address + 2 * FIELD_SIZE], "little", signed=True)
-        address = type_address + 2 * FIELD_SIZE
-        _name = self._read_zstr(address)
-        address += len(_name) + 1
-        _field_names: list[str] = []
-        while self.arena.view[address] != 0 and len(_field_names) < _field_count:
-            _field_names.append(self._read_zstr(address))
-            address += len(_field_names[-1]) + 1
-        return SsmalType(base_type, _field_count, _name, tuple(_field_names))
+        vtable_count = self._read_int(type_address + POINTER_SIZE)
+
+        vtable: list[int] = []
+        for i in range(vtable_count):
+            vtable.append(self._read_int(type_address + 2 * POINTER_SIZE + i * POINTER_SIZE))
+
+        vtable_names: tuple[str] = self._read_name_list(type_address + 2 * POINTER_SIZE + vtable_count * POINTER_SIZE, len(vtable))
+
+        _HERE = type_address + 2 * POINTER_SIZE + vtable_count * POINTER_SIZE + sum(len(vtable_name) + 1 for vtable_name in vtable_names) + 1
+        name = self._read_zstr(_HERE)
+
+        field_count = self._read_int(_HERE + len(name) + 1)
+        field_names: tuple[str] = self._read_name_list(_HERE + len(name) + 1 + POINTER_SIZE, field_count)
+
+        return SsmalType(
+            base_type=base_type,
+            vtable_count=vtable_count,
+            vtable=tuple(vtable),
+            vtable_names=vtable_names,
+            name=name,
+            field_count=field_count,
+            field_names=field_names,
+        )
+
+    def load_type(self, type_name: str) -> SsmalType:
+        type_index = self.loaded_types.index(type_name)
+        type_address = int.from_bytes(self._heap_view(type_index), "little", signed=True)
+        return self.load_type_from_address(type_address)
 
     def create_object(self, type_name: str) -> int:
         ...
