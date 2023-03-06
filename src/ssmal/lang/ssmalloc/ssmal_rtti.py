@@ -36,32 +36,9 @@ class SsmalRttiManager:
             i += 1
         return zstr
 
-    def _construct_vtable(self, type: type, base: SsmalType | None) -> tuple[tuple[int, str]]:
-        type_name = type.__name__
-        virtual_method_names = set(name for name, method in type.__dict__.items() if "__" not in name and callable(method))
-        base_vtable: list[tuple[int, str]] = list(zip(base.vtable, base.vtable_names)) if base is not None else []
-        for i in range(len(base_vtable)):
-            base_method_name = base_vtable[i][1]
-            if base_method_name in virtual_method_names:
-                base_vtable[i] = (self.method_impl_map[f"{type_name}.{base_method_name}"], base_method_name)
-                virtual_method_names.remove(base_method_name)
-        return tuple(
-            base_vtable
-            + [
-                (self.method_impl_map[f"{type_name}.{virtual_method_name}"], virtual_method_name)
-                for virtual_method_name in virtual_method_names
-            ]
-        )
-
     def from_type(self, type: type) -> SsmalType:
         type_name = type.__name__
         if type_name not in self.type_cache:
-            if type_name == "SsmalType":
-                raise NotImplementedError()
-                # self._type_cache[type_name] = SsmalType("ssmal_type", -1, 4, ["name", "base_type", "field_count", "field_names"])
-            elif type_name == "int":
-                raise NotImplementedError()
-                # self._type_cache[type_name] = SsmalType("int", -1, 1, ["value"])
             bases = type.__bases__
             if len(bases) > 1:
                 raise NotImplementedError("Multiple inheritance not supported")
@@ -69,18 +46,12 @@ class SsmalRttiManager:
                 base_type = self.from_type(bases[0])
             else:
                 base_type = None
-            _vtable = self._construct_vtable(type, base_type)
+
+            vtable, vtable_names = self._construct_vtable(type, base_type)
             field_names = tuple(f.name for f in fields(type))
-            field_count = len(field_names)
 
             self.type_cache[type_name] = SsmalType(
-                base_type=base_type,
-                vtable_count=len(_vtable),
-                vtable=tuple(address for address, _ in _vtable),
-                vtable_names=tuple(name for _, name in _vtable),
-                name=type_name,
-                field_count=field_count,
-                field_names=field_names,
+                base_type=base_type, vtable=vtable, vtable_names=vtable_names, name=type_name, field_names=field_names
             )
 
         return self.type_cache[type_name]
@@ -144,7 +115,9 @@ class SsmalRttiManager:
 
         vtable_names: tuple[str] = self._read_name_list(type_address + 2 * POINTER_SIZE + vtable_count * POINTER_SIZE, len(vtable))
 
-        _HERE = type_address + 2 * POINTER_SIZE + vtable_count * POINTER_SIZE + sum(len(vtable_name) + 1 for vtable_name in vtable_names) + 1
+        _HERE = (
+            type_address + 2 * POINTER_SIZE + vtable_count * POINTER_SIZE + sum(len(vtable_name) + 1 for vtable_name in vtable_names) + 1
+        )
         name = self._read_zstr(_HERE)
 
         field_count = self._read_int(_HERE + len(name) + 1)
