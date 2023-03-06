@@ -1,11 +1,47 @@
+from collections import OrderedDict
+from dataclasses import dataclass
+import io
+from typing import Callable, Generator
+
 from ssmal.lang.ssmalloc.arena import Arena
-from ssmal.lang.ssmalloc.ssmal_type import SsmalType
+from ssmal.lang.ssmalloc.ssmal_type import SsmalField, SsmalType, OverrideInfo
 
 POINTER_SIZE = 4
 
 
+@dataclass
+class ArenaReaderWriter:
+    arena: Arena
+
+    def get_addr(self, base_address: int, offset: int = 0) -> int:
+        return base_address + offset * POINTER_SIZE
+
+    def get_view(self, start: int, size: int) -> memoryview:
+        return self.arena.view[start : start + size]
+
+    def read_zstr(self, address: int) -> str:
+        zstr: str = ""
+        while self.arena.view[address] != 0:
+            zstr += str(self.arena.view[address].to_bytes(1, "little", signed=False), encoding="ascii")
+            address += 1
+        return zstr
+
+    def read_zstr_table(self, address: int) -> Generator[str, None, None]:
+        while self.arena.view[address] != 0:
+            zstr = self.read_zstr(address)
+            yield zstr
+            address += len(zstr) + 1
+
+    def read_ptr(self, base_address: int, *, offset: int = 0) -> int:
+        return int.from_bytes(self.get_view(base_address + offset * POINTER_SIZE, 4), "little", signed=True)
+
+    def write_ptr(self, base_address: int, value: int, *, offset: int = 0):
+        self.get_view(base_address + offset * POINTER_SIZE, 4)[:4] = value.to_bytes(4, "little", signed=True)
+
+
 class SsmalTypeEmbedder:
     arena: Arena
+    arena_rw: ArenaReaderWriter
     ssmal_types: list[SsmalType]
     ssmal_types_table_address: int
     # built internally for type and method names
@@ -16,6 +52,7 @@ class SsmalTypeEmbedder:
 
     def __init__(self, arena: Arena, ssmal_types: list[SsmalType], symbol_table: dict[str, int]) -> None:
         self.arena = arena
+        self.arena_rw = ArenaReaderWriter(arena)
         self.ssmal_types = ssmal_types
         self.ssmal_types_table_address = -1
         self.string_table = {}
@@ -25,26 +62,120 @@ class SsmalTypeEmbedder:
     def embed(self):
         assert self.string_table_address == -1, "Attempted to embed SsmalTypeInfo more than once."
         TYPE_INFO_SIZE = 5 * POINTER_SIZE
-        self.embed_string_table()
+
         self.ssmal_types_table_address = self.arena.malloc(len(self.ssmal_types) * POINTER_SIZE)
+        _type_info_offsets = SsmalType.offsets()
+
         for i, ssmal_type in enumerate(self.ssmal_types):
-            address = self.arena.malloc(TYPE_INFO_SIZE)
-            # get pointers, make tables, ...
+            string_table_offsets, string_table_bytes = self.compile_string_table(ssmal_type.strings)
+            string_table_address = self.arena.embed(string_table_bytes)
 
+            def _get_string_address(s: str) -> int:
+                return string_table_address + string_table_offsets[s]
 
-    def embed_string_table(self):
-        strings = set()
-        for ssmal_type in self.ssmal_types:
-            strings.add(ssmal_type.name)
-            strings.update(ssmal_type.field_names)
-            strings.update(ssmal_type.vtable_names)
+            type_info_address = self.arena.malloc(TYPE_INFO_SIZE)
+            self.arena_rw.write_ptr(self.ssmal_types_table_address, type_info_address, offset=i)
 
-        _string_list = list(strings)
-        _strtable_bytes = b""
-        i = 0
-        for s in _string_list:
-            self.string_table[s] = i
-            _strtable_bytes += bytes(s, encoding="ascii") + b"\x00"
-            i += len(s) + 1
+            base_type_info_address = self.get_type_info_address(ssmal_type.base_type)
+            vtable_address = self.build_vtable(ssmal_type, _get_string_address)
+            name_address = _get_string_address(ssmal_type.name)
+            fields_address = self.build_field_table(ssmal_type, _get_string_address)
 
-        self.string_table_address = self.arena.embed(_strtable_bytes)
+            self.arena_rw.write_ptr(type_info_address, base_type_info_address, offset=_type_info_offsets["base_type"])
+            self.arena_rw.write_ptr(type_info_address, vtable_address, offset=_type_info_offsets["vtable"])
+            self.arena_rw.write_ptr(type_info_address, name_address, offset=_type_info_offsets["name"])
+            self.arena_rw.write_ptr(type_info_address, fields_address, offset=_type_info_offsets["fields"])
+
+    def hydrate(self, type_name: str) -> SsmalType:
+        _type_info_offsets = SsmalType.offsets()
+        type_info_address = self.get_type_info_address_from_name(type_name)
+
+        base_type_info_address = self.arena_rw.read_ptr(type_info_address, offset=_type_info_offsets["base_type"])
+        vtable_address = self.arena_rw.read_ptr(type_info_address, offset=_type_info_offsets["vtable"])
+        name_address = self.arena_rw.read_ptr(type_info_address, offset=_type_info_offsets["name"])
+        fields_address = self.arena_rw.read_ptr(type_info_address, offset=_type_info_offsets["fields"])
+
+        base_type_name = self.arena_rw.read_zstr(base_type_info_address + POINTER_SIZE * _type_info_offsets["name"])
+        base_type = self.hydrate(base_type_name)
+
+        vtable_names: list[str] = []
+        vtable_size = self.arena_rw.read_ptr(vtable_address)
+        for i in range(vtable_size):
+            method_name_address = self.arena_rw.read_ptr(self.arena_rw.get_addr(vtable_address, offset=2 * i + 1))
+            vtable_names.append(self.arena_rw.read_zstr(method_name_address))
+
+        name = self.arena_rw.read_zstr(name_address)
+
+        _fields: list[SsmalField] = []
+        fields_size = self.arena_rw.read_ptr(fields_address)
+        for i in range(fields_size):
+            field_name_address = self.arena_rw.read_ptr(self.arena_rw.get_addr(fields_address, offset=2 * i + 1))
+            field_type_address = self.arena_rw.read_ptr(self.arena_rw.get_addr(fields_address, offset=2 * i + 2))
+            field_name = self.arena_rw.read_zstr(field_name_address)
+            field_type = self.arena_rw.read_zstr(field_type_address)
+            _fields.append(SsmalField(field_name, field_type))
+
+        return SsmalType(base_type=base_type, vtable_names=tuple(vtable_names), name=name, fields=tuple(_fields))
+
+    def compile_string_table(self, strings: tuple[str]) -> tuple[OrderedDict[str, int], bytes]:
+        buffer = io.BytesIO()
+        offsets = OrderedDict[str, int]()
+        for string in strings:
+            if string in offsets:
+                continue
+            else:
+                offsets[string] = buffer.tell()
+            buffer.write(bytes(string, encoding="ascii"))
+            buffer.write(b"\x00")
+        buffer.write(b"\x00")
+        return offsets, buffer.getvalue()
+
+    def get_type_info_address_from_name(self, name: str) -> int:
+        if name == "int":
+            return -2
+        if name == "str":
+            return -3
+        for i, ssmal_type in enumerate(self.ssmal_types):
+            if ssmal_type.name == name:
+                return self.arena_rw.get_addr(self.ssmal_types_table_address, i)
+        else:
+            return -1
+
+    def get_type_info_address(self, type_info: SsmalType | None) -> int:
+        if type_info is None:
+            return -1
+        else:
+            return self.get_type_info_address_from_name(type_info.name)
+
+    def build_vtable(self, ssmal_type: SsmalType, _get_string_address: Callable[[str], int]) -> int:
+        vtable_implementations = self.get_vtable_implementations(ssmal_type)
+        vtable_address = self.arena.malloc(1 + POINTER_SIZE * 2 * len(vtable_implementations))
+        self.arena_rw.write_ptr(vtable_address, len(vtable_implementations))
+        for i, item in enumerate(vtable_implementations.items()):
+            method_name, method_address = item
+            method_name_address = _get_string_address(method_name)
+            self.arena_rw.write_ptr(vtable_address, method_name_address, offset=2 * i + 1)
+            self.arena_rw.write_ptr(vtable_address, method_address, offset=2 * i + 2)
+
+        return vtable_address
+
+    def get_vtable_implementations(self, ssmal_type: SsmalType) -> OrderedDict[str, int]:
+        override_table = ssmal_type.override_table
+        vtable_implementations = OrderedDict[str, int]()
+        for name in override_table.keys():
+            implementer = ssmal_type.get_implementer(name)
+            qualified_name = f"{implementer.name}.{name}"
+            vtable_implementations[name] = self.symbol_table[qualified_name]
+
+        return vtable_implementations
+
+    def build_field_table(self, ssmal_type: SsmalType, _get_string_address: Callable[[str], int]) -> int:
+        fields_address = self.arena.malloc(POINTER_SIZE * 2 * len(ssmal_type.fields))
+        self.arena_rw.write_ptr(fields_address, len(ssmal_type.fields))
+        for i, field in enumerate(ssmal_type.fields):
+            name_address = _get_string_address(field.name)
+            type_address = self.get_type_info_address_from_name(field.name)
+            self.arena_rw.write_ptr(fields_address, name_address, offset=2 * i + 1)
+            self.arena_rw.write_ptr(fields_address, type_address, offset=2 * i + 2)
+
+        return fields_address
