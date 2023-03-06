@@ -1,8 +1,10 @@
 from dataclasses import dataclass
 
 import pytest
+from ssmal.lang.ssmalloc.arena import Arena
 
 from ssmal.lang.ssmalloc.ssmal_type import SsmalField, SsmalType, OverrideInfo
+from ssmal.lang.ssmalloc.ssmal_type_info import SsmalTypeEmbedder
 
 def test_small_type():
     @dataclass
@@ -32,32 +34,16 @@ def test_small_type():
     expected_point_3d_fields = (*expected_point_2d_fields, *(SsmalField(name, _type) for name, _type in [("z", "int")]))
     expected_point_3d = SsmalType(expected_point_2d, ("l2", "volume"), "Point3D", expected_point_3d_fields)
 
-    assert SsmalType.from_dataclass(Point2D) == expected_point_2d
-    assert SsmalType.from_dataclass(Point3D) == expected_point_3d
-
-    assert expected_point_2d.override_table == {
-        'l2': OverrideInfo.DeclaresNew,
-        'area': OverrideInfo.DeclaresNew,
+    symbol_table = {
+        'Point2D.l2': 0x100,
+        'Point2D.area': 0x100,
+        'Point3D.l2': 0x100,
+        'Point3D.volume': 0x100,
     }
 
-    assert expected_point_3d.override_table == {
-        'l2': OverrideInfo.DoesOverride,
-        'area': OverrideInfo.DoesNotOverride,
-        'volume': OverrideInfo.DeclaresNew,
-    }
+    arena = Arena(memoryview(bytearray(0x400)))
 
-    assert expected_point_2d.get_implementer('l2') == expected_point_2d
-    assert expected_point_2d.get_implementer('area') == expected_point_2d
-    assert expected_point_3d.get_implementer('l2') == expected_point_3d
-    assert expected_point_3d.get_implementer('area') == expected_point_2d
-    assert expected_point_3d.get_implementer('volume') == expected_point_3d
-
-    with pytest.raises(KeyError) as e:
-        assert expected_point_3d.get_implementer("foobar")
-    assert 'not in override table' in str(e.getrepr())
-    
-    expected_point_3d.base_type = None
-    with pytest.raises(KeyError) as e:
-        assert expected_point_3d.get_implementer("area")
-    assert 'not in override table' in str(e.getrepr())
-    expected_point_3d.base_type = expected_point_2d
+    ssmal_type_embedder = SsmalTypeEmbedder(arena, [expected_point_2d, expected_point_3d], symbol_table)
+    ssmal_type_embedder.embed()
+    print(arena.view.tobytes())
+    assert ssmal_type_embedder.hydrate('Point2D') == expected_point_2d

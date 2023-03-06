@@ -67,8 +67,11 @@ class SsmalTypeEmbedder:
         name_address = self.arena_rw.read_ptr(type_info_address, offset=_type_info_offsets["name"])
         fields_address = self.arena_rw.read_ptr(type_info_address, offset=_type_info_offsets["fields"])
 
-        base_type_name = self.arena_rw.read_zstr(base_type_info_address + POINTER_SIZE * _type_info_offsets["name"])
-        base_type = self.hydrate(base_type_name)
+        if base_type_info_address != -1:
+            base_type_name = self.arena_rw.read_zstr(base_type_info_address + POINTER_SIZE * _type_info_offsets["name"])
+            base_type = self.hydrate(base_type_name)
+        else:
+            base_type = None
 
         vtable_names: list[str] = []
         vtable_size = self.arena_rw.read_ptr(vtable_address)
@@ -109,7 +112,8 @@ class SsmalTypeEmbedder:
             return -3
         for i, ssmal_type in enumerate(self.ssmal_types):
             if ssmal_type.name == name:
-                return self.arena_rw.get_addr(self.ssmal_types_table_address, i)
+                ptr_address = self.arena_rw.get_addr(self.ssmal_types_table_address, i)
+                return self.arena_rw.read_ptr(ptr_address)
         else:
             return -1
 

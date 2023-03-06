@@ -29,12 +29,7 @@ class SsmalType:
 
     @classmethod
     def offsets(cls) -> dict[str, int]:
-        return {
-            'base_type': 0,
-            'vtable': 1,
-            'name': 2,
-            'fields': 3,
-        }
+        return {"base_type": 0, "vtable": 1, "name": 2, "fields": 3}
 
     @classmethod
     def from_dataclass(cls, dataclass: type) -> SsmalType:
@@ -72,7 +67,8 @@ class SsmalType:
 
     @property
     def strings(self) -> tuple[str]:
-        return tuple(chain(self.vtable_names, [self.name], *[(f.name, f.type) for f in self.fields]))
+        _vtable_names = [name for name in self.override_table.keys()]
+        return tuple(chain(_vtable_names, [self.name], *[(f.name, f.type) for f in self.fields]))
 
     def get_implementer(self, virtual_method_name: str) -> SsmalType:
         override_table = self.override_table
@@ -83,7 +79,7 @@ class SsmalType:
                 return self
             case (OverrideInfo.DoesNotOverride) if self.base_type is not None:
                 return self.base_type.get_implementer(virtual_method_name)
-            case _: # pragma: no cover
+            case _:  # pragma: no cover
                 # unreachable...
                 raise Exception(f"method not implemented: {virtual_method_name=}")
 

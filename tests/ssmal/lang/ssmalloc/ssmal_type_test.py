@@ -4,6 +4,7 @@ import pytest
 
 from ssmal.lang.ssmalloc.ssmal_type import SsmalField, SsmalType, OverrideInfo
 
+
 def test_small_type():
     @dataclass
     class Point2D:
@@ -35,29 +36,32 @@ def test_small_type():
     assert SsmalType.from_dataclass(Point2D) == expected_point_2d
     assert SsmalType.from_dataclass(Point3D) == expected_point_3d
 
-    assert expected_point_2d.override_table == {
-        'l2': OverrideInfo.DeclaresNew,
-        'area': OverrideInfo.DeclaresNew,
-    }
+    expected_point_2d_strings = {"l2", "area", "Point2D", "name", "str", "x", "int", "y", "int"}
+    assert expected_point_2d_strings == set(expected_point_2d.strings)
+
+    expected_point_3d_strings = {"l2", "area", "volume", "Point3D", "name", "str", "x", "int", "y", "int", "z", "int"}
+    assert expected_point_3d_strings == set(expected_point_3d.strings)
+
+    assert expected_point_2d.override_table == {"l2": OverrideInfo.DeclaresNew, "area": OverrideInfo.DeclaresNew}
 
     assert expected_point_3d.override_table == {
-        'l2': OverrideInfo.DoesOverride,
-        'area': OverrideInfo.DoesNotOverride,
-        'volume': OverrideInfo.DeclaresNew,
+        "l2": OverrideInfo.DoesOverride,
+        "area": OverrideInfo.DoesNotOverride,
+        "volume": OverrideInfo.DeclaresNew,
     }
 
-    assert expected_point_2d.get_implementer('l2') == expected_point_2d
-    assert expected_point_2d.get_implementer('area') == expected_point_2d
-    assert expected_point_3d.get_implementer('l2') == expected_point_3d
-    assert expected_point_3d.get_implementer('area') == expected_point_2d
-    assert expected_point_3d.get_implementer('volume') == expected_point_3d
+    assert expected_point_2d.get_implementer("l2") == expected_point_2d
+    assert expected_point_2d.get_implementer("area") == expected_point_2d
+    assert expected_point_3d.get_implementer("l2") == expected_point_3d
+    assert expected_point_3d.get_implementer("area") == expected_point_2d
+    assert expected_point_3d.get_implementer("volume") == expected_point_3d
 
     with pytest.raises(KeyError) as e:
         assert expected_point_3d.get_implementer("foobar")
-    assert 'not in override table' in str(e.getrepr())
-    
+    assert "not in override table" in str(e.getrepr())
+
     expected_point_3d.base_type = None
     with pytest.raises(KeyError) as e:
         assert expected_point_3d.get_implementer("area")
-    assert 'not in override table' in str(e.getrepr())
+    assert "not in override table" in str(e.getrepr())
     expected_point_3d.base_type = expected_point_2d
