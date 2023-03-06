@@ -29,7 +29,6 @@ class SsmalType:
 
     @classmethod
     def offsets(cls) -> dict[str, int]:
-        # return {field.name: i for i, field in enumerate(fields(SsmalType))}
         return {
             'base_type': 0,
             'vtable': 1,
@@ -39,7 +38,7 @@ class SsmalType:
 
     @classmethod
     def from_dataclass(cls, dataclass: type) -> SsmalType:
-        bases = type.__bases__
+        bases = dataclass.__bases__
         if len(bases) > 1:
             raise NotImplementedError("Multiple inheritance not supported")
         elif len(bases) == 1 and bases[0] is not object:
@@ -82,10 +81,11 @@ class SsmalType:
                 raise KeyError(f"method not in override table: {virtual_method_name=}")
             case (OverrideInfo.DeclaresNew | OverrideInfo.DoesOverride):
                 return self
-            case (OverrideInfo.DoesOverride) if self.base_type is not None:
+            case (OverrideInfo.DoesNotOverride) if self.base_type is not None:
                 return self.base_type.get_implementer(virtual_method_name)
-            case _:
-                raise KeyError(f"method not implemented: {virtual_method_name=}")
+            case _: # pragma: no cover
+                # unreachable...
+                raise Exception(f"method not implemented: {virtual_method_name=}")
 
 
 @dataclass
