@@ -28,18 +28,41 @@ def test_small_type():
         def volume(self) -> int:
             return self.x * self.y * self.z
 
+    expected_point_2d_vtable: tuple[tuple[str, OverrideInfo], ...] = tuple(
+        (("l2", OverrideInfo.DeclaresNew), ("area", OverrideInfo.DeclaresNew))
+    )
+
+    expected_point_3d_vtable: tuple[tuple[str, OverrideInfo], ...] = tuple(
+        (("l2", OverrideInfo.DoesOverride), ("area", OverrideInfo.DoesNotOverride), ("volume", OverrideInfo.DeclaresNew))
+    )
+
     expected_point_2d_fields = tuple(SsmalField(name, _type) for name, _type in [("name", "str"), ("x", "int"), ("y", "int")])
-    expected_point_2d = SsmalType(None, ("l2", "area"), "Point2D", expected_point_2d_fields)
+    expected_point_2d = SsmalType(None, expected_point_2d_vtable, "Point2D", expected_point_2d_fields)
     expected_point_3d_fields = (*expected_point_2d_fields, *(SsmalField(name, _type) for name, _type in [("z", "int")]))
-    expected_point_3d = SsmalType(expected_point_2d, ("l2", "volume"), "Point3D", expected_point_3d_fields)
+    expected_point_3d = SsmalType(expected_point_2d, expected_point_3d_vtable, "Point3D", expected_point_3d_fields)
 
     assert SsmalType.from_dataclass(Point2D) == expected_point_2d
     assert SsmalType.from_dataclass(Point3D) == expected_point_3d
 
-    expected_point_2d_strings = {"l2", "area", "Point2D", "name", "str", "x", "int", "y", "int"}
+    expected_point_2d_strings = {"l2", "area", "Point2D", "name", "str", "x", "int", "y", "int", "Point2D.l2", "Point2D.area"}
     assert expected_point_2d_strings == set(expected_point_2d.strings)
 
-    expected_point_3d_strings = {"l2", "area", "volume", "Point3D", "name", "str", "x", "int", "y", "int", "z", "int"}
+    expected_point_3d_strings = {
+        "l2",
+        "area",
+        "volume",
+        "Point3D",
+        "name",
+        "str",
+        "x",
+        "int",
+        "y",
+        "int",
+        "z",
+        "int",
+        "Point3D.l2",
+        "Point3D.volume",
+    }
     assert expected_point_3d_strings == set(expected_point_3d.strings)
 
     assert expected_point_2d.override_table == {"l2": OverrideInfo.DeclaresNew, "area": OverrideInfo.DeclaresNew}
@@ -61,7 +84,7 @@ def test_small_type():
     assert "not in override table" in str(e.getrepr())
 
     expected_point_3d.base_type = None
-    with pytest.raises(KeyError) as e:
+    with pytest.raises(Exception) as e:
         assert expected_point_3d.get_implementer("area")
-    assert "not in override table" in str(e.getrepr())
+    assert "method not implemented" in str(e.getrepr())
     expected_point_3d.base_type = expected_point_2d

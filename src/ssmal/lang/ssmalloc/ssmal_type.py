@@ -5,6 +5,9 @@ from dataclasses import dataclass, fields
 from enum import Enum
 from itertools import chain
 from typing import Generator
+from ssmal.lang.ssmalloc.merge_tables import _merge_tables
+
+from ssmal.lang.ssmalloc.override_info import OverrideInfo
 
 
 @dataclass
@@ -13,17 +16,11 @@ class SsmalField:
     type: str
 
 
-class OverrideInfo(Enum):
-    DoesNotOverride = 1
-    DoesOverride = 2
-    DeclaresNew = 3
-
-
 @dataclass
 class SsmalType:
     base_type: SsmalType | None
     # vtable: tuple[int, ...]
-    vtable_names: tuple[str, ...]
+    vtable: tuple[tuple[str, OverrideInfo], ...]
     name: str
     fields: tuple[SsmalField, ...]
 
@@ -38,37 +35,32 @@ class SsmalType:
             raise NotImplementedError("Multiple inheritance not supported")
         elif len(bases) == 1 and bases[0] is not object:
             base_type = cls.from_dataclass(bases[0])
+            base_method_names = tuple(name for name, _ in base_type.vtable)
         else:
             base_type = None
+            base_method_names = tuple()
 
-        vtable_names: tuple[str, ...] = tuple(
+        method_names: tuple[str, ...] = tuple(
             method_name for method_name, method in dataclass.__dict__.items() if "__" not in method_name and callable(method)
         )
+
+        vtable = _merge_tables(method_names, base_method_names)
         type_name = dataclass.__name__
         _fields = tuple(SsmalField(field.name, field.type.__name__) for field in fields(dataclass))
 
-        return SsmalType(base_type=base_type, vtable_names=vtable_names, name=type_name, fields=_fields)
+        return SsmalType(base_type=base_type, vtable=tuple(vtable.items()), name=type_name, fields=_fields)
 
     @property
     def override_table(self) -> OrderedDict[str, OverrideInfo]:
-        result = OrderedDict[str, OverrideInfo]()
-        if self.base_type is not None:
-            for name in self.base_type.vtable_names:
-                if name in self.vtable_names:
-                    result[name] = OverrideInfo.DoesOverride
-                else:
-                    result[name] = OverrideInfo.DoesNotOverride
-        for name in self.vtable_names:
-            if name in result:
-                continue
-            else:
-                result[name] = OverrideInfo.DeclaresNew
-        return result
+        return OrderedDict(self.vtable)
 
     @property
     def strings(self) -> tuple[str]:
-        _vtable_names = [name for name in self.override_table.keys()]
-        return tuple(chain(_vtable_names, [self.name], *[(f.name, f.type) for f in self.fields]))
+        _vtable_names = [method_name for method_name, _ in self.vtable]
+        _method_names = [
+            f"{self.name}.{method_name}" for method_name, override_info in self.vtable if override_info != OverrideInfo.DoesNotOverride
+        ]
+        return tuple(chain(_vtable_names, _method_names, [self.name], *[(f.name, f.type) for f in self.fields]))
 
     def get_implementer(self, virtual_method_name: str) -> SsmalType:
         override_table = self.override_table

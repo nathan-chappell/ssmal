@@ -42,10 +42,18 @@ def test_hydrate():
         def volume(self) -> int:
             return self.x * self.y * self.z
 
+    expected_point_2d_vtable: tuple[tuple[str, OverrideInfo], ...] = tuple(
+        (("l2", OverrideInfo.DeclaresNew), ("area", OverrideInfo.DeclaresNew))
+    )
+
+    expected_point_3d_vtable: tuple[tuple[str, OverrideInfo], ...] = tuple(
+        (("l2", OverrideInfo.DoesOverride), ("area", OverrideInfo.DoesNotOverride), ("volume", OverrideInfo.DeclaresNew))
+    )
+
     expected_point_2d_fields = tuple(SsmalField(name, _type) for name, _type in [("name", "str"), ("x", "int"), ("y", "int")])
-    expected_point_2d = SsmalType(None, ("l2", "area"), "Point2D", expected_point_2d_fields)
+    expected_point_2d = SsmalType(None, expected_point_2d_vtable, "Point2D", expected_point_2d_fields)
     expected_point_3d_fields = (*expected_point_2d_fields, *(SsmalField(name, _type) for name, _type in [("z", "int")]))
-    expected_point_3d = SsmalType(expected_point_2d, ("l2", "volume"), "Point3D", expected_point_3d_fields)
+    expected_point_3d = SsmalType(expected_point_2d, expected_point_3d_vtable, "Point3D", expected_point_3d_fields)
 
     symbol_table = {"Point2D.l2": 0x0AAAAAAA, "Point2D.area": 0x0BBBBBBB, "Point3D.l2": 0x0CCCCCCC, "Point3D.volume": 0x0DDDDDDD}
 
@@ -65,7 +73,7 @@ def test_hydrate():
     point_2d_type_info_address = ssmal_type_embedder.get_type_info_address_from_name("Point2D")
     print(f"{point_2d_type_info_address=:x}")
     assert ssmal_type_embedder.get_type_name_from_type_info_address(point_2d_type_info_address) == "Point2D"
-    assert ssmal_type_embedder.get_vtable_names_from_type_info_address(point_2d_type_info_address) == ("l2", "area")
+    assert ssmal_type_embedder.get_vtable_names_from_type_info_address(point_2d_type_info_address) == ("Point2D.l2", "Point2D.area")
     assert ssmal_type_embedder.get_field_names_and_types_from_type_info_address(point_2d_type_info_address) == (
         ("name", "str"),
         ("x", "int"),
@@ -73,4 +81,6 @@ def test_hydrate():
     )
 
     point_2d_hydrated = ssmal_type_embedder.hydrate("Point2D")
-    assert ssmal_type_embedder.hydrate("Point2D") == expected_point_2d
+    point_3d_hydrated = ssmal_type_embedder.hydrate("Point3D")
+    assert point_2d_hydrated == expected_point_2d
+    assert point_3d_hydrated == expected_point_3d
