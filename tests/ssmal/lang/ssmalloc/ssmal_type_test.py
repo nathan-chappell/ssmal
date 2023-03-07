@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 import pytest
 
-from ssmal.lang.ssmalloc.ssmal_type import SsmalField, SsmalType, OverrideInfo
+from ssmal.lang.ssmalloc.ssmal_type import SsmalField, SsmalType, OverrideType
 
 
 def test_small_type():
@@ -28,12 +28,12 @@ def test_small_type():
         def volume(self) -> int:
             return self.x * self.y * self.z
 
-    expected_point_2d_vtable: tuple[tuple[str, OverrideInfo], ...] = tuple(
-        (("l2", OverrideInfo.DeclaresNew), ("area", OverrideInfo.DeclaresNew))
+    expected_point_2d_vtable: tuple[tuple[str, OverrideType], ...] = tuple(
+        (("l2", OverrideType.DeclaresNew), ("area", OverrideType.DeclaresNew))
     )
 
-    expected_point_3d_vtable: tuple[tuple[str, OverrideInfo], ...] = tuple(
-        (("l2", OverrideInfo.DoesOverride), ("area", OverrideInfo.DoesNotOverride), ("volume", OverrideInfo.DeclaresNew))
+    expected_point_3d_vtable: tuple[tuple[str, OverrideType], ...] = tuple(
+        (("l2", OverrideType.DoesOverride), ("area", OverrideType.DoesNotOverride), ("volume", OverrideType.DeclaresNew))
     )
 
     expected_point_2d_fields = tuple(SsmalField(name, _type) for name, _type in [("name", "str"), ("x", "int"), ("y", "int")])
@@ -65,12 +65,12 @@ def test_small_type():
     }
     assert expected_point_3d_strings == set(expected_point_3d.strings)
 
-    assert expected_point_2d.override_table == {"l2": OverrideInfo.DeclaresNew, "area": OverrideInfo.DeclaresNew}
+    assert expected_point_2d.override_table == {"l2": OverrideType.DeclaresNew, "area": OverrideType.DeclaresNew}
 
     assert expected_point_3d.override_table == {
-        "l2": OverrideInfo.DoesOverride,
-        "area": OverrideInfo.DoesNotOverride,
-        "volume": OverrideInfo.DeclaresNew,
+        "l2": OverrideType.DoesOverride,
+        "area": OverrideType.DoesNotOverride,
+        "volume": OverrideType.DeclaresNew,
     }
 
     assert expected_point_2d.get_implementer("l2") == expected_point_2d

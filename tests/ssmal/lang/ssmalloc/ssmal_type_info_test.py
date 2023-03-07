@@ -3,7 +3,7 @@ from dataclasses import dataclass
 import pytest
 from ssmal.lang.ssmalloc.arena import Arena
 
-from ssmal.lang.ssmalloc.ssmal_type import SsmalField, SsmalType, OverrideInfo
+from ssmal.lang.ssmalloc.ssmal_type import SsmalField, SsmalType, OverrideType
 from ssmal.lang.ssmalloc.ssmal_type_info import SsmalTypeEmbedder
 from ssmal.util.hexdump_bytes import hexdump_bytes
 
@@ -42,12 +42,12 @@ def test_hydrate():
         def volume(self) -> int:
             return self.x * self.y * self.z
 
-    expected_point_2d_vtable: tuple[tuple[str, OverrideInfo], ...] = tuple(
-        (("l2", OverrideInfo.DeclaresNew), ("area", OverrideInfo.DeclaresNew))
+    expected_point_2d_vtable: tuple[tuple[str, OverrideType], ...] = tuple(
+        (("l2", OverrideType.DeclaresNew), ("area", OverrideType.DeclaresNew))
     )
 
-    expected_point_3d_vtable: tuple[tuple[str, OverrideInfo], ...] = tuple(
-        (("l2", OverrideInfo.DoesOverride), ("area", OverrideInfo.DoesNotOverride), ("volume", OverrideInfo.DeclaresNew))
+    expected_point_3d_vtable: tuple[tuple[str, OverrideType], ...] = tuple(
+        (("l2", OverrideType.DoesOverride), ("area", OverrideType.DoesNotOverride), ("volume", OverrideType.DeclaresNew))
     )
 
     expected_point_2d_fields = tuple(SsmalField(name, _type) for name, _type in [("name", "str"), ("x", "int"), ("y", "int")])

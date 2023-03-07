@@ -6,71 +6,70 @@ from typing import Callable, Generator, Iterable
 
 from ssmal.lang.ssmalloc.arena import Arena
 from ssmal.lang.ssmalloc.arena_reader_writer import ArenaReaderWriter
-from ssmal.lang.ssmalloc.merge_tables import _merge_tables
-from ssmal.lang.ssmalloc.ssmal_type import SsmalField, SsmalType, OverrideInfo
+from ssmal.lang.ssmalloc.merge_tables import merge_tables
+from ssmal.lang.ssmalloc.ssmal_type import SsmalField, SsmalType, OverrideType
+from ssmal.lang.ssmalloc.string_table import StringTable
 
 POINTER_SIZE = 4
 
 
 _type_info_offsets = SsmalType.offsets()
 
+SymbolAddress = int
+StringTableOffset = int
 
 class SsmalTypeEmbedder:
     arena: Arena
     arena_rw: ArenaReaderWriter
     ssmal_types: list[SsmalType]
-    ssmal_types_table_address: int
+    type_info_table_address: int
     # built internally for type and method names
-    global_string_table_offsets: dict[str, int]
-    global_string_table_address: int
-    built_string_tables: list[tuple[int, dict[str, int]]]
+    string_table: StringTable
+    string_table_size: int
+    # global_string_table_offsets: dict[str, int]
+    string_table_address: int = -1
     # for method-implementation lookup
-    symbol_table: dict[str, int]
+    symbol_table: OrderedDict[SymbolAddress, StringTableOffset]
+
+    TYPE_INFO_TABLE_SYMBOL = '__TYPE_INFO_TABLE'
+    TYPE_INFO_SIZE = 5 * POINTER_SIZE
 
     _builtin_types = [SsmalType(None, (), "str", ()), SsmalType(None, (), "int", ())]
 
-    def __init__(self, arena: Arena, ssmal_types: list[SsmalType], symbol_table: dict[str, int]) -> None:
+    def __init__(self, arena: Arena, ssmal_types: list[SsmalType], string_table_max_size = 0x200) -> None:
         self.arena = arena
         self.arena_rw = ArenaReaderWriter(arena)
-        self.built_string_tables = []
         self.ssmal_types = ssmal_types
-        self.ssmal_types_table_address = -1
-        self.global_string_table_offsets = {}
-        self.global_string_table_address = -1
-        self.symbol_table = symbol_table
+        self.type_info_table_address = -1
+        self.string_table = StringTable(max_size=string_table_max_size)
+        self.string_table_size = string_table_max_size
+        self.symbol_table = OrderedDict[SymbolAddress, StringTableOffset]()
 
     @property
-    def all_types(self) -> Iterable[SsmalType]:
-        return chain(self._builtin_types, self.ssmal_types)
+    def all_types(self) -> list[SsmalType]:
+        return list(*self._builtin_types, *self.ssmal_types)
 
     def embed(self):
-        assert self.global_string_table_address == -1, "Attempted to embed SsmalTypeInfo more than once."
-        _builtin_type_names = ("int", "str")
-
-        self.global_string_table_offsets, _global_str_table_bytes = self.compile_string_table(_builtin_type_names)
-        self.global_string_table_address = self.arena.embed(_global_str_table_bytes)
-        TYPE_INFO_SIZE = 5 * POINTER_SIZE
-
-        self.ssmal_types_table_address = self.arena.malloc(len(self.ssmal_types) * POINTER_SIZE)
+        assert self.string_table_address == -1, "Attempted to embed SsmalTypeInfo more than once."
+        self.string_table_address = self.arena.malloc(self.string_table_size)
+        assert self.type_info_table_address == -1, "Attempted to embed SsmalTypeInfo more than once."
+        
+        self.type_info_table_address = self.arena.malloc(len(self.all_types) * POINTER_SIZE)
+        self.symbol_table[self.type_info_table_address] = self.string_table[self.TYPE_INFO_TABLE_SYMBOL]
 
         for i, ssmal_type in enumerate(self.all_types):
-            string_table_offsets, string_table_bytes = self.compile_string_table(ssmal_type.strings)
-            string_table_address = self.arena.embed(string_table_bytes)
-            self.built_string_tables.append((string_table_address, string_table_offsets))
+            # string_table_offsets, string_?table_bytes = self.compile_string_table(ssmal_type.strings)
+            # self.string_table.add_strings(*ssmal_type.strings)
+            # string_table_address = self.arena.embed(string_table_bytes)
+            # self.built_string_tables.append((string_table_address, string_table_offsets))
 
-            def _get_string_address(s: str) -> int:
-                if s in string_table_offsets:
-                    return string_table_address + string_table_offsets[s]
-                elif s in self.global_string_table_offsets:
-                    return self.global_string_table_address + self.global_string_table_offsets[s]
-                else:
-                    for address, st in self.built_string_tables:
-                        if s in st:
-                            return address + st[s]
-                raise KeyError(f"string {s=} not in any string table")
+            # def _get_string_address(s: str) -> int:
+            #     if s in self.string_table:
+            #         return self.string_table_address + self.string_table[s]
+            #     raise KeyError(f"string {s=} not in string table")
 
-            type_info_address = self.arena.malloc(TYPE_INFO_SIZE)
-            self.arena_rw.write_ptr(self.ssmal_types_table_address, type_info_address, offset=i)
+            type_info_address = self.arena.malloc(self.TYPE_INFO_SIZE)
+            self.arena_rw.write_ptr(self.type_info_table_address, type_info_address, offset=i)
 
             base_type_info_address = self.get_type_info_address(ssmal_type.base_type)
             vtable_address = self.build_vtable(ssmal_type, _get_string_address)
@@ -124,13 +123,13 @@ class SsmalTypeEmbedder:
             base_type = None
 
         vtable_names = self.get_vtable_names_from_type_info_address(type_info_address)
-        _base_vtable_unqualified_names = tuple(n[n.index('.') + 1:] for n in base_vtable_names)
-        _vtable_unqualified_names = tuple(n[n.index('.') + 1:] for n in vtable_names)
-        vtable = _merge_tables(_vtable_unqualified_names, _base_vtable_unqualified_names)
+        _base_vtable_unqualified_names = tuple(n[n.index(".") + 1 :] for n in base_vtable_names)
+        _vtable_unqualified_names = tuple(n[n.index(".") + 1 :] for n in vtable_names)
+        vtable = merge_tables(_vtable_unqualified_names, _base_vtable_unqualified_names)
         for vtable_name in vtable_names:
-            _unqualified = vtable_name[vtable_name.index('.') + 1:]
-            if not vtable_name.startswith(type_name) and vtable[_unqualified] == OverrideInfo.DoesOverride:
-                vtable[_unqualified] = OverrideInfo.DoesNotOverride
+            _unqualified = vtable_name[vtable_name.index(".") + 1 :]
+            if not vtable_name.startswith(type_name) and vtable[_unqualified] == OverrideType.DoesOverride:
+                vtable[_unqualified] = OverrideType.DoesNotOverride
 
         name = self.get_type_name_from_type_info_address(type_info_address)
 
@@ -139,23 +138,10 @@ class SsmalTypeEmbedder:
 
         return SsmalType(base_type=base_type, vtable=tuple(vtable.items()), name=name, fields=_fields)
 
-    def compile_string_table(self, strings: tuple[str, ...]) -> tuple[OrderedDict[str, int], bytes]:
-        buffer = io.BytesIO()
-        offsets = OrderedDict[str, int]()
-        for string in strings:
-            if string in offsets:
-                continue
-            else:
-                offsets[string] = buffer.tell()
-            buffer.write(bytes(string, encoding="ascii"))
-            buffer.write(b"\x00")
-        buffer.write(b"\x00")
-        return offsets, buffer.getvalue()
-
     def get_type_info_address_from_name(self, name: str) -> int:
         for i, ssmal_type in enumerate(self.all_types):
             if ssmal_type.name == name:
-                ptr_address = self.arena_rw.get_addr(self.ssmal_types_table_address, offset=i)
+                ptr_address = self.arena_rw.get_addr(self.type_info_table_address, offset=i)
                 return self.arena_rw.read_ptr(ptr_address)
         else:
             return -1

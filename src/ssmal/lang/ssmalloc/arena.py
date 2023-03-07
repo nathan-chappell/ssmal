@@ -13,7 +13,7 @@ class Arena:
 
     def _align(self):
         self.index += self.ALIGNMENT - (self.index % self.ALIGNMENT)
-    
+
     def malloc(self, size: int) -> int:
         if self.index + size >= self.size:
             raise MemoryError(f"Failed to allocate {size=} bytes: {self.index=}")
@@ -21,10 +21,10 @@ class Arena:
         self.index += size
         self._align()
         return address
-    
+
     def embed(self, _bytes: bytes) -> int:
         address = self.malloc(len(_bytes))
-        self.view[address: address + len(_bytes)] = _bytes
+        self.view[address : address + len(_bytes)] = _bytes
         return address
 
 

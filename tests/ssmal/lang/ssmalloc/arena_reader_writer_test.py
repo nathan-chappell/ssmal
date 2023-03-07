@@ -22,9 +22,9 @@ def test_arena_reader_writer_zstr_table():
     arena_rw = ArenaReaderWriter(arena)
     assert arena.malloc(1) == 0
     assert arena.index == 0x20
-    zstr_table = b'foo\x00BAR\x00\x00'
+    zstr_table = b"foo\x00BAR\x00\x00"
     address = arena.embed(zstr_table)
-    assert tuple(arena_rw.read_zstr_table(address)) == tuple(['foo', 'BAR'])
+    assert tuple(arena_rw.read_zstr_table(address)) == tuple(["foo", "BAR"])
     assert arena.index == 0x40
     with pytest.raises(MemoryError):
         arena.embed(zstr_table)
