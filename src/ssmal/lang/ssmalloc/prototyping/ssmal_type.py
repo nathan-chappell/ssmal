@@ -4,9 +4,9 @@ from collections import OrderedDict
 from dataclasses import dataclass, fields
 from itertools import chain
 from typing import Any, Callable
-from ssmal.lang.ssmalloc.merge_tables import merge_tables
+from ssmal.lang.ssmalloc.metadata.merge_tables import merge_tables
 
-from ssmal.lang.ssmalloc.override_type import OverrideType
+from ssmal.lang.ssmalloc.metadata.override_type import OverrideType
 
 
 @dataclass

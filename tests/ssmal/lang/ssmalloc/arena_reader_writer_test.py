@@ -1,7 +1,7 @@
 import pytest
 
-from ssmal.lang.ssmalloc.arena import Arena
-from ssmal.lang.ssmalloc.arena_reader_writer import ArenaReaderWriter
+from ssmal.lang.ssmalloc.metadata.arena import Arena
+from ssmal.lang.ssmalloc.metadata.arena_reader_writer import ArenaReaderWriter
 
 
 def test_arena_reader_writer():

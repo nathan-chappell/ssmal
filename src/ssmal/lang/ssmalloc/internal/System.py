@@ -5,11 +5,11 @@ from typing import Any, Callable, NoReturn, cast, ClassVar, Generic, TypeVar, ov
 MAX_STRING_SIZE = 0x400
 
 
-class _BuiltInType:
+class BuiltInType:
     ...
 
 
-class Int(_BuiltInType):
+class Int(BuiltInType):
     def __init__(self, value: int):
         ...
 
@@ -20,7 +20,7 @@ class Int(_BuiltInType):
         ...
 
 
-class Byte(_BuiltInType):
+class Byte(BuiltInType):
     def __init__(self, value: bytes):
         ...
 
@@ -47,7 +47,7 @@ class Null(Ptr):
 ItemType = TypeVar("ItemType")
 
 
-class ArrayBase(Generic[ItemType], _BuiltInType):
+class ArrayBase(Generic[ItemType], BuiltInType):
     size: Int = Int(0)
     address: Ptr = Null()
 
@@ -66,7 +66,7 @@ class IntArray(ArrayBase[Int]):
     ...
 
 
-class String(_BuiltInType):
+class String(BuiltInType):
     buffer: ByteArray = ByteArray(Int(MAX_STRING_SIZE))
 
     def __init__(self, zstr: str):

@@ -4,11 +4,11 @@ import io
 from itertools import chain
 from typing import Callable, Generator, Iterable
 
-from ssmal.lang.ssmalloc.arena import Arena
-from ssmal.lang.ssmalloc.arena_reader_writer import ArenaReaderWriter
-from ssmal.lang.ssmalloc.merge_tables import merge_tables
-from ssmal.lang.ssmalloc.ssmal_type import SsmalField, SsmalType, OverrideType
-from ssmal.lang.ssmalloc.string_table import StringTable
+from ssmal.lang.ssmalloc.metadata.arena import Arena
+from ssmal.lang.ssmalloc.metadata.arena_reader_writer import ArenaReaderWriter
+from ssmal.lang.ssmalloc.metadata.merge_tables import merge_tables
+from ssmal.lang.ssmalloc.prototyping.ssmal_type import SsmalField, SsmalType, OverrideType
+from ssmal.lang.ssmalloc.metadata.string_table import StringTable
 
 POINTER_SIZE = 4
 

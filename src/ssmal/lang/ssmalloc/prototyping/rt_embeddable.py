@@ -1,6 +1,6 @@
 
 from typing import Any
-from ssmal.lang.ssmalloc.arena import Arena
+from ssmal.lang.ssmalloc.metadata.arena import Arena
 from ssmal.processors.processor import Processor
 
 """

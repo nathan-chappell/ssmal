@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 import pytest
 
-from ssmal.lang.ssmalloc.ssmal_type import SsmalField, SsmalType, OverrideType
+from ssmal.lang.ssmalloc.prototyping.ssmal_type import SsmalField, SsmalType, OverrideType
 
 
 def test_small_type():

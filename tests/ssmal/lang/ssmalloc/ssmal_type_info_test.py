@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 
 import pytest
-from ssmal.lang.ssmalloc.arena import Arena
+from ssmal.lang.ssmalloc.metadata.arena import Arena
 
-from ssmal.lang.ssmalloc.ssmal_type import SsmalField, SsmalType, OverrideType
-from ssmal.lang.ssmalloc.ssmal_type_info import SsmalTypeEmbedder
+from ssmal.lang.ssmalloc.prototyping.ssmal_type import SsmalField, SsmalType, OverrideType
+from ssmal.lang.ssmalloc.prototyping.ssmal_type_embedder import SsmalTypeEmbedder
 from ssmal.util.hexdump_bytes import hexdump_bytes
 
 
