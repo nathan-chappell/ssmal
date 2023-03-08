@@ -36,8 +36,6 @@ class MethodInfo(TypeInfoBase):
 
 @dataclass
 class TypeInfo(TypeInfoBase):
-    name: String
-    base: TypeInfo
     fields: ArrayBase[FieldInfo]
     methods: ArrayBase[MethodInfo]
 
