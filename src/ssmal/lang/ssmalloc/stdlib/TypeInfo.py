@@ -8,6 +8,26 @@ class TypeInfoBase:
     name: String
     parent: TypeInfoBase
 
+    def foo(self, bar: Int) -> Int:
+        ...
+
+    def print(self, indent: Int) -> Int:
+        self.foo(indent)
+        i: Int = indent
+        i += indent
+        z: str = "foobar"
+        print(" ", indent)
+        print(i, indent)
+        print(z, indent)
+        print("<TypeInfo ")
+        print(self.name)
+        print(" -> ")
+        print(self.parent.name)
+        print(">")
+        return 1
+        
+
+
 
 @dataclass
 class FieldInfo(TypeInfoBase):
