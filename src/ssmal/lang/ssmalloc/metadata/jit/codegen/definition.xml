@@ -1,0 +1,16 @@
+<definition>
+    <OpClass name="BinOp">
+        <match>BinOp(left=left,op=$op,right=right)</match>
+        <Op name="Add" op="+">push(left); push(right); popa; swpab; popa; addb</Op>
+        <Op name="Sub" op="-">push(left); push(right); popa; swpab; popa; subb</Op>
+        <Op name="Mul" op="*">push(left); push(right); popa; swpab; popa; mulb</Op>
+        <Op name="Div" op="/">push(left); push(right); popa; swpab; popa; divb</Op>
+    </OpClass>
+    <OpClass name="BoolOp">
+        <match>BoolOp(values=[head, *tail])</match>
+        <Op name="And" op="and">push(head); brzi  ; popa; swpab; popa; addb</Op>
+        <Op name="Mul" op="+">push(left); push(right); popa; swpab; popa; mulb</Op>
+        <Op name="Sub" op="+">push(left); push(right); popa; swpab; popa; subb</Op>
+        <Op name="Div" op="+">push(left); push(right); popa; swpab; popa; divb</Op>
+    </OpClass>
+</definition>

@@ -14,14 +14,20 @@ class TypeInfoBase:
     def print(self, indent: Int) -> Int:
         self.foo(indent)
         i: Int = indent
-        i += indent
+        j: Int = i - Int(3) + Int(1)
         z: str = "foobar"
-        print(" ", indent)
-        print(i, indent)
-        print(z, indent)
-        print("<TypeInfo ")
-        print(self.name)
-        print(" -> ")
+        if i and j:
+            ...
+        elif i or j:
+            ...
+        else:
+            ...
+        # print(" ", indent)
+        # print(i, indent)
+        # print(z, indent)
+        # print("<TypeInfo ")
+        # print(self.name)
+        # print(" -> ")
         print(self.parent.name)
         print(">")
         return 1

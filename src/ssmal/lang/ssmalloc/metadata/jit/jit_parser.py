@@ -33,6 +33,7 @@ def dump_ast(node: ast.AST, indent=0, prefix=""):
             _array_prefix = f"{_prefix}[{{index}}]"
             _sub_prefix = " " * len(_array_prefix)
             # print(_indent(f"{_field_node}{_prefix}[]"))
+            print(_field, end=" > ")
             pprint(_field_node)
             for i, _sub_field in enumerate(_field_node):
                 dump_ast(_sub_field, indent=indent + 1, prefix=_array_prefix.format(index=i))
