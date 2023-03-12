@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Generator
 
-from ssmal.lang.ssmalloc.metadata.arena import Arena
+from ssmal.lang.ssmalloc.metadata.util.arena import Arena
 
 POINTER_SIZE = 4
 

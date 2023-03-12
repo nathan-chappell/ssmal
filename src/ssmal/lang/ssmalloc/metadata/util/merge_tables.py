@@ -1,6 +1,6 @@
 from collections import OrderedDict
 
-from ssmal.lang.ssmalloc.metadata.override_type import OverrideType
+from ssmal.lang.ssmalloc.metadata.util.override_type import OverrideType
 
 
 def merge_tables(methods: list[str], base_methods: list[str]) -> OrderedDict[str, OverrideType]:

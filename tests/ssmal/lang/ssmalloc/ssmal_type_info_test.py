@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 import pytest
-from ssmal.lang.ssmalloc.metadata.arena import Arena
+from ssmal.lang.ssmalloc.metadata.util.arena import Arena
 
 from ssmal.lang.ssmalloc.prototyping.ssmal_type import SsmalField, SsmalType, OverrideType
 from ssmal.lang.ssmalloc.prototyping.ssmal_type_embedder import SsmalTypeEmbedder

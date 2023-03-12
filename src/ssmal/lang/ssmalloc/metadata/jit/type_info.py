@@ -7,8 +7,8 @@ import logging
 from types import GenericAlias
 from typing import Callable, Generic, get_type_hints
 
-from ssmal.lang.ssmalloc.metadata.merge_tables import merge_tables
-from ssmal.lang.ssmalloc.metadata.override_type import OverrideType
+from ssmal.lang.ssmalloc.metadata.util.merge_tables import merge_tables
+from ssmal.lang.ssmalloc.metadata.util.override_type import OverrideType
 
 import ssmal.lang.ssmalloc.internal.System as InternalSystem
 
