@@ -1,15 +1,18 @@
 from __future__ import annotations
 
 import ast
-import inspect
 from pprint import pprint
-import textwrap
+import re
 
 from collections import OrderedDict
-from dataclasses import dataclass
-from typing import Any, Callable, Generator, Literal, NewType
+from dataclasses import is_dataclass
+from typing import Any
+from types import ModuleType
+from ssmal.lang.ssmalloc.metadata.jit.codegen.compiler_error import CompilerError
+from ssmal.lang.ssmalloc.metadata.jit.codegen.method_compiler import MethodCompiler
+from ssmal.lang.ssmalloc.metadata.jit.strongly_typed_strings import Identifier, TypeName
 
-from ssmal.lang.ssmalloc.metadata.type_info import TypeInfo
+from ssmal.lang.ssmalloc.metadata.jit.type_info import MethodInfo, TypeInfo
 
 
 def dump_ast(node: ast.AST, indent=0, prefix=""):
@@ -40,92 +43,8 @@ def dump_ast(node: ast.AST, indent=0, prefix=""):
         elif isinstance(_field_node, ast.AST):
             dump_ast(_field_node, prefix=_prefix)
         else:
-            print(_indent(f'  {_field} = | {_field_node} | {_field_node.__class__.__name__} |'))
+            print(_indent(f"  {_field} = | {_field_node} | {_field_node.__class__.__name__} |"))
     print(_indent(f"< {node}", marker="<"))
-
-
-FullName = NewType("FullName", str)
-Identifier = NewType("Identifier", str)
-TypeName = NewType("TypeName", Identifier)
-
-
-@dataclass
-class SmallocNode:
-    ast_node: ast.AST
-
-
-@dataclass
-class Parameter(SmallocNode):
-    name: Identifier
-    type: TypeName
-
-
-@dataclass
-class Statement(SmallocNode):
-    ...
-
-
-@dataclass
-class Expression(Statement):
-    ...
-
-
-@dataclass
-class Const(Expression):
-    value: str | int
-    type: Literal["int", "str"]
-
-
-@dataclass
-class Variable(Expression):
-    name: Identifier
-    type: TypeName
-
-
-@dataclass
-class IndexAccess(Expression):
-    _self: LValue
-    index: Variable | Const
-
-
-@dataclass
-class FieldAccess(Expression):
-    _self: LValue
-    field_name: Identifier
-
-
-@dataclass
-class FunctionCall(Expression):
-    function: LValue
-    args: list[Expression]
-
-
-LValue = Variable | IndexAccess | FieldAccess
-
-
-@dataclass
-class Declaration(Statement):
-    variable: Variable
-    value: Expression | None
-
-
-@dataclass
-class Assignment(Statement):
-    lhs: LValue
-    rhs: Expression
-
-
-@dataclass
-class Return(Statement):
-    value: Expression
-
-
-@dataclass
-class MethodDef(Statement):
-    name: Identifier
-    parameters: list[Parameter]
-    return_type: TypeName
-    body: list[Statement]
 
 
 class ParseError(Exception):
@@ -133,54 +52,29 @@ class ParseError(Exception):
 
 
 class JitParser:
-    type_cache: OrderedDict[str, TypeInfo]
+    type_info_dict: OrderedDict[TypeName, TypeInfo]
 
-    def __init__(self, type_cache: OrderedDict[str, TypeInfo]) -> None:
-        self.type_cache = type_cache
+    def __init__(self, module: ModuleType) -> None:
+        type_name_regex = re.compile(r"[A-Z][a-zA-Z]*")
 
-    def get_method_def(self, method_def: Callable) -> ast.FunctionDef:
-        _module = ast.parse(textwrap.dedent(inspect.getsource(method_def)))
-        _function_def = _module.body[0]
-        if not isinstance(_function_def, ast.FunctionDef):
-            raise ParseError(f"Invalid method def: {method_def}", method_def)
+        self.type_info_dict = OrderedDict[TypeName, TypeInfo]()
+        self.type_info_dict[TypeName(Identifier("int"))] = TypeInfo("int", None, int, [], [])
+        self.type_info_dict[TypeName(Identifier("str"))] = TypeInfo("str", None, str, [], [])
 
-        return _function_def
+        for type_name, item in module.__dict__.items():
+            if not type_name_regex.match(type_name):
+                continue
+            if isinstance(item, type) and is_dataclass(item):
+                self.type_info_dict[TypeName(Identifier(type_name))] = TypeInfo.from_py_type(item)
+            raise CompilerError(item)
 
-    def parse_method_def(self, method_def: ast.FunctionDef) -> MethodDef:
-        name: Identifier = Identifier(method_def.name)
-        parameters: list[Parameter] = list(self.parse_parameters(method_def.args))
-        match method_def.returns:
-            case ast.Name(id=_return_type):
-                pass
-            case _returns:
-                raise ParseError(method_def, _returns)
-        # if not isinstance(expr, string)
-        return_type: TypeName = TypeName(Identifier(_return_type))
-        body: list[Statement] = self.parse_method_body(method_def.body)
+        for type_name, type_info in self.type_info_dict.items():
+            method_compiler = MethodCompiler(self.type_info_dict, self_type=type_info)
+            for method_info in type_info.methods:
+                method_info.assembly_code = " ".join(method_compiler.compile_method(method_info))
 
-        return MethodDef(ast_node=method_def, name=name, parameters=parameters, body=body, return_type=return_type)
-
-    def parse_parameters(self, arguments: ast.arguments) -> Generator[Parameter, None, None]:
-        if arguments.vararg or arguments.kwonlyargs or arguments.kw_defaults or arguments.kwarg or arguments.defaults:
-            raise ParseError(arguments)
-        for arg in arguments.args:
-            match arg:
-                case ast.arg(arg="self"):
-                    pass
-                case ast.arg(arg=_name, annotation=ast.Name(id=_type_name)):
-                    yield Parameter(arg, Identifier(_name), TypeName(Identifier(_type_name)))
-                case _:
-                    raise ParseError(arg)
-
-    def parse_method_body(self, body: list[ast.stmt]) -> Generator[Statement, None, None]:
-        for stmt in body:
-            match stmt:
-                case ast.Assign(): ...
-                case ast.AugAssign(): ...
-                case ast.AnnAssign(): ...
-                case ast.expr(value=ast.Call()): ...
-                case _:
-                    raise ParseError(stmt)
+        # at this point, all methods have their code compiled.
+        # Now we just need to assemble the type_info_dict into an executable...
 
 if __name__ == "__main__":
     jit = JitParser(OrderedDict())

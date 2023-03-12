@@ -2,253 +2,300 @@
                                                               name = | print | str |
 >args                                                       > arguments
 .args                                                         posonlyargs = | [] | list |
-args > [<ast.arg object at 0x0000018CEE41E800>, <ast.arg object at 0x0000018CEE41F040>]
+args > [<ast.arg object at 0x00000280ED6CF3D0>, <ast.arg object at 0x00000280ED6CEFB0>]
 >args.args[0]                                               > arg
 .args.args[0]                                                 arg = | self | str |
 .args.args[0]                                                 annotation = | None | NoneType |
 .args.args[0]                                                 type_comment = | None | NoneType |
-<args.args[0]                                               < <ast.arg object at 0x0000018CEE41E800>
+<args.args[0]                                               < <ast.arg object at 0x00000280ED6CF3D0>
 >args.args[1]                                               > arg
 .args.args[1]                                                 arg = | indent | str |
 >args.args[1].annotation                                    > Name
 .args.args[1].annotation                                      id = | Int | str |
 >args.args[1].annotation.ctx                                > Load
-<args.args[1].annotation.ctx                                < <ast.Load object at 0x0000018CEE049630>
-<args.args[1].annotation                                    < <ast.Name object at 0x0000018CEE41F4F0>
+<args.args[1].annotation.ctx                                < <ast.Load object at 0x00000280ED2F9630>
+<args.args[1].annotation                                    < <ast.Name object at 0x00000280ED6CF580>
 .args.args[1]                                                 type_comment = | None | NoneType |
-<args.args[1]                                               < <ast.arg object at 0x0000018CEE41F040>
+<args.args[1]                                               < <ast.arg object at 0x00000280ED6CEFB0>
 .args                                                         vararg = | None | NoneType |
 .args                                                         kwonlyargs = | [] | list |
 .args                                                         kw_defaults = | [] | list |
 .args                                                         kwarg = | None | NoneType |
 .args                                                         defaults = | [] | list |
-<args                                                       < <ast.arguments object at 0x0000018CEE41F430>
-body > [<ast.Expr object at 0x0000018CEE41F190>,
- <ast.AnnAssign object at 0x0000018CEE41DB70>,
- <ast.AnnAssign object at 0x0000018CEE41E290>,
- <ast.AnnAssign object at 0x0000018CEE41F8E0>,
- <ast.If object at 0x0000018CEE41F5E0>,
- <ast.Expr object at 0x0000018CEE41F640>,
- <ast.Expr object at 0x0000018CEE41EEC0>,
- <ast.Return object at 0x0000018CEE41E770>]
+<args                                                       < <ast.arguments object at 0x00000280ED6CFFA0>
+body > [<ast.Expr object at 0x00000280ED6CEF20>,
+ <ast.AnnAssign object at 0x00000280ED6CE2F0>,
+ <ast.AnnAssign object at 0x00000280ED6CF1C0>,
+ <ast.AnnAssign object at 0x00000280ED6CF460>,
+ <ast.Assign object at 0x00000280ED6CF520>,
+ <ast.If object at 0x00000280ED6CFD00>,
+ <ast.Expr object at 0x00000280ED6CDDE0>,
+ <ast.Expr object at 0x00000280ED6CDFC0>,
+ <ast.Return object at 0x00000280ED6CFF70>]
 >body[0]                                                    > Expr
 >body[0].value                                              > Call
 >body[0].value.func                                         > Attribute
 >body[0].value.func.value                                   > Name
 .body[0].value.func.value                                     id = | self | str |
 >body[0].value.func.value.ctx                               > Load
-<body[0].value.func.value.ctx                               < <ast.Load object at 0x0000018CEE049630>
-<body[0].value.func.value                                   < <ast.Name object at 0x0000018CEE41F070>
+<body[0].value.func.value.ctx                               < <ast.Load object at 0x00000280ED2F9630>
+<body[0].value.func.value                                   < <ast.Name object at 0x00000280ED6CE530>
 .body[0].value.func                                           attr = | foo | str |
 >body[0].value.func.ctx                                     > Load
-<body[0].value.func.ctx                                     < <ast.Load object at 0x0000018CEE049630>
-<body[0].value.func                                         < <ast.Attribute object at 0x0000018CEE41F6A0>
-args > [<ast.Name object at 0x0000018CEE41E530>]
+<body[0].value.func.ctx                                     < <ast.Load object at 0x00000280ED2F9630>
+<body[0].value.func                                         < <ast.Attribute object at 0x00000280ED6CEF80>
+args > [<ast.Name object at 0x00000280ED6CF190>]
 >body[0].value.args[0]                                      > Name
 .body[0].value.args[0]                                        id = | indent | str |
 >body[0].value.args[0].ctx                                  > Load
-<body[0].value.args[0].ctx                                  < <ast.Load object at 0x0000018CEE049630>
-<body[0].value.args[0]                                      < <ast.Name object at 0x0000018CEE41E530>
+<body[0].value.args[0].ctx                                  < <ast.Load object at 0x00000280ED2F9630>
+<body[0].value.args[0]                                      < <ast.Name object at 0x00000280ED6CF190>
 .body[0].value                                                keywords = | [] | list |
-<body[0].value                                              < <ast.Call object at 0x0000018CEE41F0D0>
-<body[0]                                                    < <ast.Expr object at 0x0000018CEE41F190>
+<body[0].value                                              < <ast.Call object at 0x00000280ED6CEF50>
+<body[0]                                                    < <ast.Expr object at 0x00000280ED6CEF20>
 >body[1]                                                    > AnnAssign
 >body[1].target                                             > Name
 .body[1].target                                               id = | i | str |
 >body[1].target.ctx                                         > Store
-<body[1].target.ctx                                         < <ast.Store object at 0x0000018CEE049690>
-<body[1].target                                             < <ast.Name object at 0x0000018CEE41F2B0>
+<body[1].target.ctx                                         < <ast.Store object at 0x00000280ED2F9690>
+<body[1].target                                             < <ast.Name object at 0x00000280ED6CF1F0>
 >body[1].annotation                                         > Name
 .body[1].annotation                                           id = | Int | str |
 >body[1].annotation.ctx                                     > Load
-<body[1].annotation.ctx                                     < <ast.Load object at 0x0000018CEE049630>
-<body[1].annotation                                         < <ast.Name object at 0x0000018CEE41F310>
+<body[1].annotation.ctx                                     < <ast.Load object at 0x00000280ED2F9630>
+<body[1].annotation                                         < <ast.Name object at 0x00000280ED6CF250>
 >body[1].value                                              > Name
 .body[1].value                                                id = | indent | str |
 >body[1].value.ctx                                          > Load
-<body[1].value.ctx                                          < <ast.Load object at 0x0000018CEE049630>
-<body[1].value                                              < <ast.Name object at 0x0000018CEE41F2E0>
+<body[1].value.ctx                                          < <ast.Load object at 0x00000280ED2F9630>
+<body[1].value                                              < <ast.Name object at 0x00000280ED6CF220>
 .body[1]                                                      simple = | 1 | int |
-<body[1]                                                    < <ast.AnnAssign object at 0x0000018CEE41DB70>
+<body[1]                                                    < <ast.AnnAssign object at 0x00000280ED6CE2F0>
 >body[2]                                                    > AnnAssign
 >body[2].target                                             > Name
 .body[2].target                                               id = | j | str |
 >body[2].target.ctx                                         > Store
-<body[2].target.ctx                                         < <ast.Store object at 0x0000018CEE049690>
-<body[2].target                                             < <ast.Name object at 0x0000018CEE41F370>
+<body[2].target.ctx                                         < <ast.Store object at 0x00000280ED2F9690>
+<body[2].target                                             < <ast.Name object at 0x00000280ED6CE9B0>
 >body[2].annotation                                         > Name
 .body[2].annotation                                           id = | Int | str |
 >body[2].annotation.ctx                                     > Load
-<body[2].annotation.ctx                                     < <ast.Load object at 0x0000018CEE049630>
-<body[2].annotation                                         < <ast.Name object at 0x0000018CEE41F340>
+<body[2].annotation.ctx                                     < <ast.Load object at 0x00000280ED2F9630>
+<body[2].annotation                                         < <ast.Name object at 0x00000280ED6CF280>
 >body[2].value                                              > BinOp
 >body[2].value.left                                         > BinOp
 >body[2].value.left.left                                    > Name
 .body[2].value.left.left                                      id = | i | str |
 >body[2].value.left.left.ctx                                > Load
-<body[2].value.left.left.ctx                                < <ast.Load object at 0x0000018CEE049630>
-<body[2].value.left.left                                    < <ast.Name object at 0x0000018CEE41DCF0>
+<body[2].value.left.left.ctx                                < <ast.Load object at 0x00000280ED2F9630>
+<body[2].value.left.left                                    < <ast.Name object at 0x00000280ED6CDC60>
 >body[2].value.left.op                                      > Sub
-<body[2].value.left.op                                      < <ast.Sub object at 0x0000018CEE0498D0>
+<body[2].value.left.op                                      < <ast.Sub object at 0x00000280ED2F98D0>
 >body[2].value.left.right                                   > Call
 >body[2].value.left.right.func                              > Name
 .body[2].value.left.right.func                                id = | Int | str |
 >body[2].value.left.right.func.ctx                          > Load
-<body[2].value.left.right.func.ctx                          < <ast.Load object at 0x0000018CEE049630>
-<body[2].value.left.right.func                              < <ast.Name object at 0x0000018CEE41DCC0>
-args > [<ast.Constant object at 0x0000018CEE41E1D0>]
+<body[2].value.left.right.func.ctx                          < <ast.Load object at 0x00000280ED2F9630>
+<body[2].value.left.right.func                              < <ast.Name object at 0x00000280ED6CFB80>
+args > [<ast.Constant object at 0x00000280ED6CF3A0>]
 >body[2].value.left.right.args[0]                           > Constant
 .body[2].value.left.right.args[0]                             value = | 3 | int |
 .body[2].value.left.right.args[0]                             kind = | None | NoneType |
-<body[2].value.left.right.args[0]                           < <ast.Constant object at 0x0000018CEE41E1D0>
+<body[2].value.left.right.args[0]                           < <ast.Constant object at 0x00000280ED6CF3A0>
 .body[2].value.left.right                                     keywords = | [] | list |
-<body[2].value.left.right                                   < <ast.Call object at 0x0000018CEE41DC90>
-<body[2].value.left                                         < <ast.BinOp object at 0x0000018CEE41F3A0>
+<body[2].value.left.right                                   < <ast.Call object at 0x00000280ED6CE230>
+<body[2].value.left                                         < <ast.BinOp object at 0x00000280ED6CDCF0>
 >body[2].value.op                                           > Add
-<body[2].value.op                                           < <ast.Add object at 0x0000018CEE049870>
+<body[2].value.op                                           < <ast.Add object at 0x00000280ED2F9870>
 >body[2].value.right                                        > Call
 >body[2].value.right.func                                   > Name
 .body[2].value.right.func                                     id = | Int | str |
 >body[2].value.right.func.ctx                               > Load
-<body[2].value.right.func.ctx                               < <ast.Load object at 0x0000018CEE049630>
-<body[2].value.right.func                                   < <ast.Name object at 0x0000018CEE41FCA0>
-args > [<ast.Constant object at 0x0000018CEE41F4C0>]
+<body[2].value.right.func.ctx                               < <ast.Load object at 0x00000280ED2F9630>
+<body[2].value.right.func                                   < <ast.Name object at 0x00000280ED6CF7C0>
+args > [<ast.Constant object at 0x00000280ED6CF490>]
 >body[2].value.right.args[0]                                > Constant
 .body[2].value.right.args[0]                                  value = | 1 | int |
 .body[2].value.right.args[0]                                  kind = | None | NoneType |
-<body[2].value.right.args[0]                                < <ast.Constant object at 0x0000018CEE41F4C0>
+<body[2].value.right.args[0]                                < <ast.Constant object at 0x00000280ED6CF490>
 .body[2].value.right                                          keywords = | [] | list |
-<body[2].value.right                                        < <ast.Call object at 0x0000018CEE41DD20>
-<body[2].value                                              < <ast.BinOp object at 0x0000018CEE41EAD0>
+<body[2].value.right                                        < <ast.Call object at 0x00000280ED6CDC90>
+<body[2].value                                              < <ast.BinOp object at 0x00000280ED6CDCC0>
 .body[2]                                                      simple = | 1 | int |
-<body[2]                                                    < <ast.AnnAssign object at 0x0000018CEE41E290>
+<body[2]                                                    < <ast.AnnAssign object at 0x00000280ED6CF1C0>
 >body[3]                                                    > AnnAssign
 >body[3].target                                             > Name
 .body[3].target                                               id = | z | str |
 >body[3].target.ctx                                         > Store
-<body[3].target.ctx                                         < <ast.Store object at 0x0000018CEE049690>
-<body[3].target                                             < <ast.Name object at 0x0000018CEE41F5B0>
+<body[3].target.ctx                                         < <ast.Store object at 0x00000280ED2F9690>
+<body[3].target                                             < <ast.Name object at 0x00000280ED6CF4F0>
 >body[3].annotation                                         > Name
 .body[3].annotation                                           id = | str | str |
 >body[3].annotation.ctx                                     > Load
-<body[3].annotation.ctx                                     < <ast.Load object at 0x0000018CEE049630>
-<body[3].annotation                                         < <ast.Name object at 0x0000018CEE41F580>
+<body[3].annotation.ctx                                     < <ast.Load object at 0x00000280ED2F9630>
+<body[3].annotation                                         < <ast.Name object at 0x00000280ED6CF4C0>
 >body[3].value                                              > Constant
 .body[3].value                                                value = | foobar | str |
 .body[3].value                                                kind = | None | NoneType |
-<body[3].value                                              < <ast.Constant object at 0x0000018CEE41F610>
+<body[3].value                                              < <ast.Constant object at 0x00000280ED6CF550>
 .body[3]                                                      simple = | 1 | int |
-<body[3]                                                    < <ast.AnnAssign object at 0x0000018CEE41F8E0>
->body[4]                                                    > If
->body[4].test                                               > BoolOp
->body[4].test.op                                            > And
-<body[4].test.op                                            < <ast.And object at 0x0000018CEE049780>
-values > [<ast.Name object at 0x0000018CEE41E980>,
- <ast.Name object at 0x0000018CEE41E8F0>]
->body[4].test.values[0]                                     > Name
-.body[4].test.values[0]                                       id = | i | str |
->body[4].test.values[0].ctx                                 > Load
-<body[4].test.values[0].ctx                                 < <ast.Load object at 0x0000018CEE049630>
-<body[4].test.values[0]                                     < <ast.Name object at 0x0000018CEE41E980>
->body[4].test.values[1]                                     > Name
-.body[4].test.values[1]                                       id = | j | str |
->body[4].test.values[1].ctx                                 > Load
-<body[4].test.values[1].ctx                                 < <ast.Load object at 0x0000018CEE049630>
-<body[4].test.values[1]                                     < <ast.Name object at 0x0000018CEE41E8F0>
-<body[4].test                                               < <ast.BoolOp object at 0x0000018CEE41F670>
-body > [<ast.Expr object at 0x0000018CEE41E920>]
->body[4].body[0]                                            > Expr
->body[4].body[0].value                                      > Constant
-.body[4].body[0].value                                        value = | Ellipsis | ellipsis |
-.body[4].body[0].value                                        kind = | None | NoneType |
-<body[4].body[0].value                                      < <ast.Constant object at 0x0000018CEE41E950>
-<body[4].body[0]                                            < <ast.Expr object at 0x0000018CEE41E920>
-orelse > [<ast.If object at 0x0000018CEE41DE40>]
->body[4].orelse[0]                                          > If
->body[4].orelse[0].test                                     > BoolOp
->body[4].orelse[0].test.op                                  > Or
-<body[4].orelse[0].test.op                                  < <ast.Or object at 0x0000018CEE0497E0>
-values > [<ast.Name object at 0x0000018CEE41DED0>,
- <ast.Name object at 0x0000018CEE41F1C0>]
->body[4].orelse[0].test.values[0]                           > Name
-.body[4].orelse[0].test.values[0]                             id = | i | str |
->body[4].orelse[0].test.values[0].ctx                       > Load
-<body[4].orelse[0].test.values[0].ctx                       < <ast.Load object at 0x0000018CEE049630>
-<body[4].orelse[0].test.values[0]                           < <ast.Name object at 0x0000018CEE41DED0>
->body[4].orelse[0].test.values[1]                           > Name
-.body[4].orelse[0].test.values[1]                             id = | j | str |
->body[4].orelse[0].test.values[1].ctx                       > Load
-<body[4].orelse[0].test.values[1].ctx                       < <ast.Load object at 0x0000018CEE049630>
-<body[4].orelse[0].test.values[1]                           < <ast.Name object at 0x0000018CEE41F1C0>
-<body[4].orelse[0].test                                     < <ast.BoolOp object at 0x0000018CEE41F7F0>
-body > [<ast.Expr object at 0x0000018CEE41EE30>]
->body[4].orelse[0].body[0]                                  > Expr
->body[4].orelse[0].body[0].value                            > Constant
-.body[4].orelse[0].body[0].value                              value = | Ellipsis | ellipsis |
-.body[4].orelse[0].body[0].value                              kind = | None | NoneType |
-<body[4].orelse[0].body[0].value                            < <ast.Constant object at 0x0000018CEE41DE10>
-<body[4].orelse[0].body[0]                                  < <ast.Expr object at 0x0000018CEE41EE30>
-orelse > [<ast.Expr object at 0x0000018CEE41EE00>]
->body[4].orelse[0].orelse[0]                                > Expr
->body[4].orelse[0].orelse[0].value                          > Constant
-.body[4].orelse[0].orelse[0].value                            value = | Ellipsis | ellipsis |
-.body[4].orelse[0].orelse[0].value                            kind = | None | NoneType |
-<body[4].orelse[0].orelse[0].value                          < <ast.Constant object at 0x0000018CEE41ECE0>
-<body[4].orelse[0].orelse[0]                                < <ast.Expr object at 0x0000018CEE41EE00>
-<body[4].orelse[0]                                          < <ast.If object at 0x0000018CEE41DE40>
-<body[4]                                                    < <ast.If object at 0x0000018CEE41F5E0>
->body[5]                                                    > Expr
->body[5].value                                              > Call
->body[5].value.func                                         > Name
-.body[5].value.func                                           id = | print | str |
->body[5].value.func.ctx                                     > Load
-<body[5].value.func.ctx                                     < <ast.Load object at 0x0000018CEE049630>
-<body[5].value.func                                         < <ast.Name object at 0x0000018CEE41DA20>
-args > [<ast.Attribute object at 0x0000018CEE41EF80>]
->body[5].value.args[0]                                      > Attribute
->body[5].value.args[0].value                                > Attribute
->body[5].value.args[0].value.value                          > Name
-.body[5].value.args[0].value.value                            id = | self | str |
->body[5].value.args[0].value.value.ctx                      > Load
-<body[5].value.args[0].value.value.ctx                      < <ast.Load object at 0x0000018CEE049630>
-<body[5].value.args[0].value.value                          < <ast.Name object at 0x0000018CEE41C3D0>
-.body[5].value.args[0].value                                  attr = | parent | str |
->body[5].value.args[0].value.ctx                            > Load
-<body[5].value.args[0].value.ctx                            < <ast.Load object at 0x0000018CEE049630>
-<body[5].value.args[0].value                                < <ast.Attribute object at 0x0000018CEE41F550>
-.body[5].value.args[0]                                        attr = | name | str |
->body[5].value.args[0].ctx                                  > Load
-<body[5].value.args[0].ctx                                  < <ast.Load object at 0x0000018CEE049630>
-<body[5].value.args[0]                                      < <ast.Attribute object at 0x0000018CEE41EF80>
-.body[5].value                                                keywords = | [] | list |
-<body[5].value                                              < <ast.Call object at 0x0000018CEE41F7C0>
-<body[5]                                                    < <ast.Expr object at 0x0000018CEE41F640>
+<body[3]                                                    < <ast.AnnAssign object at 0x00000280ED6CF460>
+>body[4]                                                    > Assign
+targets > [<ast.Name object at 0x00000280ED6CE860>]
+>body[4].targets[0]                                         > Name
+.body[4].targets[0]                                           id = | x | str |
+>body[4].targets[0].ctx                                     > Store
+<body[4].targets[0].ctx                                     < <ast.Store object at 0x00000280ED2F9690>
+<body[4].targets[0]                                         < <ast.Name object at 0x00000280ED6CE860>
+>body[4].value                                              > Call
+>body[4].value.func                                         > Attribute
+>body[4].value.func.value                                   > Attribute
+>body[4].value.func.value.value                             > Name
+.body[4].value.func.value.value                               id = | z | str |
+>body[4].value.func.value.value.ctx                         > Load
+<body[4].value.func.value.value.ctx                         < <ast.Load object at 0x00000280ED2F9630>
+<body[4].value.func.value.value                             < <ast.Name object at 0x00000280ED6CDE10>
+.body[4].value.func.value                                     attr = | y | str |
+>body[4].value.func.value.ctx                               > Load
+<body[4].value.func.value.ctx                               < <ast.Load object at 0x00000280ED2F9630>
+<body[4].value.func.value                                   < <ast.Attribute object at 0x00000280ED6CC610>
+.body[4].value.func                                           attr = | split | str |
+>body[4].value.func.ctx                                     > Load
+<body[4].value.func.ctx                                     < <ast.Load object at 0x00000280ED2F9630>
+<body[4].value.func                                         < <ast.Attribute object at 0x00000280ED6CDE70>
+args > [<ast.Call object at 0x00000280ED6CF6D0>]
+>body[4].value.args[0]                                      > Call
+>body[4].value.args[0].func                                 > Attribute
+>body[4].value.args[0].func.value                           > Name
+.body[4].value.args[0].func.value                             id = | i | str |
+>body[4].value.args[0].func.value.ctx                       > Load
+<body[4].value.args[0].func.value.ctx                       < <ast.Load object at 0x00000280ED2F9630>
+<body[4].value.args[0].func.value                           < <ast.Name object at 0x00000280ED6CF0A0>
+.body[4].value.args[0].func                                   attr = | __str__ | str |
+>body[4].value.args[0].func.ctx                             > Load
+<body[4].value.args[0].func.ctx                             < <ast.Load object at 0x00000280ED2F9630>
+<body[4].value.args[0].func                                 < <ast.Attribute object at 0x00000280ED6CDF30>
+args > [<ast.Constant object at 0x00000280ED6CF6A0>]
+>body[4].value.args[0].args[0]                              > Constant
+.body[4].value.args[0].args[0]                                value = | axb | str |
+.body[4].value.args[0].args[0]                                kind = | None | NoneType |
+<body[4].value.args[0].args[0]                              < <ast.Constant object at 0x00000280ED6CF6A0>
+.body[4].value.args[0]                                        keywords = | [] | list |
+<body[4].value.args[0]                                      < <ast.Call object at 0x00000280ED6CF6D0>
+.body[4].value                                                keywords = | [] | list |
+<body[4].value                                              < <ast.Call object at 0x00000280ED6CDE40>
+.body[4]                                                      type_comment = | None | NoneType |
+<body[4]                                                    < <ast.Assign object at 0x00000280ED6CF520>
+>body[5]                                                    > If
+>body[5].test                                               > BoolOp
+>body[5].test.op                                            > And
+<body[5].test.op                                            < <ast.And object at 0x00000280ED2F9780>
+values > [<ast.Name object at 0x00000280ED6CF670>,
+ <ast.Name object at 0x00000280ED6CECE0>]
+>body[5].test.values[0]                                     > Name
+.body[5].test.values[0]                                       id = | i | str |
+>body[5].test.values[0].ctx                                 > Load
+<body[5].test.values[0].ctx                                 < <ast.Load object at 0x00000280ED2F9630>
+<body[5].test.values[0]                                     < <ast.Name object at 0x00000280ED6CF670>
+>body[5].test.values[1]                                     > Name
+.body[5].test.values[1]                                       id = | j | str |
+>body[5].test.values[1].ctx                                 > Load
+<body[5].test.values[1].ctx                                 < <ast.Load object at 0x00000280ED2F9630>
+<body[5].test.values[1]                                     < <ast.Name object at 0x00000280ED6CECE0>
+<body[5].test                                               < <ast.BoolOp object at 0x00000280ED6CED10>
+body > [<ast.Expr object at 0x00000280ED6CEBC0>]
+>body[5].body[0]                                            > Expr
+>body[5].body[0].value                                      > Constant
+.body[5].body[0].value                                        value = | Ellipsis | ellipsis |
+.body[5].body[0].value                                        kind = | None | NoneType |
+<body[5].body[0].value                                      < <ast.Constant object at 0x00000280ED6CEE90>
+<body[5].body[0]                                            < <ast.Expr object at 0x00000280ED6CEBC0>
+orelse > [<ast.If object at 0x00000280ED6CEE60>]
+>body[5].orelse[0]                                          > If
+>body[5].orelse[0].test                                     > BoolOp
+>body[5].orelse[0].test.op                                  > Or
+<body[5].orelse[0].test.op                                  < <ast.Or object at 0x00000280ED2F97E0>
+values > [<ast.Name object at 0x00000280ED6CC3D0>,
+ <ast.Name object at 0x00000280ED6CC520>]
+>body[5].orelse[0].test.values[0]                           > Name
+.body[5].orelse[0].test.values[0]                             id = | i | str |
+>body[5].orelse[0].test.values[0].ctx                       > Load
+<body[5].orelse[0].test.values[0].ctx                       < <ast.Load object at 0x00000280ED2F9630>
+<body[5].orelse[0].test.values[0]                           < <ast.Name object at 0x00000280ED6CC3D0>
+>body[5].orelse[0].test.values[1]                           > Name
+.body[5].orelse[0].test.values[1]                             id = | j | str |
+>body[5].orelse[0].test.values[1].ctx                       > Load
+<body[5].orelse[0].test.values[1].ctx                       < <ast.Load object at 0x00000280ED2F9630>
+<body[5].orelse[0].test.values[1]                           < <ast.Name object at 0x00000280ED6CC520>
+<body[5].orelse[0].test                                     < <ast.BoolOp object at 0x00000280ED6CF430>
+body > [<ast.Expr object at 0x00000280ED6CFA00>]
+>body[5].orelse[0].body[0]                                  > Expr
+>body[5].orelse[0].body[0].value                            > Constant
+.body[5].orelse[0].body[0].value                              value = | Ellipsis | ellipsis |
+.body[5].orelse[0].body[0].value                              kind = | None | NoneType |
+<body[5].orelse[0].body[0].value                            < <ast.Constant object at 0x00000280ED6CDD20>
+<body[5].orelse[0].body[0]                                  < <ast.Expr object at 0x00000280ED6CFA00>
+orelse > [<ast.Expr object at 0x00000280ED6CC550>]
+>body[5].orelse[0].orelse[0]                                > Expr
+>body[5].orelse[0].orelse[0].value                          > Constant
+.body[5].orelse[0].orelse[0].value                            value = | Ellipsis | ellipsis |
+.body[5].orelse[0].orelse[0].value                            kind = | None | NoneType |
+<body[5].orelse[0].orelse[0].value                          < <ast.Constant object at 0x00000280ED6CE7A0>
+<body[5].orelse[0].orelse[0]                                < <ast.Expr object at 0x00000280ED6CC550>
+<body[5].orelse[0]                                          < <ast.If object at 0x00000280ED6CEE60>
+<body[5]                                                    < <ast.If object at 0x00000280ED6CFD00>
 >body[6]                                                    > Expr
 >body[6].value                                              > Call
 >body[6].value.func                                         > Name
 .body[6].value.func                                           id = | print | str |
 >body[6].value.func.ctx                                     > Load
-<body[6].value.func.ctx                                     < <ast.Load object at 0x0000018CEE049630>
-<body[6].value.func                                         < <ast.Name object at 0x0000018CEE41DD50>
-args > [<ast.Constant object at 0x0000018CEE41E140>]
->body[6].value.args[0]                                      > Constant
-.body[6].value.args[0]                                        value = | > | str |
-.body[6].value.args[0]                                        kind = | None | NoneType |
-<body[6].value.args[0]                                      < <ast.Constant object at 0x0000018CEE41E140>
+<body[6].value.func.ctx                                     < <ast.Load object at 0x00000280ED2F9630>
+<body[6].value.func                                         < <ast.Name object at 0x00000280ED6CF5B0>
+args > [<ast.Attribute object at 0x00000280ED6CF640>]
+>body[6].value.args[0]                                      > Attribute
+>body[6].value.args[0].value                                > Attribute
+>body[6].value.args[0].value.value                          > Name
+.body[6].value.args[0].value.value                            id = | self | str |
+>body[6].value.args[0].value.value.ctx                      > Load
+<body[6].value.args[0].value.value.ctx                      < <ast.Load object at 0x00000280ED2F9630>
+<body[6].value.args[0].value.value                          < <ast.Name object at 0x00000280ED6CD9C0>
+.body[6].value.args[0].value                                  attr = | parent | str |
+>body[6].value.args[0].value.ctx                            > Load
+<body[6].value.args[0].value.ctx                            < <ast.Load object at 0x00000280ED2F9630>
+<body[6].value.args[0].value                                < <ast.Attribute object at 0x00000280ED6CEC20>
+.body[6].value.args[0]                                        attr = | name | str |
+>body[6].value.args[0].ctx                                  > Load
+<body[6].value.args[0].ctx                                  < <ast.Load object at 0x00000280ED2F9630>
+<body[6].value.args[0]                                      < <ast.Attribute object at 0x00000280ED6CF640>
 .body[6].value                                                keywords = | [] | list |
-<body[6].value                                              < <ast.Call object at 0x0000018CEE41FB20>
-<body[6]                                                    < <ast.Expr object at 0x0000018CEE41EEC0>
->body[7]                                                    > Return
->body[7].value                                              > Constant
-.body[7].value                                                value = | 1 | int |
-.body[7].value                                                kind = | None | NoneType |
-<body[7].value                                              < <ast.Constant object at 0x0000018CEE41DF00>
-<body[7]                                                    < <ast.Return object at 0x0000018CEE41E770>
+<body[6].value                                              < <ast.Call object at 0x00000280ED6CEDA0>
+<body[6]                                                    < <ast.Expr object at 0x00000280ED6CDDE0>
+>body[7]                                                    > Expr
+>body[7].value                                              > Call
+>body[7].value.func                                         > Name
+.body[7].value.func                                           id = | print | str |
+>body[7].value.func.ctx                                     > Load
+<body[7].value.func.ctx                                     < <ast.Load object at 0x00000280ED2F9630>
+<body[7].value.func                                         < <ast.Name object at 0x00000280ED6CFDF0>
+args > [<ast.Constant object at 0x00000280ED6CFEE0>]
+>body[7].value.args[0]                                      > Constant
+.body[7].value.args[0]                                        value = | > | str |
+.body[7].value.args[0]                                        kind = | None | NoneType |
+<body[7].value.args[0]                                      < <ast.Constant object at 0x00000280ED6CFEE0>
+.body[7].value                                                keywords = | [] | list |
+<body[7].value                                              < <ast.Call object at 0x00000280ED6CDFF0>
+<body[7]                                                    < <ast.Expr object at 0x00000280ED6CDFC0>
+>body[8]                                                    > Return
+>body[8].value                                              > Constant
+.body[8].value                                                value = | 1 | int |
+.body[8].value                                                kind = | None | NoneType |
+<body[8].value                                              < <ast.Constant object at 0x00000280ED6CF5E0>
+<body[8]                                                    < <ast.Return object at 0x00000280ED6CFF70>
                                                               decorator_list = | [] | list |
 >returns                                                    > Name
 .returns                                                      id = | Int | str |
 >returns.ctx                                                > Load
-<returns.ctx                                                < <ast.Load object at 0x0000018CEE049630>
-<returns                                                    < <ast.Name object at 0x0000018CEE41D9F0>
+<returns.ctx                                                < <ast.Load object at 0x00000280ED2F9630>
+<returns                                                    < <ast.Name object at 0x00000280ED6CD6F0>
                                                               type_comment = | None | NoneType |
-<                                                           < <ast.FunctionDef object at 0x0000018CEE41E560>
+<                                                           < <ast.FunctionDef object at 0x00000280ED6CF310>

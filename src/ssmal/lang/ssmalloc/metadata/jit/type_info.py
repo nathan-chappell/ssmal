@@ -40,7 +40,8 @@ class ParameterInfo(TypeInfoBase):
 class MethodInfo(TypeInfoBase):
     parameters: list[ParameterInfo]
     return_type: TypeInfo
-    code: str | None
+    assembly_code: str | None
+    method: Callable
 
 
 @dataclass
@@ -55,6 +56,12 @@ class TypeInfo(TypeInfoBase):
                 return method
         if isinstance(self.parent, TypeInfo):
             return self.parent.get_method_info(name)
+        return None
+    
+    def get_field_info(self, name: str) -> FieldInfo | None:
+        for field in self.fields:
+            if field.name == name:
+                return field
         return None
 
     @classmethod
@@ -125,7 +132,14 @@ class TypeInfo(TypeInfoBase):
 
                     return_type = cls.from_py_type(method_hints["return"])
                     result.methods.append(
-                        MethodInfo(name=method_name, parent=result, parameters=parameters, return_type=return_type, code=None)
+                        MethodInfo(
+                            name=method_name,
+                            parent=result,
+                            parameters=parameters,
+                            return_type=return_type,
+                            assembly_code=None,
+                            method=class_methods[method_name],
+                        )
                     )
                 case OverrideType.DoesNotOverride if result.parent is not None and method_name in base_method_names:
                     base_method = result.parent.get_method_info(method_name)
