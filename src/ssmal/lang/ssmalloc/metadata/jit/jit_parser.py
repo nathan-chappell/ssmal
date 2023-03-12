@@ -6,9 +6,10 @@ import re
 
 from collections import OrderedDict
 from dataclasses import is_dataclass
-from typing import Any
+from typing import Any, Generator
 from types import ModuleType
 from ssmal.lang.ssmalloc.metadata.jit.codegen.compiler_error import CompilerError
+from ssmal.lang.ssmalloc.metadata.jit.codegen.compiler_internals import CompilerInternals
 from ssmal.lang.ssmalloc.metadata.jit.codegen.method_compiler import MethodCompiler
 from ssmal.lang.ssmalloc.metadata.jit.strongly_typed_strings import Identifier, TypeName
 
@@ -53,6 +54,7 @@ class ParseError(Exception):
 
 class JitParser:
     type_info_dict: OrderedDict[TypeName, TypeInfo]
+    ci = CompilerInternals()
 
     def __init__(self, module: ModuleType) -> None:
         type_name_regex = re.compile(r"[A-Z][a-zA-Z]*")
@@ -76,10 +78,31 @@ class JitParser:
         # at this point, all methods have their code compiled.
         # Now we just need to assemble the type_info_dict into an executable...
 
-if __name__ == "__main__":
-    jit = JitParser(OrderedDict())
-    # _get_method_def = jp.get_method_def(JitParser.get_method_def)
-    from ssmal.lang.ssmalloc.stdlib.TypeInfo import TypeInfoBase
+    def get_type_info_binary(self, offset: int) -> tuple[bytes, OrderedDict[str, int]]:
+        ...
 
-    method_def = jit.get_method_def(TypeInfoBase.print)
-    dump_ast(method_def)
+    def embed(self) -> Generator[str, None, None]:
+        ci = self.ci
+        TYPEINFO_OFFSET = 0x20
+        ENTRYPOINT = "Program.Main"
+        # create assembly...
+        type_info_binary, type_info_labels = self.get_type_info_binary(TYPEINFO_OFFSET)
+
+        yield ".goto 0"
+        yield ci.BRi
+        yield ci.GOTO_LABEL(ENTRYPOINT)
+        yield ".goto 0x20"
+        yield '"TYPEINFO"'
+        yield f".goto 0x{TYPEINFO_OFFSET:02x}"
+        yield f"b'{type_info_binary.hex()}"
+        for symbol, address in type_info_labels.items():
+            yield ci.MARK_LABEL(symbol)
+            yield f"0x{address:08x}"
+        yield ".align"
+        for type_info in self.type_info_dict.values():
+            for method_info in type_info.methods:
+                yield ci.MARK_LABEL(f"{type_info.name}.{method_info.name}")
+                if method_info.assembly_code is None:
+                    raise CompilerError(method_info)
+                yield method_info.assembly_code
+                yield ".align"

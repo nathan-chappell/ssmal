@@ -1,4 +1,3 @@
-
 # fmt: off
 
 class CompilerInternals:
@@ -62,6 +61,6 @@ class CompilerInternals:
 
     def ZSTR(self, s: str) -> str: return f'"{s}"'
     def GOTO_LABEL(self, s: str) -> str: return f'${s}'
-    def MARK_LABEL(self, s: str) -> str: return f'.{s}'
+    def MARK_LABEL(self, s: str) -> str: return f'{s}:'
     def OFFSET(self, z: int) -> str: return f'{4 * z}'
     def TO_BYTES(self, z: int) -> str: return f'{z}'

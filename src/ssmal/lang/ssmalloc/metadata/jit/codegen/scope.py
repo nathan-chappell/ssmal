@@ -72,6 +72,6 @@ class Scope:
             yield ci.SWPAB; yield ci.LDAb
         # restore B
         yield ci.SWPAB; yield ci.POPA; yield ci.SWPAB
-    
+
 
 # fmt: on

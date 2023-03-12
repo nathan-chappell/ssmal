@@ -1,6 +1,7 @@
 from __future__ import annotations
 from ssmal.lang.ssmalloc.internal.System import *
-from ssmal.lang.ssmalloc.stdlib import *
+
+# from ssmal.lang.ssmalloc.stdlib import *
 
 
 @dataclass
@@ -12,10 +13,7 @@ class TypeInfoBase:
         ...
 
     def print(self, indent: Int) -> Int:
-        print(self.parent.name)
-        print(">")
-        
-
+        ...
 
 
 @dataclass

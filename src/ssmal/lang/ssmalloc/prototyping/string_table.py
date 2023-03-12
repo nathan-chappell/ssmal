@@ -18,7 +18,7 @@ class StringTable:
     def add_strings(self, *strings: str):
         for string in strings:
             _ = self[string]
-    
+
     def __contains__(self, string: str) -> bool:
         return string in self._map
 

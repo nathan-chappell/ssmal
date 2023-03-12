@@ -18,6 +18,7 @@ _type_info_offsets = SsmalType.offsets()
 SymbolAddress = int
 StringTableOffset = int
 
+
 class SsmalTypeEmbedder:
     arena: Arena
     arena_rw: ArenaReaderWriter
@@ -31,12 +32,12 @@ class SsmalTypeEmbedder:
     # for method-implementation lookup
     symbol_table: OrderedDict[SymbolAddress, StringTableOffset]
 
-    TYPE_INFO_TABLE_SYMBOL = '__TYPE_INFO_TABLE'
+    TYPE_INFO_TABLE_SYMBOL = "__TYPE_INFO_TABLE"
     TYPE_INFO_SIZE = 5 * POINTER_SIZE
 
     _builtin_types = [SsmalType(None, (), "str", ()), SsmalType(None, (), "int", ())]
 
-    def __init__(self, arena: Arena, ssmal_types: list[SsmalType], string_table_max_size = 0x200) -> None:
+    def __init__(self, arena: Arena, ssmal_types: list[SsmalType], string_table_max_size=0x200) -> None:
         self.arena = arena
         self.arena_rw = ArenaReaderWriter(arena)
         self.ssmal_types = ssmal_types
@@ -53,7 +54,7 @@ class SsmalTypeEmbedder:
         assert self.string_table_address == -1, "Attempted to embed SsmalTypeInfo more than once."
         self.string_table_address = self.arena.malloc(self.string_table_size)
         assert self.type_info_table_address == -1, "Attempted to embed SsmalTypeInfo more than once."
-        
+
         self.type_info_table_address = self.arena.malloc(len(self.all_types) * POINTER_SIZE)
         self.symbol_table[self.type_info_table_address] = self.string_table[self.TYPE_INFO_TABLE_SYMBOL]
 

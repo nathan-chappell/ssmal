@@ -10,7 +10,7 @@ from typing import Callable, Generic, get_type_hints
 from ssmal.lang.ssmalloc.metadata.util.merge_tables import merge_tables
 from ssmal.lang.ssmalloc.metadata.util.override_type import OverrideType
 
-import ssmal.lang.ssmalloc.internal.System as InternalSystem
+# import ssmal.lang.ssmalloc.metadata.System as InternalSystem
 
 log = logging.getLogger(__name__)
 
@@ -57,7 +57,7 @@ class TypeInfo(TypeInfoBase):
         if isinstance(self.parent, TypeInfo):
             return self.parent.get_method_info(name)
         return None
-    
+
     def get_field_info(self, name: str) -> FieldInfo | None:
         for field in self.fields:
             if field.name == name:
@@ -80,7 +80,7 @@ class TypeInfo(TypeInfoBase):
         else:
             type_cache[name] = result
 
-        if py_type in (int, str) or name == "ArrayBase" or issubclass(py_type, InternalSystem.BuiltInType):
+        if py_type in (int, str) or name == "ArrayBase":
             return result
 
         log.info(f"{py_type=}")
@@ -152,11 +152,11 @@ class TypeInfo(TypeInfoBase):
         return result
 
 
-if __name__ == "__main__":
-    import ssmal.lang.ssmalloc.stdlib as stdlib
-    from pprint import pprint
+# if __name__ == "__main__":
+#     import ssmal.lang.ssmalloc.stdlib as stdlib
+#     from pprint import pprint
 
-    logging.basicConfig()
-    log.setLevel(logging.DEBUG)
-    type_info: TypeInfo = TypeInfo.from_py_type(stdlib.TypeInfo)
-    pprint(type_info)
+#     logging.basicConfig()
+#     log.setLevel(logging.DEBUG)
+#     type_info: TypeInfo = TypeInfo.from_py_type(stdlib.TypeInfo)
+#     pprint(type_info)

@@ -69,7 +69,7 @@ class MethodCompiler:
                             raise TypeError(type_name, stmt)
                         target_type = self.type_dict[type_name]
                         expr_type = self.infer_type(expr)
-                        if not self.is_subtype(expr_type, target_type)
+                        if not self.is_subtype(expr_type, target_type):
                             raise TypeError(expr_type, target_type, stmt)
                         self.variable_types[Identifier(variable_name)] = target_type
                         yield from scope.access_variable(variable_name, 'access')

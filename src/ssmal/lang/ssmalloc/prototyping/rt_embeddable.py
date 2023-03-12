@@ -1,4 +1,3 @@
-
 from typing import Any
 from ssmal.lang.ssmalloc.metadata.util.arena import Arena
 from ssmal.processors.processor import Processor
@@ -12,6 +11,7 @@ embeddable_type: should be built-in types:
     * tuple[T, n] # finite tuple
     * tuple[T, ...] # built-in array
 """
+
 
 class RtProxy:
     address: int
@@ -32,7 +32,7 @@ class RtProxy:
     def __getattribute__(self, name) -> Any:
         """Get the attribute from the arena using a processor"""
         ...
-    
+
     def __setattr__(self, name) -> Any:
         """Set the attribute from the arena using a processor"""
         ...
@@ -46,7 +46,7 @@ class RtEmbeddable:
 
     def embed(self) -> None:
         raise NotImplementedError()
-    
+
     @classmethod
     def hydrate(cls, address) -> RtProxy:
         ...
