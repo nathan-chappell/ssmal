@@ -50,7 +50,7 @@ opcode_map: dict[bytes, Callable[[Registers, Memory], None]] = {
     # register ops
     b"\x40": r_op.SWPAB,
     b"\x41": r_op.SWPAI,
-    b"\x42": r_op.SWPAS,
+    b"\x42": r_op.MOVSA,
     # branch ops
     b"\x50": b_op.BRi,
     b"\x51": b_op.BRa,

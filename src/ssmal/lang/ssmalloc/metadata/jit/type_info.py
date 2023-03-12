@@ -110,7 +110,7 @@ class TypeInfo(TypeInfoBase):
             base_method_names = []
 
         class_methods: OrderedDict[str, Callable] = OrderedDict(
-            (method_name, method) for method_name, method in dataclass.__dict__.items() if "__" not in method_name and callable(method)
+            (method_name, method) for method_name, method in py_type.__dict__.items() if "__" not in method_name and callable(method)
         )
         method_names = list(class_methods.keys())
 

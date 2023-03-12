@@ -28,7 +28,7 @@ class CallingConvention:
         # save return address
         yield ci.SWPAI; ci.PSHA; yield ci.SWPAI
         # B points to bottom of stack
-        yield ci.SWPAS; yield ci.PSHA; yield ci.SWPAS; yield ci.POPA; yield ci.SWPAB
+        yield ci.MOVSA; yield ci.PSHA; yield ci.MOVSA; yield ci.POPA; yield ci.SWPAB
         # push all arguments onto stack
         for arg_expr in args_exprs:
             yield from self.evaluate(arg_expr, 'eval'); yield ci.PSHA
@@ -43,7 +43,7 @@ class CallingConvention:
 
     def _copy_SP_to_A(self) -> Generator[str, None, None]:
         ci = self.ci
-        yield ci.SWPAS; yield ci.PSHA; yield ci.SWPAS; yield ci.POPA;
+        yield ci.MOVSA; yield ci.PSHA; yield ci.MOVSA; yield ci.POPA;
     
     def answer_method(self) -> Generator[str, None, None]:
         ci = self.ci

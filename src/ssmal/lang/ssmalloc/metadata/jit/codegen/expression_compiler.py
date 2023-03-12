@@ -45,7 +45,7 @@ class ExpressionCompiler:
                 yield ci.SWPAB; yield ci.POPA; yield ci.SWPAB
         
         def _ld_stack_offset(offset: int, clobber_B=False):
-            yield ci.SWPAS; yield ci.PSHA; yield ci.SWPAS; yield ci.POPA
+            yield ci.MOVSA; yield ci.PSHA; yield ci.MOVSA; yield ci.POPA
             yield ci.ADDi; yield f'{offset}'
             yield from _deref_A(clobber_B=clobber_B)
         

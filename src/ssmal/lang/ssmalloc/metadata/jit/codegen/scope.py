@@ -22,9 +22,9 @@ class Scope:
     def __init__(self, function_def: ast.FunctionDef) -> None:
         self.function_def = function_def
         self.offsets = OrderedDict[str, int]()
-        self._parse(self.function_def)
         self.locals = set[str]()
         self.args = set[str]()
+        self._parse(self.function_def)
 
     # fmt: off
 
@@ -63,7 +63,7 @@ class Scope:
         # save B
         yield ci.SWPAB; yield ci.PSHA; yield ci.SWPAB
         # load SP into A
-        yield ci.SWPAS; yield ci.PSHA; yield ci.SWPAS; yield ci.POPA
+        yield ci.MOVSA
         # offset is from bottom, and currenty SP is at TOP + 4 (because we saved B)
         _offset = 4 * (len(self.offsets) - self.offsets[name] + 1)
         yield ci.SUBi; yield f'{_offset}'; 

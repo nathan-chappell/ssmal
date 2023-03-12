@@ -37,7 +37,7 @@ class CompilerInternals:
     # register ops
     SWPAB   = "SWPAB"
     SWPAI   = "SWPAI"
-    SWPAS   = "SWPAS"
+    MOVSA   = "MOVSA"
     # branch ops
     BRi     = "BRi"
     BRa     = "BRa"

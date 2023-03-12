@@ -10,7 +10,7 @@ from ssmal.components.registers import Registers
     "op_name, registers, expected",
     [
         ("SWPAB", Registers(A=3, B=4), Registers(A=4, B=3, IP=1)),
-        ("SWPAS", Registers(A=3, SP=14), Registers(A=14, SP=3, IP=1)),
+        ("MOVSA", Registers(A=3, SP=14), Registers(A=14, SP=14, IP=1)),
         ("SWPAI", Registers(A=3, IP=17), Registers(A=17, IP=3)),
     ],
 )
