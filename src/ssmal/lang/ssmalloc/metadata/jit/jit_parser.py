@@ -13,7 +13,7 @@ from ssmal.lang.ssmalloc.metadata.jit.codegen.compiler_internals import Compiler
 from ssmal.lang.ssmalloc.metadata.jit.codegen.method_compiler import MethodCompiler
 from ssmal.lang.ssmalloc.metadata.jit.strongly_typed_strings import Identifier, TypeName
 
-from ssmal.lang.ssmalloc.metadata.jit.type_info import MethodInfo, TypeInfo
+from ssmal.lang.ssmalloc.metadata.jit.type_info import MethodInfo, TypeInfo, int_type, str_type
 
 
 def dump_ast(node: ast.AST, indent=0, prefix=""):
@@ -56,12 +56,17 @@ class JitParser:
     type_info_dict: OrderedDict[TypeName, TypeInfo]
     ci = CompilerInternals()
 
+    @classmethod
+    def builtin_type_info(cls) -> OrderedDict[TypeName, TypeInfo]:
+        return OrderedDict((
+            (TypeName(Identifier("int")), int_type),
+            (TypeName(Identifier("str")), str_type)
+        ))
+
     def __init__(self, module: ModuleType) -> None:
         type_name_regex = re.compile(r"[A-Z][a-zA-Z]*")
 
-        self.type_info_dict = OrderedDict[TypeName, TypeInfo]()
-        self.type_info_dict[TypeName(Identifier("int"))] = TypeInfo("int", None, int, [], [])
-        self.type_info_dict[TypeName(Identifier("str"))] = TypeInfo("str", None, str, [], [])
+        self.type_info_dict = self.builtin_type_info()
 
         for type_name, item in module.__dict__.items():
             if not type_name_regex.match(type_name):

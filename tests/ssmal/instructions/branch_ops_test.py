@@ -19,6 +19,8 @@ from ssmal.components.registers import Registers
         ("BRZb", 1, 0, 0, 1),
         ("BRNb", -1, 14, 0, 14),
         ("BRNb", 0, 0, 0, 1),
+        ("BRb", 14, 0, 0, 0),
+        ("BRb", 0, 14, 0, 14),
     ],
 )
 def test_br(op_name: str, A: int, B: int, i: int, expected_IP: int):

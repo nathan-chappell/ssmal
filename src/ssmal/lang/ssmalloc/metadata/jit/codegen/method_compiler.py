@@ -4,6 +4,7 @@ import ast
 from collections import OrderedDict
 from dataclasses import dataclass, field
 import inspect
+import logging
 import textwrap
 from typing import Generator, Literal, TypeGuard, cast
 
@@ -11,9 +12,11 @@ from ssmal.lang.ssmalloc.metadata.jit.codegen.compiler_error import CompilerErro
 from ssmal.lang.ssmalloc.metadata.jit.codegen.compiler_internals import CompilerInternals
 from ssmal.lang.ssmalloc.metadata.jit.codegen.expression_compiler import ExpressionCompiler
 from ssmal.lang.ssmalloc.metadata.jit.codegen.scope import Scope
-from ssmal.lang.ssmalloc.metadata.jit.jit_parser import TypeName
-from ssmal.lang.ssmalloc.metadata.jit.strongly_typed_strings import Identifier
-from ssmal.lang.ssmalloc.metadata.jit.type_info import MethodInfo, TypeInfo, TypeInfoBase
+from ssmal.lang.ssmalloc.metadata.jit.strongly_typed_strings import Identifier, TypeName
+from ssmal.lang.ssmalloc.metadata.jit.type_info import MethodInfo, TypeInfo, TypeInfoBase, int_type, str_type
+
+
+log = logging.getLogger(__name__)
 
 
 class TypeError(CompilerError):
@@ -32,17 +35,23 @@ class MethodCompiler:
         self.self_type = self_type
         self.type_dict = type_dict
         self.variable_types = OrderedDict[Identifier, TypeInfo]()
+        # self.variable_types[Identifier('self')] = self_type
     
     def is_typename(self, name: str) -> TypeGuard[TypeName]:
         return name in self.type_dict
 
-    def is_identifier(self, name: str) -> TypeGuard[TypeName]:
-        return name in self.type_dict
+    def is_identifier(self, name: str) -> TypeGuard[Identifier]:
+        return name in self.variable_types
+    
+    def reset_variable_types(self, method_info: MethodInfo):
+        self.variable_types = OrderedDict[Identifier, TypeInfo]()
+        self.variable_types[Identifier('self')] = self.self_type
+        for param in method_info.parameters:
+            self.variable_types[Identifier(param.name)] = param.type
     
     def compile_method(self, method_info: MethodInfo) -> Generator[str, None, None]:
         ci = self.ci
 
-        self.variable_types[Identifier('self')] = cast(TypeInfo, method_info.parent)
         function_def = ast.parse(textwrap.dedent(inspect.getsource(method_info.method))).body[0]
 
         if isinstance(function_def, ast.FunctionDef):
@@ -65,19 +74,22 @@ class MethodCompiler:
                 yield ci.STAb
 
             for stmt in function_def.body:
+                log.debug(f'{stmt=}')
+                yield f"; > {stmt=} {stmt.lineno=}\n"
                 match stmt:
-                    case ast.AnnAssign(target=ast.Name(id=variable_name), annotation=ast.Name(id=type_name), expr=expr):
+                    case ast.AnnAssign(target=ast.Name(id=variable_name), annotation=ast.Name(id=type_name), value=value):
                         if variable_name not in scope.offsets:
                             raise CompilerError(stmt)
                         if not self.is_typename(type_name):
                             raise TypeError(type_name, stmt)
                         target_type = self.type_dict[type_name]
-                        expr_type = self.infer_type(expr)
-                        if not self.is_subtype(expr_type, target_type):
-                            raise TypeError(expr_type, target_type, stmt)
                         self.variable_types[Identifier(variable_name)] = target_type
-                        yield from scope.access_variable(variable_name, 'access')
-                        yield from _assign_to_A(expr)
+                        if value is not None:
+                            value_type = self.infer_type(value)
+                            if not self.is_subtype(value_type, target_type):
+                                raise TypeError(value_type, target_type, stmt)
+                            yield from scope.access_variable(variable_name, 'access')
+                            yield from _assign_to_A(value)
                     
                     case ast.Assign(targets=[target], value=value):
                         target_type = self.infer_type(target)
@@ -91,22 +103,36 @@ class MethodCompiler:
                         self.infer_type(expr)
                         yield from expression_compiler.compile_expression(expr, 'eval')
                     
+                    # case ast.If(expr):
+                    #     self.infer_type(expr)
+                    #     yield from expression_compiler.compile_expression(expr, 'eval')
+                    
+                    case ast.Return(value=expr):
+                        if expr is None:
+                            raise CompilerError(expr, stmt)
+                        returned_type = self.infer_type(expr)
+                        if not self.is_subtype(returned_type, method_info.return_type):
+                            raise CompilerError(stmt)
+                        yield from expression_compiler.compile_expression(expr, 'eval')
+                    
                     case _:
                         raise CompilerError(stmt)
+                
+                yield f"; < {stmt=} {stmt.lineno=}\n"
             
             # CALLING CONVENTION: [RETURN]
+            # save A (result)
+            yield ci.SWPAB
             yield from (ci.POPA for _ in range(len(scope.locals)))
             yield from (ci.POPA for _ in range(len(scope.args)))
-            yield ci.POPA; yield ci.BRa
+            # A has result, B has return address
+            yield ci.POPA; yield ci.SWPAB; yield ci.BRb
         else:
             raise CompilerError(method_info)
     
     def infer_type(self, expr: ast.expr) -> TypeInfo:
-        int_type = self.type_dict[TypeName(Identifier('int'))]
-        str_type = self.type_dict[TypeName(Identifier('str'))]
-
         match expr:
-            case ast.Attribute(value=value, method_attr=method_attr):
+            case ast.Attribute(value=value, attr=method_attr):
                 value_type = self.infer_type(value)
                 field_info = value_type.get_field_info(method_attr)
                 if field_info is not None:

@@ -58,4 +58,5 @@ opcode_map: dict[bytes, Callable[[Registers, Memory], None]] = {
     b"\x53": b_op.BRNi,
     b"\x54": b_op.BRZb,
     b"\x55": b_op.BRNb,
+    b"\x56": b_op.BRb,
 }

@@ -151,6 +151,8 @@ class TypeInfo(TypeInfoBase):
         type_cache[result.name] = result
         return result
 
+int_type = TypeInfo("int", None, int, [], [])
+str_type = TypeInfo("str", None, str, [], [])
 
 # if __name__ == "__main__":
 #     import ssmal.lang.ssmalloc.stdlib as stdlib

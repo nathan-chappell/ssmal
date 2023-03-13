@@ -17,3 +17,5 @@ def BRZi(r: Registers, m: Memory) -> None: r.IP += 1; _br_if(r, r.A == 0, m.load
 def BRNi(r: Registers, m: Memory) -> None: r.IP += 1; _br_if(r, r.A < 0, m.load(r.IP), r.IP + 4)
 def BRZb(r: Registers, m: Memory) -> None: r.IP += 1; _br_if(r, r.A == 0, r.B, r.IP)
 def BRNb(r: Registers, m: Memory) -> None: r.IP += 1; _br_if(r, r.A < 0, r.B, r.IP)
+
+def BRb(r: Registers, m: Memory) -> None: r.IP = r.B

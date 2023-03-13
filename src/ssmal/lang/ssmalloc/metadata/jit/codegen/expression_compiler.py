@@ -73,6 +73,7 @@ class ExpressionCompiler:
     def compile_expression(self, expr: ast.expr, mode: Literal['eval','access']) -> Generator[str, None, None]:
         ci = self.ci
 
+        yield f"; > {expr=} {expr.lineno=}\n"
         match (expr):
             case ast.Attribute(value=value, attr=attr):
                 yield from self.compile_expression(value, 'eval')
@@ -156,3 +157,7 @@ class ExpressionCompiler:
 
             case ast.Name(id=id):
                 yield from self.scope.access_variable(id, mode)
+            
+            case _: raise CompilerError(expr)
+        
+        yield f"; < {expr=} {expr.lineno=}\n"
