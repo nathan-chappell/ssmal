@@ -4,7 +4,6 @@ import ast
 from collections import OrderedDict
 from dataclasses import dataclass, field
 from typing import Callable, Generator, Literal
-from ssmal.lang.ssmalloc.metadata.jit.codegen.calling_convention import CallingConvention
 
 from ssmal.lang.ssmalloc.metadata.jit.codegen.compiler_error import CompilerError
 from ssmal.lang.ssmalloc.metadata.jit.codegen.compiler_internals import CompilerInternals
@@ -18,67 +17,61 @@ class ExpressionCompiler:
     get_type: Callable[[ast.expr], TypeInfo]
     _i: int = 0
     ci = CompilerInternals()
-    cc: CallingConvention
 
     def __init__(self, scope: Scope, get_type: Callable[[ast.expr], TypeInfo]) -> None:
         self.scope = scope
         self.get_type = get_type
-        self.cc = CallingConvention(self.compile_expression, self.scope)
 
     def get_label(self, expr: ast.expr) -> str:
         label = f"label_for_line_{expr.lineno}_col_{expr.col_offset}__{self._i}"
         self._i += 1
         return label
+    
+    def deref_A(self, clobber_B=False) -> Generator[str, None, None]:
+        ci = self.ci
+        yield ci.SWPAB
+        if not clobber_B:
+            yield ci.PSHA
+        # deref A
+        yield ci.LDAb
+        if not clobber_B:
+            # restore B
+            yield ci.SWPAB; yield ci.POPA; yield ci.SWPAB
+        
+    def ld_stack_offset(self, offset: int, clobber_B=False):
+        ci = self.ci
+        yield ci.MOVSA; yield ci.PSHA; yield ci.MOVSA; yield ci.POPA
+        yield ci.ADDi; yield f'{offset}'
+        yield from self.deref_A(clobber_B=clobber_B)
+    
+    def get_method(self, self_expr: ast.expr, method_name: str) -> Generator[str, None, None]:
+        ci = self.ci
+        yield from self.compile_expression(self_expr, 'access')
+        yield from self.deref_A(clobber_B=True)
+        # A now points at type info...
+        METHODS_ARRAY_OFFSET = 3
+        CODE_OFFSET = 4
+        yield ci.ADDi; yield f'{4*METHODS_ARRAY_OFFSET}'; yield from self.deref_A(clobber_B=True); yield ci.PSHA
+        # A now points at methods array object, saved on stack
+        yield from self.deref_A(clobber_B=True); yield ci.PSHA
+        # A now has array size, saved on stack
+        yield from self.ld_stack_offset(-8) # methods array object
+        yield ci.ADDi; yield f'{4}'; yield from self.deref_A(clobber_B=True)
+        # A now has ptr to method info
+        value_type = self.get_type(self_expr)
+        for index, method_info in enumerate(value_type.methods):
+            if method_info.name == method_name:
+                break
+        else:
+            raise CompilerError(value_type, method_name, self_expr)
+        # use index to access vtable...
+        yield ci.ADDi; yield f'{4 * (index)}'; yield from self.deref_A(clobber_B=True)
+        # access code
+        yield ci.ADDi;  yield f'{4 * CODE_OFFSET}'; yield from self.deref_A(clobber_B=True)
+        # A now has ptr to method implementation
 
     def compile_expression(self, expr: ast.expr, mode: Literal['eval','access']) -> Generator[str, None, None]:
         ci = self.ci
-        cc = self.cc
-
-        def _deref_A(clobber_B=False) -> Generator[str, None, None]:
-            yield ci.SWPAB
-            if not clobber_B:
-                yield ci.PSHA
-            # deref A
-            yield ci.LDAb
-            if not clobber_B:
-                # restore B
-                yield ci.SWPAB; yield ci.POPA; yield ci.SWPAB
-        
-        def _ld_stack_offset(offset: int, clobber_B=False):
-            yield ci.MOVSA; yield ci.PSHA; yield ci.MOVSA; yield ci.POPA
-            yield ci.ADDi; yield f'{offset}'
-            yield from _deref_A(clobber_B=clobber_B)
-        
-        def _get_method(func_expr: ast.expr) -> Generator[str, None, None]:
-            match func_expr:
-                # case ast.Name(id='print'):
-                #     ...
-                case ast.Attribute(value=value, attr=attr):
-                    yield from self.compile_expression(value, 'access')
-                    yield from _deref_A(clobber_B=True)
-                    # A now points at type info...
-                    METHODS_ARRAY_OFFSET = 3
-                    CODE_OFFSET = 4
-                    yield ci.ADDi; yield f'{4*METHODS_ARRAY_OFFSET}'; yield from _deref_A(clobber_B=True); yield ci.PSHA
-                    # A now points at methods array object, saved on stack
-                    yield from _deref_A(clobber_B=True); yield ci.PSHA
-                    # A now has array size, saved on stack
-                    yield from _ld_stack_offset(-8) # methods array object
-                    yield ci.ADDi; yield f'{4}'; yield from _deref_A(clobber_B=True)
-                    # A now has ptr to method info
-                    value_type = self.get_type(value)
-                    for index, method_info in enumerate(value_type.methods):
-                        if method_info.name == attr:
-                            break
-                    else:
-                        raise CompilerError(value_type, attr, func_expr)
-                    # use index to access vtable...
-                    yield ci.ADDi; yield f'{4 * (index)}'; yield from _deref_A(clobber_B=True)
-                    # access code
-                    yield ci.ADDi;  yield f'{4 * CODE_OFFSET}'; yield from _deref_A(clobber_B=True)
-                    # A now has ptr to method implementation
-                case _:
-                    raise CompilerError(func_expr)
 
         match (expr):
             case ast.Attribute(value=value, attr=attr):
@@ -91,7 +84,7 @@ class ExpressionCompiler:
                     yield ci.ADDi; yield f'{4 * (index + 1)}'
                     # A now points at field
                     if mode == 'eval':
-                        yield from _deref_A()
+                        yield from self.deref_A()
                 else:
                     raise CompilerError(value, attr, expr)
             
@@ -139,11 +132,14 @@ class ExpressionCompiler:
                 else:
                     raise CompilerError(func)
 
-
-            case ast.Call(func=ast.Attribute() as func, args=args) if mode == 'eval':
-                yield from _get_method(func); yield ci.PSHA
-                yield from self.compile_expression(func.value, mode='eval'); yield ci.PSHA
-                yield from cc.call_method(func, args)
+            case ast.Call(func=ast.Attribute(value=self_expr, attr=method_name) as func, args=args) if mode == 'eval':
+                # CALLING CONVENTION: [CALL]
+                # save return address
+                yield ci.SWPAI; ci.PSHA; yield ci.SWPAI
+                yield from self.compile_expression(self_expr, mode='eval'); yield ci.PSHA
+                for arg in args:
+                    yield from self.compile_expression(arg, 'eval'); yield ci.PSHA
+                yield from self.get_method(self_expr, method_name); yield ci.BRa
 
             #   value: Any  # None, str, bytes, bool, int, float, complex, Ellipsis
             case ast.Constant(value=value) if mode == 'eval':
@@ -153,7 +149,7 @@ class ExpressionCompiler:
                     case bytes(val):    raise CompilerError(val)
                     case True:          yield ci.TRUE
                     case False:         yield ci.FALSE
-                    case int(val):      yield ci.TO_BYTES(val)
+                    case int(val):      yield f'{val}'
                     case float(val):    raise CompilerError(val)
                     case complex(val):  raise CompilerError(val)
                     case _:             raise CompilerError(value)

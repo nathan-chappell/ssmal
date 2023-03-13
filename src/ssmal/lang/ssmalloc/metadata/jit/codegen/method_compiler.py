@@ -6,7 +6,6 @@ from dataclasses import dataclass, field
 import inspect
 import textwrap
 from typing import Generator, Literal, TypeGuard, cast
-from ssmal.lang.ssmalloc.metadata.jit.codegen.calling_convention import CallingConvention
 
 from ssmal.lang.ssmalloc.metadata.jit.codegen.compiler_error import CompilerError
 from ssmal.lang.ssmalloc.metadata.jit.codegen.compiler_internals import CompilerInternals
@@ -50,6 +49,11 @@ class MethodCompiler:
             # create scope
             scope = Scope(function_def)
             expression_compiler = ExpressionCompiler(scope, self.infer_type)
+            
+            # CALLING CONVENTION: [ANSWER]
+            yield ci.STAi; yield f'{0}'
+            for _ in range(len(scope.locals)):
+                yield ci.PSHA
 
             def _assign_to_A(expr: ast.expr) -> Generator[str, None, None]:
                 # save B, then A
@@ -86,6 +90,14 @@ class MethodCompiler:
                     case ast.Expr(expr):
                         self.infer_type(expr)
                         yield from expression_compiler.compile_expression(expr, 'eval')
+                    
+                    case _:
+                        raise CompilerError(stmt)
+            
+            # CALLING CONVENTION: [RETURN]
+            yield from (ci.POPA for _ in range(len(scope.locals)))
+            yield from (ci.POPA for _ in range(len(scope.args)))
+            yield ci.POPA; yield ci.BRa
         else:
             raise CompilerError(method_info)
     

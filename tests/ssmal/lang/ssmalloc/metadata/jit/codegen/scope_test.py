@@ -14,6 +14,7 @@ def test_scope_get_offset():
     def f(x: int, y: str, z: int):
         a: str = "foo"
         b: int = 0
+        return a,b
 
     f_ast = ast.parse(textwrap.dedent(inspect.getsource(f))).body[0]
     assert isinstance(f_ast, ast.FunctionDef)
@@ -30,6 +31,7 @@ def test_scope_codegen(varname: str, value: int):
     def f(x: int, y: str, z: int):
         a: str = "foo"
         b: int = 0
+        return a,b
 
     f_ast = ast.parse(textwrap.dedent(inspect.getsource(f))).body[0]
     assert isinstance(f_ast, ast.FunctionDef)
@@ -44,8 +46,7 @@ def test_scope_codegen(varname: str, value: int):
 
     text = "\n".join(s.lower() for s in scope.access_variable(varname, "eval"))
     print(text)
-    tokens = list(tokenize(text))
-    assembler = Assembler(list(tokens))
+    assembler = Assembler(list(tokenize(text)))
     assembler.assemble()
     IP = 0x40
     processor.memory.store_bytes(IP, assembler.buffer.getvalue())
