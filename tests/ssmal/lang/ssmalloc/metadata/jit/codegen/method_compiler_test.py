@@ -54,7 +54,13 @@ def test_assemble_basic_method(Base1_method_compiler: MethodCompiler):
     assert Base1_method_compiler.variable_types[Identifier('self')] == Base1_method_compiler.self_type
     assert Base1_method_compiler.variable_types[Identifier('y')] == int_type
     assembly_code = "\n".join(Base1_method_compiler.compile_method(method))
-    print(assembly_code)
+    indent=0
+    for ins in Base1_method_compiler.compile_method(method):
+        if '|>' in ins:
+            indent += 1
+        elif '|<' in ins:
+            indent -= 1
+        print('  '*indent + ins)
 
     assembler = Assembler(list(tokenize(assembly_code)))
     assembler.assemble()

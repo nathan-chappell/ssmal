@@ -64,3 +64,9 @@ class CompilerInternals:
     def GOTO_LABEL(self, s: str) -> str: return f'${s}'
     def MARK_LABEL(self, s: str) -> str: return f'{s}:'
     def OFFSET(self, z: int) -> str: return f'{4 * z}'
+
+    # Macros
+
+    def PUSH_B(self) -> str: return f'{self.SWPAB} {self.PSHA} {self.SWPAB}'
+    def POP_B(self) -> str: return f'{self.SWPAB} {self.POPA} {self.SWPAB}'
+    def FOLLOW_A(self) -> str: return f'{self.SWPAB} {self.LDAb} {self.SWPAB}'

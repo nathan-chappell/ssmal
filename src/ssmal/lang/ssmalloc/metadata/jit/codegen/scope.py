@@ -16,6 +16,7 @@ class Scope:
     offsets: OrderedDict[str, int]
     locals: set[str]
     args: set[str]
+    push_count: int = 0
 
     ci = CompilerInternals()
 
@@ -46,32 +47,55 @@ class Scope:
         match node:
             case ast.FunctionDef(args=args, body=body):
                 for arg in args.args:
-                    self._add_name(arg.arg, 'local', check='free')
+                    self._add_name(arg.arg, 'arg', check='free')
                 for stmt in body:
                     self._parse(stmt)
             case ast.AnnAssign(target=ast.Name(id=_id)):
                 self._add_name(_id, 'local', check='free')
+    
+
+    def push_A(self):
+        """
+        PSHA, but does bookkeeping so that variable access works properly
+        """
+        ci = self.ci
+        yield ci.PSHA
+        self.push_count += 1
+    
+    def pop_A(self):
+        """
+        POPA, but does bookkeeping so that variable access works properly
+        """
+        ci = self.ci
+        yield ci.POPA
+        self.push_count -= 1
 
 
     def get_offset(self, name: str) -> int:
         return self.offsets[name]
     
     def access_variable(self, name: str, mode: Literal['eval', 'access']) -> Generator[str, None, None]:
+        """
+        CLOBBERS A
+        PRESERVES B, STACK
+        """
         ci = self.ci
+        yield f'; |> {mode=} {name=}'
         # 'eval':   loads value of variable into register A
         # 'access': loads address of variable into register A
         # save B
-        yield ci.SWPAB; yield ci.PSHA; yield ci.SWPAB
+        yield ci.PUSH_B()
         # load SP into A
         yield ci.MOVSA
-        # offset is from bottom, and currenty SP is at TOP + 4 (because we saved B)
-        _offset = 4 * (len(self.offsets) - self.offsets[name] + 1)
+        # offset is from bottom
+        _offset = 4 * (len(self.offsets) - self.offsets[name])
         yield ci.SUBi; yield f'{_offset}'; 
         # now A points at variable
         if mode == 'eval':
             yield ci.SWPAB; yield ci.LDAb
         # restore B
-        yield ci.SWPAB; yield ci.POPA; yield ci.SWPAB
+        yield ci.POP_B()
+        yield f'; |< {mode=} {name=}'
 
 
 # fmt: on

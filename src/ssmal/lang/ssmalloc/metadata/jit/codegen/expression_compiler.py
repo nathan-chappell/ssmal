@@ -27,16 +27,16 @@ class ExpressionCompiler:
         self._i += 1
         return label
     
-    def deref_A(self, clobber_B=False) -> Generator[str, None, None]:
-        ci = self.ci
-        yield ci.SWPAB
-        if not clobber_B:
-            yield ci.PSHA
-        # deref A
-        yield ci.LDAb
-        if not clobber_B:
-            # restore B
-            yield ci.SWPAB; yield ci.POPA; yield ci.SWPAB
+    # def deref_A(self, clobber_B=False) -> Generator[str, None, None]:
+    #     ci = self.ci
+    #     yield ci.SWPAB
+    #     if not clobber_B:
+    #         yield ci.PSHA
+    #     # deref A
+    #     yield ci.LDAb
+    #     if not clobber_B:
+    #         # restore B
+    #         yield ci.SWPAB; yield ci.POPA; yield ci.SWPAB
         
     def ld_stack_offset(self, offset: int, clobber_B=False):
         ci = self.ci
@@ -47,16 +47,16 @@ class ExpressionCompiler:
     def get_method(self, self_expr: ast.expr, method_name: str) -> Generator[str, None, None]:
         ci = self.ci
         yield from self.compile_expression(self_expr, 'access')
-        yield from self.deref_A(clobber_B=True)
+        yield ci.FOLLOW_A()
         # A now points at type info...
         METHODS_ARRAY_OFFSET = 3
         CODE_OFFSET = 4
-        yield ci.ADDi; yield f'{4*METHODS_ARRAY_OFFSET}'; yield from self.deref_A(clobber_B=True); yield ci.PSHA
+        yield ci.ADDi; yield f'{4*METHODS_ARRAY_OFFSET}'; yield ci.FOLLOW_A(); yield ci.PSHA
         # A now points at methods array object, saved on stack
-        yield from self.deref_A(clobber_B=True); yield ci.PSHA
+        yield ci.FOLLOW_A(); yield ci.PSHA
         # A now has array size, saved on stack
         yield from self.ld_stack_offset(-8) # methods array object
-        yield ci.ADDi; yield f'{4}'; yield from self.deref_A(clobber_B=True)
+        yield ci.ADDi; yield f'{4}'; yield ci.FOLLOW_A()
         # A now has ptr to method info
         value_type = self.get_type(self_expr)
         for index, method_info in enumerate(value_type.methods):
@@ -65,15 +65,15 @@ class ExpressionCompiler:
         else:
             raise CompilerError(value_type, method_name, self_expr)
         # use index to access vtable...
-        yield ci.ADDi; yield f'{4 * (index)}'; yield from self.deref_A(clobber_B=True)
+        yield ci.ADDi; yield f'{4 * (index)}'; yield ci.FOLLOW_A()
         # access code
-        yield ci.ADDi;  yield f'{4 * CODE_OFFSET}'; yield from self.deref_A(clobber_B=True)
+        yield ci.ADDi;  yield f'{4 * CODE_OFFSET}'; yield ci.FOLLOW_A()
         # A now has ptr to method implementation
 
     def compile_expression(self, expr: ast.expr, mode: Literal['eval','access']) -> Generator[str, None, None]:
         ci = self.ci
 
-        yield f"; > {expr=} {expr.lineno=}\n"
+        yield f"; |> {expr=} {expr.lineno=}\n"
         match (expr):
             case ast.Attribute(value=value, attr=attr):
                 yield from self.compile_expression(value, 'eval')
@@ -85,7 +85,7 @@ class ExpressionCompiler:
                     yield ci.ADDi; yield f'{4 * (index + 1)}'
                     # A now points at field
                     if mode == 'eval':
-                        yield from self.deref_A()
+                        yield ci.FOLLOW_A()
                 else:
                     raise CompilerError(value, attr, expr)
             
@@ -136,7 +136,7 @@ class ExpressionCompiler:
             case ast.Call(func=ast.Attribute(value=self_expr, attr=method_name) as func, args=args) if mode == 'eval':
                 # CALLING CONVENTION: [CALL]
                 # save return address
-                yield ci.SWPAI; ci.PSHA; yield ci.SWPAI
+                yield ci.SWPAI; yield ci.PSHA; yield ci.SWPAI
                 yield from self.compile_expression(self_expr, mode='eval'); yield ci.PSHA
                 for arg in args:
                     yield from self.compile_expression(arg, 'eval'); yield ci.PSHA
@@ -160,4 +160,4 @@ class ExpressionCompiler:
             
             case _: raise CompilerError(expr)
         
-        yield f"; < {expr=} {expr.lineno=}\n"
+        yield f"; |< {expr=} {expr.lineno=}\n"

@@ -64,18 +64,9 @@ class MethodCompiler:
             for _ in range(len(scope.locals)):
                 yield ci.PSHA
 
-            def _assign_to_A(expr: ast.expr) -> Generator[str, None, None]:
-                # save B, then A
-                yield ci.SWPAB; yield ci.PSHA; yield ci.SWPAB; yield ci.PSHA
-                yield from expression_compiler.compile_expression(expr, 'eval')
-                # A has value
-                yield ci.SWPAB; yield ci.POPA; yield ci.SWPAB
-                # A has value, B has address
-                yield ci.STAb
-
             for stmt in function_def.body:
                 log.debug(f'{stmt=}')
-                yield f"; > {stmt=} {stmt.lineno=}\n"
+                yield f"; |> {stmt=} {stmt.lineno=}\n"
                 match stmt:
                     case ast.AnnAssign(target=ast.Name(id=variable_name), annotation=ast.Name(id=type_name), value=value):
                         if variable_name not in scope.offsets:
@@ -88,16 +79,19 @@ class MethodCompiler:
                             value_type = self.infer_type(value)
                             if not self.is_subtype(value_type, target_type):
                                 raise TypeError(value_type, target_type, stmt)
+                            yield from expression_compiler.compile_expression(value, 'eval'); yield ci.SWPAB
                             yield from scope.access_variable(variable_name, 'access')
-                            yield from _assign_to_A(value)
+                            yield ci.SWPAB; yield ci.STAb
                     
                     case ast.Assign(targets=[target], value=value):
                         target_type = self.infer_type(target)
                         value_type = self.infer_type(value)
                         if not self.is_subtype(value_type, target_type):
                             raise TypeError(value_type, target_type, stmt)
+                        yield from expression_compiler.compile_expression(value, 'eval')
+                        yield from scope.push_A()
                         yield from expression_compiler.compile_expression(target, 'access')
-                        yield from _assign_to_A(value)
+                        yield ci.SWPAB; yield from scope.pop_A(); yield ci.SWPAB; yield ci.STAb
                         
                     case ast.Expr(expr):
                         self.infer_type(expr)
@@ -118,15 +112,15 @@ class MethodCompiler:
                     case _:
                         raise CompilerError(stmt)
                 
-                yield f"; < {stmt=} {stmt.lineno=}\n"
+                yield f"; |< {stmt=} {stmt.lineno=}\n"
             
             # CALLING CONVENTION: [RETURN]
             # save A (result)
             yield ci.SWPAB
-            yield from (ci.POPA for _ in range(len(scope.locals)))
-            yield from (ci.POPA for _ in range(len(scope.args)))
-            # A has result, B has return address
+            yield ' '.join(ci.POPA for _ in range(len(scope.locals)))
+            yield ' '.join(ci.POPA for _ in range(len(scope.args)))
             yield ci.POPA; yield ci.SWPAB; yield ci.BRb
+            # A has result, B has return address
         else:
             raise CompilerError(method_info)
     
