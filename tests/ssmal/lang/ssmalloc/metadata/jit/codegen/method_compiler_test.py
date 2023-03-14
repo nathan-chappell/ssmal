@@ -15,6 +15,7 @@ from ssmal.processors.processor import Processor
 from ssmal.lang.ssmalloc.metadata.jit.type_info import TypeInfo, int_type, str_type
 from ssmal.lang.ssmalloc.metadata.jit.codegen.scope import Scope
 from ssmal.lang.ssmalloc.metadata.jit.codegen.method_compiler import MethodCompiler
+from ssmal.util.writer.line_writer import LineWriter
 
 
 @pytest.fixture
@@ -31,8 +32,9 @@ def Base1_method_compiler():
             return z
 
     Base_type_info = TypeInfo.from_py_type(Base1)
+    assembler_writer = LineWriter()
 
-    method_compiler = MethodCompiler(JitParser.builtin_type_info(), Base_type_info)
+    method_compiler = MethodCompiler(assembler_writer, JitParser.builtin_type_info(), Base_type_info)
     yield method_compiler
 
 

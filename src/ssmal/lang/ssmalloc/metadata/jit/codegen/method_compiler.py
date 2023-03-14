@@ -8,6 +8,7 @@ import logging
 import textwrap
 from typing import Generator, Literal, TypeGuard, cast
 
+from ssmal.util.writer.line_writer import LineWriter
 from ssmal.lang.ssmalloc.metadata.jit.codegen.compiler_error import CompilerError
 from ssmal.lang.ssmalloc.metadata.jit.codegen.compiler_internals import CompilerInternals
 from ssmal.lang.ssmalloc.metadata.jit.codegen.expression_compiler import ExpressionCompiler
@@ -26,16 +27,17 @@ class TypeError(CompilerError):
 # fmt: off
 
 class MethodCompiler:
+    line_writer: LineWriter
     ci = CompilerInternals()
     type_dict: OrderedDict[TypeName, TypeInfo]
     variable_types: OrderedDict[Identifier, TypeInfo]
     self_type: TypeInfo
 
-    def __init__(self, type_dict: OrderedDict[TypeName, TypeInfo], self_type: TypeInfo) -> None:
+    def __init__(self, assembler_writer: LineWriter, type_dict: OrderedDict[TypeName, TypeInfo], self_type: TypeInfo) -> None:
+        self.line_writer = assembler_writer
         self.self_type = self_type
         self.type_dict = type_dict
         self.variable_types = OrderedDict[Identifier, TypeInfo]()
-        # self.variable_types[Identifier('self')] = self_type
     
     def is_typename(self, name: str) -> TypeGuard[TypeName]:
         return name in self.type_dict
@@ -49,24 +51,23 @@ class MethodCompiler:
         for param in method_info.parameters:
             self.variable_types[Identifier(param.name)] = param.type
     
-    def compile_method(self, method_info: MethodInfo) -> Generator[str, None, None]:
+    def compile_method(self, method_info: MethodInfo) -> None:
         ci = self.ci
+        w = self.line_writer
 
         function_def = ast.parse(textwrap.dedent(inspect.getsource(method_info.method))).body[0]
 
         if isinstance(function_def, ast.FunctionDef):
             # create scope
             scope = Scope(function_def)
-            expression_compiler = ExpressionCompiler(scope, self.infer_type)
+            expression_compiler = ExpressionCompiler(self.line_writer, scope, self.infer_type)
             
             # CALLING CONVENTION: [ANSWER]
-            yield ci.STAi; yield f'{0}'
-            for _ in range(len(scope.locals)):
-                yield ci.PSHA
+            w.write_line(ci.STAi, f'{0}', *(ci.PSHA for _ in range(len(scope.locals))), ci.COMMENT("create stack"))
 
             for stmt in function_def.body:
-                log.debug(f'{stmt=}')
-                yield f"; |> {stmt=} {stmt.lineno=}\n"
+                w.indent()
+                w.write_line(ci.COMMENT(f"stmt {stmt.__class__.__name__} {stmt.lineno=}"))
                 match stmt:
                     case ast.AnnAssign(target=ast.Name(id=variable_name), annotation=ast.Name(id=type_name), value=value):
                         if variable_name not in scope.offsets:
@@ -79,23 +80,24 @@ class MethodCompiler:
                             value_type = self.infer_type(value)
                             if not self.is_subtype(value_type, target_type):
                                 raise TypeError(value_type, target_type, stmt)
-                            yield from expression_compiler.compile_expression(value, 'eval'); yield ci.SWPAB
-                            yield from scope.access_variable(variable_name, 'access')
-                            yield ci.SWPAB; yield ci.STAb
+                            expression_compiler.compile_expression(value, 'eval')
+                            w.write_line(ci.SWPAB)
+                            scope.access_variable(self.line_writer, variable_name, 'access')
+                            w.write_line(ci.SWPAB, ci.STAb)
                     
                     case ast.Assign(targets=[target], value=value):
                         target_type = self.infer_type(target)
                         value_type = self.infer_type(value)
                         if not self.is_subtype(value_type, target_type):
                             raise TypeError(value_type, target_type, stmt)
-                        yield from expression_compiler.compile_expression(value, 'eval')
-                        yield from scope.push_A()
-                        yield from expression_compiler.compile_expression(target, 'access')
-                        yield ci.SWPAB; yield from scope.pop_A(); yield ci.SWPAB; yield ci.STAb
+                        expression_compiler.compile_expression(value, 'eval')
+                        w.write_line(scope.push_A())
+                        expression_compiler.compile_expression(target, 'access')
+                        w.write_line(ci.SWPAB, scope.pop_A(), ci.SWPAB, ci.STAb, ci.COMMENT('*TOP <- A'))
                         
                     case ast.Expr(expr):
                         self.infer_type(expr)
-                        yield from expression_compiler.compile_expression(expr, 'eval')
+                        expression_compiler.compile_expression(expr, 'eval')
                     
                     # case ast.If(expr):
                     #     self.infer_type(expr)
@@ -107,20 +109,17 @@ class MethodCompiler:
                         returned_type = self.infer_type(expr)
                         if not self.is_subtype(returned_type, method_info.return_type):
                             raise CompilerError(stmt)
-                        yield from expression_compiler.compile_expression(expr, 'eval')
+                        expression_compiler.compile_expression(expr, 'eval')
                     
                     case _:
                         raise CompilerError(stmt)
                 
-                yield f"; |< {stmt=} {stmt.lineno=}\n"
+                w.dedent()
             
             # CALLING CONVENTION: [RETURN]
-            # save A (result)
-            yield ci.SWPAB
-            yield ' '.join(ci.POPA for _ in range(len(scope.locals)))
-            yield ' '.join(ci.POPA for _ in range(len(scope.args)))
-            yield ci.POPA; yield ci.SWPAB; yield ci.BRb
-            # A has result, B has return address
+            w.write_line(ci.SWPAB, ci.COMMENT("save result"))
+            w.write_line(*(ci.POPA for _ in range(len(scope.locals) + len(scope.args))), ci.COMMENT("clear stack"))
+            w.write_line(ci.POPA, ci.SWPAB, ci.BRb, ci.COMMENT("A <- result; return"))
         else:
             raise CompilerError(method_info)
     

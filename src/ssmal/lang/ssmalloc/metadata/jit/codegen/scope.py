@@ -3,6 +3,7 @@ from collections import OrderedDict
 from typing import Generator, Literal
 from ssmal.lang.ssmalloc.metadata.jit.codegen.compiler_error import CompilerError
 from ssmal.lang.ssmalloc.metadata.jit.codegen.compiler_internals import CompilerInternals
+from ssmal.util.writer.line_writer import LineWriter
 
 
 class Scope:
@@ -59,43 +60,41 @@ class Scope:
         PSHA, but does bookkeeping so that variable access works properly
         """
         ci = self.ci
-        yield ci.PSHA
         self.push_count += 1
+        return ci.PSHA
     
     def pop_A(self):
         """
         POPA, but does bookkeeping so that variable access works properly
         """
         ci = self.ci
-        yield ci.POPA
         self.push_count -= 1
+        return ci.POPA
 
 
     def get_offset(self, name: str) -> int:
         return self.offsets[name]
     
-    def access_variable(self, name: str, mode: Literal['eval', 'access']) -> Generator[str, None, None]:
+    def access_variable(self, line_writer: LineWriter, name: str, mode: Literal['eval', 'access']) -> None:
         """
         CLOBBERS A
         PRESERVES B, STACK
+
+        :param mode:
+            'eval'      loads value of variable into register A
+            'access'    loads address of variable into register A
+
         """
         ci = self.ci
-        yield f'; |> {mode=} {name=}'
-        # 'eval':   loads value of variable into register A
-        # 'access': loads address of variable into register A
-        # save B
-        yield ci.PUSH_B()
-        # load SP into A
-        yield ci.MOVSA
-        # offset is from bottom
         _offset = 4 * (len(self.offsets) - self.offsets[name])
-        yield ci.SUBi; yield f'{_offset}'; 
-        # now A points at variable
+        _location = "self" if name == 'self' else 'local' if name in self.locals else 'arg'
+        line_writer.indent()
+        line_writer.write_line(f'[access {_location}] {name} {mode=}')
+        line_writer.write_line(ci.PUSH_B(), ci.MOVSA, ci.SUBi, f'{_offset}')
         if mode == 'eval':
-            yield ci.SWPAB; yield ci.LDAb
-        # restore B
-        yield ci.POP_B()
-        yield f'; |< {mode=} {name=}'
+            line_writer.write_line(ci.FOLLOW_A(), ci.COMMENT('eval'))
+        line_writer.write_line(ci.POP_B())
+        line_writer.dedent()
 
 
 # fmt: on

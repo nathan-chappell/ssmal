@@ -14,6 +14,7 @@ from ssmal.lang.ssmalloc.metadata.jit.codegen.method_compiler import MethodCompi
 from ssmal.lang.ssmalloc.metadata.jit.strongly_typed_strings import Identifier, TypeName
 
 from ssmal.lang.ssmalloc.metadata.jit.type_info import MethodInfo, TypeInfo, int_type, str_type
+from ssmal.util.writer.line_writer import LineWriter
 
 
 def dump_ast(node: ast.AST, indent=0, prefix=""):
@@ -76,9 +77,11 @@ class JitParser:
             raise CompilerError(item)
 
         for type_name, type_info in self.type_info_dict.items():
-            method_compiler = MethodCompiler(self.type_info_dict, self_type=type_info)
             for method_info in type_info.methods:
-                method_info.assembly_code = " ".join(method_compiler.compile_method(method_info))
+                line_writer = LineWriter()
+                method_compiler = MethodCompiler(line_writer, self.type_info_dict, self_type=type_info)
+                method_compiler.compile_method(method_info)
+                method_info.assembly_code = method_compiler.line_writer.text
 
         # at this point, all methods have their code compiled.
         # Now we just need to assemble the type_info_dict into an executable...

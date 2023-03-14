@@ -60,13 +60,20 @@ class CompilerInternals:
     PREG = 3  # print registers
     PMEM = 4  # dump memory
 
-    def ZSTR(self, s: str) -> str: return f'"{s}"'
-    def GOTO_LABEL(self, s: str) -> str: return f'${s}'
-    def MARK_LABEL(self, s: str) -> str: return f'{s}:'
-    def OFFSET(self, z: int) -> str: return f'{4 * z}'
+    def COMMENT(self, s: str) -> str:       return f'; {s}'
+    def GOTO_LABEL(self, s: str) -> str:    return f'${s}'
+    def MARK_LABEL(self, s: str) -> str:    return f'{s}:'
+    def OFFSET(self, z: int) -> str:        return f'{4 * z}'
+    def ZSTR(self, s: str) -> str:          return f'"{s}"'
 
     # Macros
 
-    def PUSH_B(self) -> str: return f'{self.SWPAB} {self.PSHA} {self.SWPAB}'
-    def POP_B(self) -> str: return f'{self.SWPAB} {self.POPA} {self.SWPAB}'
-    def FOLLOW_A(self) -> str: return f'{self.SWPAB} {self.LDAb} {self.SWPAB}'
+    def PUSH_B(self) -> str:    return f'{self.SWPAB} {self.PSHA} {self.SWPAB}'
+    def POP_B(self) -> str:     return f'{self.SWPAB} {self.POPA} {self.SWPAB}'
+    def FOLLOW_A(self) -> str:  return f'{self.SWPAB} {self.LDAb}'
+
+    def LINE(self, *instructions: str, comment: str = None, alignment=40) -> str:
+        instructions_str = ' '.join(instructions)
+        comment_str = f'; {comment}' if comment is not None else ""
+        alignment_str = ' '*(alignment - len(instructions_str))
+        return instructions_str + alignment_str + comment_str #  + "\n"
