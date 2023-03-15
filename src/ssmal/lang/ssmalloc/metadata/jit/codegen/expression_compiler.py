@@ -129,13 +129,14 @@ class ExpressionCompiler:
 
             #   value: Any  # None, str, bytes, bool, int, float, complex, Ellipsis
             case ast.Constant(value=value) if mode == 'eval':
+                breakpoint()
                 match value:
-                    case None:          w.write(ci.NONE)
-                    case str(val):      w.write(ci.ZSTR(val))
+                    case None:          w.write_line(ci.LDAi, ci.NONE, ci.COMMENT('CONST None'))
+                    case str(val):      w.write_line(ci.LDAi, ci.ZSTR(val), ci.COMMENT('CONST str'))
                     case bytes(val):    raise CompilerError(val)
-                    case True:          w.write(ci.TRUE)
-                    case False:         w.write(ci.FALSE)
-                    case int(val):      w.write(f'{val}')
+                    case True:          w.write_line(ci.LDAi, ci.TRUE, ci.COMMENT('CONST True'))
+                    case False:         w.write_line(ci.LDAi, ci.FALSE, ci.COMMENT('CONST False'))
+                    case int(val):      w.write_line(ci.LDAi, f'{val}', ci.COMMENT('CONST int'))
                     case float(val):    raise CompilerError(val)
                     case complex(val):  raise CompilerError(val)
                     case _:             raise CompilerError(value)

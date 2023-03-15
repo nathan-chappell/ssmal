@@ -22,11 +22,24 @@ from ssmal.util.writer.line_writer import LineWriter
 
 @dataclass
 class Base1:
-    x: int
-    s: str
+    def p1(self, x: int, y: int) -> int:
+        z: int = 0x12121212
+        return x
 
-    def f(self, y: int) -> int:
-        z: int = self.x * y
+    def add(self, x: int, y: int) -> int:
+        z: int = x + y
+        return z
+
+    def sub(self, x: int, y: int) -> int:
+        z: int = x - y
+        return z
+
+    def mul(self, x: int, y: int) -> int:
+        z: int = x * y
+        return z
+
+    def div(self, x: int, y: int) -> int:
+        z: int = x // y
         return z
 
 
@@ -39,26 +52,30 @@ def Base1_method_compiler():
     yield method_compiler
 
 
-def prepare_and_run_Base1_f_to_halt(Base1_method_compiler: MethodCompiler, x: int, y: int) -> int:
-    method = Base1_method_compiler.self_type.methods[0]
+def prepare_and_run_to_halt(Base1_method_compiler: MethodCompiler, method_name: str, *args: int) -> int:
+    method = Base1_method_compiler.self_type.get_method_info(method_name)
+    assert method is not None
     Base1_method_compiler.reset_variable_types(method)
-    assert len(Base1_method_compiler.variable_types) == 2
     assert Base1_method_compiler.variable_types[Identifier("self")] == Base1_method_compiler.self_type
-    assert Base1_method_compiler.variable_types[Identifier("y")] == int_type
     Base1_method_compiler.compile_method(method)
+
     assembly_code = Base1_method_compiler.line_writer.text
+
+    args_assembly = "\n".join([f"    {arg:4};    0x{0x120 + 4*i:03x} (args[{i}])" for i, arg in enumerate(args)]) + "\n"
+    ret_addr_addr = 0x11C
+    stack_size = len(args) + 2  # args + self + z
 
     assembly_code = f"""
     halt nop nop nop "abc" .align
     {assembly_code}
     .goto 0x100
-    -1 {x} 4  ; 0x100 self
+    -1;      0x100 self
     .goto 0x11c
-    0       ; 0x11c return address
+    0       ; 0x{ret_addr_addr:3x} return address
             ; stack start
     0x100   ; 0x120 self
-    {y}      ; 0x124 y
-    0xdeadbeef ; 0x128 z
+{args_assembly}
+    0xdeadbeef ; locals
     """
     print(assembly_code)
     assembly_code_lines = assembly_code.split("\n")
@@ -70,11 +87,12 @@ def prepare_and_run_Base1_f_to_halt(Base1_method_compiler: MethodCompiler, x: in
     processor = Processor()
     processor.memory.store_bytes(0, code_text)
     processor.registers.IP = 0x20
-    processor.registers.SP = 0x128
+    processor.registers.SP = ret_addr_addr + 4 * (stack_size + 1)
 
     processor.memory.monitor(0, 0x11C)
     # processor.memory.dump()
     _source_line = -1
+    processor.memory.dump()
     with pytest.raises(HaltSignal):
         for _ in range(80):
             op = processor.opcode_map.get(processor.memory.load_bytes(processor.registers.IP, 1), None)
@@ -94,20 +112,25 @@ def prepare_and_run_Base1_f_to_halt(Base1_method_compiler: MethodCompiler, x: in
                 print(m.args)
                 m.finish_write()
 
+    processor.memory.dump()
     return processor.registers.A
 
 
-def test_infer_type(Base1_method_compiler: MethodCompiler):
-    f_ast = ast.parse(textwrap.dedent(inspect.getsource(Base1_method_compiler.self_type.methods[0].method))).body[0]
-    assert isinstance(f_ast, ast.FunctionDef)
-    body_0 = f_ast.body[0]
-    assert isinstance(body_0, ast.AnnAssign)
-    assert isinstance(body_0.value, ast.BinOp)
-    Base1_method_compiler.reset_variable_types(Base1_method_compiler.self_type.methods[0])
-    Base1_method_compiler.variable_types[Identifier("y")] = int_type
-    assert Base1_method_compiler.infer_type(body_0.value).name == "int"
-
-
-@pytest.mark.parametrize("x,y", [(-2, 3), (4, 0)])
-def test_assemble_basic_method(x: int, y: int, Base1_method_compiler: MethodCompiler):
-    assert prepare_and_run_Base1_f_to_halt(Base1_method_compiler, x, y) == Base1(x=x, s="").f(y)
+@pytest.mark.parametrize(
+    "method_name,x,y",
+    [
+        # fmt: off
+    ('p1', -2,  3),
+    ('add', -2,  3),
+    ('add',  2, -300),
+    ('sub', -2, -10),
+    ('sub',  0,  0),
+    ('mul', -2,  3),
+    ('mul', -2,  -100),
+    ('div',  0,  3),
+    ('div',  1,  2),
+        # fmt: on
+    ],
+)
+def test_assemble_basic_method(method_name: str, x: int, y: int, Base1_method_compiler: MethodCompiler):
+    assert prepare_and_run_to_halt(Base1_method_compiler, method_name, x, y) == Base1.__dict__[method_name](None, x, y)
