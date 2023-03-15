@@ -14,8 +14,8 @@ from ssmal.lang.ssmalloc.metadata.jit.codegen.compiler_internals import Compiler
 def test_compiler_internals():
     ci = CompilerInternals()
 
-    s, s_addr = 'foobar', 0x40
-    l, l_addr = 'l1', 0x18
+    s, s_addr = "foobar", 0x40
+    l, l_addr = "l1", 0x18
 
     text = f"""
     .goto {s_addr} {ci.ZSTR(s)}
@@ -35,4 +35,4 @@ def test_compiler_internals():
         processor.advance()
         print(processor.registers)
     assert processor.registers.IP == l_addr
-    assert processor.memory.load_bytes(s_addr, len(s) + 1) == bytes(s, encoding='ascii') + b'\x00'
+    assert processor.memory.load_bytes(s_addr, len(s) + 1) == bytes(s, encoding="ascii") + b"\x00"

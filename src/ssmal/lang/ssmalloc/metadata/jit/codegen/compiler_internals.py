@@ -68,8 +68,7 @@ class CompilerInternals:
 
     # Macros
 
-    def PUSH_B(self) -> str:    return f'{self.SWPAB} {self.PSHA} {self.SWPAB}'
-    def POP_B(self) -> str:     return f'{self.SWPAB} {self.POPA} {self.SWPAB}'
+    
     def FOLLOW_A(self) -> str:  return f'{self.SWPAB} {self.LDAb}'
 
     def LINE(self, *instructions: str, comment: str = None, alignment=40) -> str:

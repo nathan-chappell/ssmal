@@ -26,14 +26,14 @@ def test_type_info():
 
         def g(self) -> None:
             ...
-    
+
     derived_type_info = TypeInfo.from_py_type(Derived)
     assert derived_type_info.name == "Derived"
     assert derived_type_info.py_type == Derived
     assert len(derived_type_info.fields) == 3
-    assert derived_type_info.fields[0].name == 'x'
-    assert derived_type_info.fields[2].name == 'z'
-    assert derived_type_info.fields[2].type.name == 'int'
+    assert derived_type_info.fields[0].name == "x"
+    assert derived_type_info.fields[2].name == "z"
+    assert derived_type_info.fields[2].type.name == "int"
     assert len(derived_type_info.methods) == 3
     assert derived_type_info.methods[1].method == Base.h
     parent = derived_type_info.parent
@@ -41,4 +41,3 @@ def test_type_info():
     assert parent.py_type == Base
     assert len(parent.fields) == 2
     assert len(parent.methods) == 2
-    

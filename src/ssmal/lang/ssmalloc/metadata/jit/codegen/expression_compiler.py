@@ -77,13 +77,13 @@ class ExpressionCompiler:
                 self.compile_expression(left, mode)
                 w.write_line(self.scope.push_A(), ci.COMMENT("TOP <- left"))
                 self.compile_expression(right, mode)
-                w.write(ci.SWPAB, self.scope.pop_A(), ci.COMMENT("B <- right, A <- left"))
+                w.write(ci.SWPAB, self.scope.pop_A(), ' ')
 
                 match op:
-                    case ast.Add():     w.write_line(ci.ADDB)
-                    case ast.Sub():     w.write_line(ci.SUBB)
-                    case ast.Div():     w.write_line(ci.MULB)
-                    case ast.Mult():    w.write_line(ci.DIVB)
+                    case ast.Add():     w.write_line(ci.ADDB, ci.COMMENT("B <- right, A <- left"))
+                    case ast.Sub():     w.write_line(ci.SUBB, ci.COMMENT("B <- right, A <- left"))
+                    case ast.Div():     w.write_line(ci.DIVB, ci.COMMENT("B <- right, A <- left"))
+                    case ast.Mult():    w.write_line(ci.MULB, ci.COMMENT("B <- right, A <- left"))
                     case _:             raise CompilerError(expr)
 
             case ast.BoolOp(values=values, op=op) if mode == 'eval':

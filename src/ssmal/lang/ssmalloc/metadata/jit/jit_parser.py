@@ -59,10 +59,7 @@ class JitParser:
 
     @classmethod
     def builtin_type_info(cls) -> OrderedDict[TypeName, TypeInfo]:
-        return OrderedDict((
-            (TypeName(Identifier("int")), int_type),
-            (TypeName(Identifier("str")), str_type)
-        ))
+        return OrderedDict(((TypeName(Identifier("int")), int_type), (TypeName(Identifier("str")), str_type)))
 
     def __init__(self, module: ModuleType) -> None:
         type_name_regex = re.compile(r"[A-Z][a-zA-Z]*")

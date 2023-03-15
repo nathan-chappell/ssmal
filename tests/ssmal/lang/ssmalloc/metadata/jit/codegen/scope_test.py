@@ -15,7 +15,7 @@ def test_scope_get_offset():
     def f(x: int, y: str, z: int):
         a: str = "foo"
         b: int = 0
-        return a,b
+        return a, b
 
     f_ast = ast.parse(textwrap.dedent(inspect.getsource(f))).body[0]
     assert isinstance(f_ast, ast.FunctionDef)
@@ -32,7 +32,7 @@ def test_scope_codegen(varname: str, value: int):
     def f(x: int, y: str, z: int):
         a: str = "foo"
         b: int = 0
-        return a,b
+        return a, b
 
     f_ast = ast.parse(textwrap.dedent(inspect.getsource(f))).body[0]
     assert isinstance(f_ast, ast.FunctionDef)

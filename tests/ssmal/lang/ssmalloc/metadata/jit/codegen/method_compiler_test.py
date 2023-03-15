@@ -8,6 +8,8 @@ import pytest
 
 from ssmal.assemblers.tokenizer import tokenize
 from ssmal.assemblers.assembler import Assembler
+from ssmal.components.memory import MonitoredWrite
+from ssmal.instructions.processor_signals import HaltSignal
 from ssmal.lang.ssmalloc.metadata.jit.jit_parser import JitParser
 from ssmal.lang.ssmalloc.metadata.jit.strongly_typed_strings import Identifier, TypeName
 from ssmal.processors.processor import Processor
@@ -57,29 +59,53 @@ def test_assemble_basic_method(Base1_method_compiler: MethodCompiler):
     assert Base1_method_compiler.variable_types[Identifier("y")] == int_type
     Base1_method_compiler.compile_method(method)
     assembly_code = Base1_method_compiler.line_writer.text
+
+    x, y = 3, -2
+
     assembly_code = f"""
     halt nop nop nop "abc" .align
     {assembly_code}
     .goto 0x100
-    -1 2 4 ; self
-    0                       ; return address
-    0x100 ; self pointer
-    -2 ; y
+    -1 {x} 4  ; 0x100 self
+    .goto 0x11c
+    0       ; 0x11c return address
+            ; stack start
+    0x100   ; 0x120 self
+    {y}      ; 0x124 y
+    0xdeadbeef ; 0x128 z
     """
     print(assembly_code)
+    assembly_code_lines = assembly_code.split("\n")
 
     assembler = Assembler(list(tokenize(assembly_code)))
     assembler.assemble()
-    c_code = assembler.buffer.getvalue()
+    code_text = assembler.buffer.getvalue()
 
     processor = Processor()
-    processor.memory.store_bytes(0, c_code)
+    processor.memory.store_bytes(0, code_text)
     processor.registers.IP = 0x20
-    processor.registers.SP = 0x110
+    processor.registers.SP = 0x128
 
-    processor.memory.dump()
-    for _ in range(20):
-        processor.advance()
-        print(processor.registers)
+    processor.memory.monitor(0, 0x11C)
+    # processor.memory.dump()
+    _source_line = -1
+    with pytest.raises(HaltSignal):
+        for _ in range(80):
+            op = processor.opcode_map.get(processor.memory.load_bytes(processor.registers.IP, 1), None)
+            dbg = assembler.source_map.get(processor.registers.IP, None)
+            if op and dbg:
+                op_name = op.__name__
+                if dbg.line != _source_line:
+                    print(f"{processor.registers}, {op_name=} # {assembly_code_lines[dbg.line]}")
+                    _source_line = dbg.line
+                else:
+                    print(f"{processor.registers}, {op_name=}")
+            else:
+                print(f"{processor.registers}, (IP NOT AT OP) {dbg=}")
+            try:
+                processor.advance()
+            except MonitoredWrite as m:
+                print(m.args)
+                m.finish_write()
 
-    assert False
+    assert processor.registers.A == x * y

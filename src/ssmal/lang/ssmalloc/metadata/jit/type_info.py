@@ -64,7 +64,7 @@ class TypeInfo(TypeInfoBase):
             if field.name == name:
                 return field
         return None
-    
+
     @property
     def size(self) -> int:
         return 4 * (len(self.fields) + 1)
@@ -145,7 +145,7 @@ class TypeInfo(TypeInfoBase):
                             return_type=return_type,
                             assembly_code=None,
                             method=class_methods[method_name],
-                            index=index
+                            index=index,
                         )
                     )
                 case OverrideType.DoesNotOverride if result.parent is not None and method_name in base_method_names:
@@ -157,6 +157,7 @@ class TypeInfo(TypeInfoBase):
             index += 1
         type_cache[result.name] = result
         return result
+
 
 int_type = TypeInfo("int", None, int, [], [])
 str_type = TypeInfo("str", None, str, [], [])
