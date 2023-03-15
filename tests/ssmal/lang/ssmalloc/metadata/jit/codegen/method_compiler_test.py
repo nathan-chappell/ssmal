@@ -53,18 +53,33 @@ def test_assemble_basic_method(Base1_method_compiler: MethodCompiler):
     method = Base1_method_compiler.self_type.methods[0]
     Base1_method_compiler.reset_variable_types(method)
     assert len(Base1_method_compiler.variable_types) == 2
-    assert Base1_method_compiler.variable_types[Identifier('self')] == Base1_method_compiler.self_type
-    assert Base1_method_compiler.variable_types[Identifier('y')] == int_type
-    assembly_code = "\n".join(Base1_method_compiler.compile_method(method))
-    indent=0
-    for ins in Base1_method_compiler.compile_method(method):
-        if '|>' in ins:
-            indent += 1
-        elif '|<' in ins:
-            indent -= 1
-        print('  '*indent + ins)
+    assert Base1_method_compiler.variable_types[Identifier("self")] == Base1_method_compiler.self_type
+    assert Base1_method_compiler.variable_types[Identifier("y")] == int_type
+    Base1_method_compiler.compile_method(method)
+    assembly_code = Base1_method_compiler.line_writer.text
+    assembly_code = f"""
+    halt nop nop nop "abc" .align
+    {assembly_code}
+    .goto 0x100
+    -1 2 4 ; self
+    0                       ; return address
+    0x100 ; self pointer
+    -2 ; y
+    """
+    print(assembly_code)
 
     assembler = Assembler(list(tokenize(assembly_code)))
     assembler.assemble()
+    c_code = assembler.buffer.getvalue()
+
+    processor = Processor()
+    processor.memory.store_bytes(0, c_code)
+    processor.registers.IP = 0x20
+    processor.registers.SP = 0x110
+
+    processor.memory.dump()
+    for _ in range(20):
+        processor.advance()
+        print(processor.registers)
 
     assert False

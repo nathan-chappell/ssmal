@@ -63,7 +63,7 @@ class MethodCompiler:
             expression_compiler = ExpressionCompiler(self.line_writer, scope, self.infer_type)
             
             # CALLING CONVENTION: [ANSWER]
-            w.write_line(ci.STAi, f'{0}', *(ci.PSHA for _ in range(len(scope.locals))), ci.COMMENT("create stack"))
+            w.write_line(ci.STAi, f'{0}', *(ci.PSHA for _ in range(len(scope.locals))), ci.COMMENT("create space on stack for locals"))
 
             for stmt in function_def.body:
                 w.indent()
@@ -120,6 +120,7 @@ class MethodCompiler:
             w.write_line(ci.SWPAB, ci.COMMENT("save result"))
             w.write_line(*(ci.POPA for _ in range(len(scope.locals) + len(scope.args))), ci.COMMENT("clear stack"))
             w.write_line(ci.POPA, ci.SWPAB, ci.BRb, ci.COMMENT("A <- result; return"))
+            w.write_line(".align")
         else:
             raise CompilerError(method_info)
     

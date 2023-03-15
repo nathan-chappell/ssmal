@@ -42,6 +42,7 @@ class MethodInfo(TypeInfoBase):
     return_type: TypeInfo
     assembly_code: str | None
     method: Callable
+    index: int
 
 
 @dataclass
@@ -63,6 +64,10 @@ class TypeInfo(TypeInfoBase):
             if field.name == name:
                 return field
         return None
+    
+    @property
+    def size(self) -> int:
+        return 4 * (len(self.fields) + 1)
 
     @classmethod
     def from_py_type(cls, py_type: type) -> TypeInfo:
@@ -116,6 +121,7 @@ class TypeInfo(TypeInfoBase):
 
         override_info = merge_tables(method_names, base_method_names)
 
+        index = 0
         for method_name, override_type in override_info.items():
             match override_type:
                 case OverrideType.DeclaresNew | OverrideType.DoesOverride:
@@ -139,6 +145,7 @@ class TypeInfo(TypeInfoBase):
                             return_type=return_type,
                             assembly_code=None,
                             method=class_methods[method_name],
+                            index=index
                         )
                     )
                 case OverrideType.DoesNotOverride if result.parent is not None and method_name in base_method_names:
@@ -147,7 +154,7 @@ class TypeInfo(TypeInfoBase):
                     result.methods.append(base_method)
                 case _:
                     raise Exception(f"No method info available for {method_name} {override_type} {py_type}")
-
+            index += 1
         type_cache[result.name] = result
         return result
 

@@ -86,10 +86,10 @@ class Scope:
 
         """
         ci = self.ci
-        _offset = 4 * (len(self.offsets) - self.offsets[name])
+        _offset = 4 * (len(self.offsets) - self.offsets[name] + 1)
         _location = "self" if name == 'self' else 'local' if name in self.locals else 'arg'
         line_writer.indent()
-        line_writer.write_line(f'[access {_location}] {name} {mode=}')
+        line_writer.write_line(ci.COMMENT(f'[access {_location}] {name} {mode=}'))
         line_writer.write_line(ci.PUSH_B(), ci.MOVSA, ci.SUBi, f'{_offset}')
         if mode == 'eval':
             line_writer.write_line(ci.FOLLOW_A(), ci.COMMENT('eval'))

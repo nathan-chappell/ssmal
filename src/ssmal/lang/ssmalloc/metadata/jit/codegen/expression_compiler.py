@@ -38,29 +38,17 @@ class ExpressionCompiler:
     #     yield from self.deref_A(clobber_B=clobber_B)
     
     def get_method(self, self_expr: ast.expr, method_name: str) -> None:
+        """
+        We assume that A holds a pointer to the vtable
+        and vtable holds pointers to code
+        """
         ci = self.ci
-        yield from self.compile_expression(self_expr, 'access')
-        yield ci.FOLLOW_A()
-        # A now points at type info...
-        METHODS_ARRAY_OFFSET = 3
-        CODE_OFFSET = 4
-        yield ci.ADDi; yield f'{4*METHODS_ARRAY_OFFSET}'; yield ci.FOLLOW_A(); yield ci.PSHA
-        # A now points at methods array object, saved on stack
-        yield ci.FOLLOW_A(); yield ci.PSHA
-        # A now has array size, saved on stack
-        yield from self.ld_stack_offset(-8) # methods array object
-        yield ci.ADDi; yield f'{4}'; yield ci.FOLLOW_A()
-        # A now has ptr to method info
+        w = self.line_writer
         value_type = self.get_type(self_expr)
-        for index, method_info in enumerate(value_type.methods):
-            if method_info.name == method_name:
-                break
-        else:
-            raise CompilerError(value_type, method_name, self_expr)
-        # use index to access vtable...
-        yield ci.ADDi; yield f'{4 * (index)}'; yield ci.FOLLOW_A()
-        # access code
-        yield ci.ADDi;  yield f'{4 * CODE_OFFSET}'; yield ci.FOLLOW_A()
+        method_info = value_type.get_method_info(method_name)
+        if method_info is None:
+            raise CompilerError(self_expr, method_name)
+        w.write_line(ci.FOLLOW_A(), ci.ADDi, f'{4*method_info.index}', ci.FOLLOW_A(), ci.COMMENT("A <- type_info.methods[index].code"))
         # A now has ptr to method implementation
 
     def compile_expression(self, expr: ast.expr, mode: Literal['eval','access']) -> None:
@@ -115,7 +103,8 @@ class ExpressionCompiler:
                 w.write_line(ci.MARK_LABEL(short_circuit_label))
             
             case ast.Call(func=ast.Name(id='print') as func, args=[arg]) if mode == 'eval':
-                self.compile_expression(arg, mode='eval'); yield ci.PSHA
+                self.compile_expression(arg, mode='eval')
+                w.write(ci.PSHA, ' ')
                 arg_type = self.get_type(arg)
                 _PTOP = -1
                 match arg_type.name:
@@ -123,7 +112,7 @@ class ExpressionCompiler:
                     case 'str': _PTOP = ci.PTOPz
                     case _: raise CompilerError(func)
 
-                w.write_line(ci.LDAi, f'{_PTOP}', ci.SYS)
+                w.write_line(ci.LDAi, f'{_PTOP}', ci.SYS, ci.COMMENT('print()'))
 
             case ast.Call(func=ast.Attribute(value=self_expr, attr=method_name) as func, args=args) if mode == 'eval':
                 # CALLING CONVENTION: [CALL]
@@ -134,6 +123,7 @@ class ExpressionCompiler:
                 for i,arg in enumerate(args):
                     self.compile_expression(arg, 'eval')
                     w.write_line(ci.PSHA, ci.COMMENT(f'save args[{i}]'))
+                w.write_line(ci.MOVSA, ci.SUBi, f'{4 * (len(args) + 1)}', ci.SWPAB, ci.LDAb, ci.COMMENT("A <- self"))
                 self.get_method(self_expr, method_name)
                 w.write_line(ci.BRa, ci.COMMENT(f'goto {method_name}'))
 

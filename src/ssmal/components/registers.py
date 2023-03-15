@@ -11,3 +11,6 @@ class Registers:
     # Pointers
     IP: int = 0
     SP: int = 0
+
+    def __repr__(self) -> str:
+        return f'[{self.A:4x}, {self.B:4x}, {self.IP:4x}, {self.SP:4x}]'

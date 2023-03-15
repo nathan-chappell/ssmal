@@ -8,6 +8,7 @@ from ssmal.assemblers.tokenizer import tokenize
 from ssmal.assemblers.assembler import Assembler
 from ssmal.lang.ssmalloc.metadata.jit.codegen.scope import Scope
 from ssmal.processors.processor import Processor
+from ssmal.util.writer.line_writer import LineWriter
 
 
 def test_scope_get_offset():
@@ -44,7 +45,10 @@ def test_scope_codegen(varname: str, value: int):
     processor.memory.store_bytes(0, stack)
     processor.registers.SP = 5 * 4
 
-    text = "\n".join(s.lower() for s in scope.access_variable(varname, "eval"))
+    line_writer = LineWriter()
+    scope.access_variable(line_writer, varname, "eval")
+
+    text = line_writer.text
     print(text)
     assembler = Assembler(list(tokenize(text)))
     assembler.assemble()
@@ -52,6 +56,7 @@ def test_scope_codegen(varname: str, value: int):
     processor.memory.store_bytes(IP, assembler.buffer.getvalue())
     processor.registers.IP = IP
 
+    processor.memory.dump()
     for _ in range(20):
         processor.advance()
         print(processor.registers)
