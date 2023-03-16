@@ -79,8 +79,8 @@ class Scope:
         ci = self.ci
         return f'{ci.SWPAB} {self.pop_A()} {ci.SWPAB}'
 
-    def get_offset(self, name: str) -> int:
-        return self.offsets[name]
+    def get_offset_from_top(self, name: str) -> int:
+        return len(self.offsets) - self.offsets[name] - 1
     
     def access_variable(self, line_writer: LineWriter, name: str, mode: Literal['eval', 'access']) -> None:
         """
@@ -94,14 +94,15 @@ class Scope:
         """
         ci = self.ci
         line_writer.indent()
-        line_writer.write_line(ci.COMMENT(f'{self.offsets[name]=} {self.push_count=}'))
-        _offset = 4 * (len(self.offsets) - self.offsets[name] + self.push_count + 1)
         _location = "self" if name == 'self' else 'local' if name in self.locals else 'arg'
-        line_writer.write_line(ci.COMMENT(f'[access {_location}] {name} {mode=}'))
-        line_writer.write_line(self.PUSH_B(), ci.MOVSA, ci.SUBi, f'{_offset}')
+        # _offset = self.offsets[name]
+        _offset = self.get_offset_from_top(name)
+        line_writer.write_line(ci.COMMENT(f'[access {_location=}] {name} {_offset=} {mode=} {self.push_count=}'))
+        # _offset = 4 * (len(self.offsets) - self.offsets[name] + self.push_count + 1)
+        # line_writer.write_line(self.PUSH_B(), ci.MOVSA, ci.SUBi, f'{_offset}')
+        line_writer.write_line(ci.LDA_, f'{_offset}')
         if mode == 'eval':
             line_writer.write_line(ci.FOLLOW_A(), ci.COMMENT('eval'))
-        line_writer.write_line(self.POP_B())
         line_writer.dedent()
 
 

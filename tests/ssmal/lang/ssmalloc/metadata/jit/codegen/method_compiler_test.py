@@ -57,8 +57,8 @@ def prepare_and_run_Base1_f_to_halt(Base1_method_compiler: MethodCompiler, x: in
     0       ; 0x11c return address
             ; stack start
     0x100   ; 0x120 self
-    {y}      ; 0x124 y
-    0xdeadbeef ; 0x128 z
+    {y}     ; 0x124 y
+    0xbeef  ; 0x128 z
     """
     print(assembly_code)
     assembly_code_lines = assembly_code.split("\n")
