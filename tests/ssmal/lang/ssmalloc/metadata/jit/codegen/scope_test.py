@@ -20,6 +20,23 @@ def test_scope_get_offset():
     f_ast = ast.parse(textwrap.dedent(inspect.getsource(f))).body[0]
     assert isinstance(f_ast, ast.FunctionDef)
     scope = Scope(f_ast)
+
+    assert scope.get_offset_from_top("x") == 4
+    assert scope.get_offset_from_top("y") == 3
+    assert scope.get_offset_from_top("z") == 2
+    assert scope.get_offset_from_top("a") == 1
+    assert scope.get_offset_from_top("b") == 0
+
+    scope.push_A()
+
+    assert scope.get_offset_from_top("x") == 4 + 1
+    assert scope.get_offset_from_top("y") == 3 + 1
+    assert scope.get_offset_from_top("z") == 2 + 1
+    assert scope.get_offset_from_top("a") == 1 + 1
+    assert scope.get_offset_from_top("b") == 0 + 1
+    
+    scope.pop_A()
+
     assert scope.get_offset_from_top("x") == 4
     assert scope.get_offset_from_top("y") == 3
     assert scope.get_offset_from_top("z") == 2
@@ -46,7 +63,7 @@ def test_scope_codegen(varname: str, value: int):
     processor.registers.SP = 4 * len(vals)
 
     line_writer = LineWriter()
-    scope.access_variable(line_writer, varname, "access")
+    scope.access_variable(line_writer, varname, "eval")
 
     text = line_writer.text
     print(text)
@@ -63,40 +80,3 @@ def test_scope_codegen(varname: str, value: int):
     # processor.memory.dump()
 
     assert processor.registers.A == value
-
-def test_scope_codegen():
-    def f(x: int, y: str, z: int):
-        a: str = "foo"
-        b: int = 0
-        return a, b
-
-    f_ast = ast.parse(textwrap.dedent(inspect.getsource(f))).body[0]
-    assert isinstance(f_ast, ast.FunctionDef)
-    scope = Scope(f_ast)
-
-    # x is pointer to y
-    vals = x, y, z, a, b = 0x04, 0xbeef, 5, 6, 7
-
-    stack = b"".join(v.to_bytes(4, "little", signed=True) for v in vals)
-    processor = Processor()
-    processor.memory.store_bytes(0, stack)
-    processor.registers.SP = 4 * len(vals)
-
-    line_writer = LineWriter()
-    scope.access_variable(line_writer, "x", "eval")
-
-    text = line_writer.text
-    print(text)
-    assembler = Assembler(list(tokenize(text)))
-    assembler.assemble()
-    IP = 0x40
-    processor.memory.store_bytes(IP, assembler.buffer.getvalue())
-    processor.registers.IP = IP
-
-    # processor.memory.dump()
-    for _ in range(4):
-        processor.advance()
-        # print(processor.registers)
-    # processor.memory.dump()
-
-    assert processor.registers.A == y

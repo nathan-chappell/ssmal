@@ -72,8 +72,8 @@ def prepare_and_run_Base1_f_to_halt(Base1_method_compiler: MethodCompiler, x: in
     processor.registers.IP = 0x20
     processor.registers.SP = 0x128
 
-    processor.memory.monitor(0, 0x11C)
-    # processor.memory.dump()
+    # processor.memory.monitor(0, 0x140)
+    processor.memory.dump()
     _source_line = -1
     with pytest.raises(HaltSignal):
         for _ in range(80):
@@ -93,6 +93,7 @@ def prepare_and_run_Base1_f_to_halt(Base1_method_compiler: MethodCompiler, x: in
             except MonitoredWrite as m:
                 print(m.args)
                 m.finish_write()
+                processor.memory.dump()
 
     return processor.registers.A
 

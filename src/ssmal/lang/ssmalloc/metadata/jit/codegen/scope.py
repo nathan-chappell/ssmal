@@ -80,7 +80,7 @@ class Scope:
         return f'{ci.SWPAB} {self.pop_A()} {ci.SWPAB}'
 
     def get_offset_from_top(self, name: str) -> int:
-        return len(self.offsets) - self.offsets[name] - 1
+        return len(self.offsets) - self.offsets[name] - 1 + self.push_count
     
     def access_variable(self, line_writer: LineWriter, name: str, mode: Literal['eval', 'access']) -> None:
         """
@@ -100,9 +100,10 @@ class Scope:
         line_writer.write_line(ci.COMMENT(f'[access {_location=}] {name} {_offset=} {mode=} {self.push_count=}'))
         # _offset = 4 * (len(self.offsets) - self.offsets[name] + self.push_count + 1)
         # line_writer.write_line(self.PUSH_B(), ci.MOVSA, ci.SUBi, f'{_offset}')
-        line_writer.write_line(ci.LDA_, f'{_offset}')
         if mode == 'eval':
-            line_writer.write_line(ci.FOLLOW_A(), ci.COMMENT('eval'))
+            line_writer.write_line(ci.LDA_, f'{_offset}')
+        else:
+            line_writer.write_line(ci.MOVSA, ci.SUBi, f'{4 * (_offset + 1)}')
         line_writer.dedent()
 
 

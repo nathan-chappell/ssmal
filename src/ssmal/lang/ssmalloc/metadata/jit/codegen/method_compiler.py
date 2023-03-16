@@ -121,6 +121,9 @@ class MethodCompiler:
             w.write_line(*(ci.POPA for _ in range(len(scope.locals) + len(scope.args))), ci.COMMENT("clear stack"))
             w.write_line(ci.POPA, ci.SWPAB, ci.BRb, ci.COMMENT("A <- result; return"))
             w.write_line(".align")
+            assert method_info.parent is not None
+            param_list = ",".join(p.name for p in method_info.parameters)
+            w.write_line(f'"{method_info.parent.name}.{method_info.name}({param_list})"', ".align")
         else:
             raise CompilerError(method_info)
     
