@@ -8,5 +8,6 @@ def STAi(r: Registers, m: Memory) -> None: r.IP += 1; m.store(m.load(r.IP), r.A)
 def LDAb(r: Registers, m: Memory) -> None: r.IP += 1; r.A = m.load(r.B)
 def STAb(r: Registers, m: Memory) -> None: r.IP += 1; m.store(r.B, r.A)
 
-def LDA_(r: Registers, m: Memory) -> None: r.IP += 1; r.A = m.load(m.load(r.B))
-def STA_(r: Registers, m: Memory) -> None: r.IP += 1; m.store(m.load(r.B), r.A)
+# LDA_ and STA_ use an immediate operand ($i) to access the $i-th item on the stack
+def LDA_(r: Registers, m: Memory) -> None: r.IP += 1; r.A = m.load(r.SP - 4 * (m.load(r.IP) + 1)); r.IP += 4
+def STA_(r: Registers, m: Memory) -> None: r.IP += 1; m.store(r.SP - 4 * (m.load(r.IP) + 1), r.A); r.IP += 4
