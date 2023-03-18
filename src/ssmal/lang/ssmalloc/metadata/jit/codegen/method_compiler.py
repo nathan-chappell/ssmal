@@ -65,67 +65,73 @@ class MethodCompiler:
             # CALLING CONVENTION: [ANSWER]
             w.write_line(ci.LDAi, f'{0}', *(ci.PSHA for _ in range(len(scope.locals))), ci.COMMENT("create space on stack for locals"))
 
-            for stmt in function_def.body:
-                w.indent()
-                w.write_line(ci.COMMENT(f"stmt {stmt.__class__.__name__} {stmt.lineno=}"))
-                match stmt:
-                    case ast.AnnAssign(target=ast.Name(id=variable_name), annotation=ast.Name(id=type_name), value=value):
-                        if variable_name not in scope.offsets:
-                            raise CompilerError(stmt)
-                        if not self.is_typename(type_name):
-                            raise TypeError(type_name, stmt)
-                        target_type = self.type_dict[type_name]
-                        self.variable_types[Identifier(variable_name)] = target_type
-                        if value is not None:
-                            value_type = self.infer_type(value)
-                            if not self.is_subtype(value_type, target_type):
-                                raise TypeError(value_type, target_type, stmt)
-                            expression_compiler.compile_expression(value, 'eval')
-                            w.write_line(ci.SWPAB)
-                            scope.access_variable(self.line_writer, variable_name, 'access')
-                            w.write_line(ci.SWPAB, ci.STAb)
-                    
-                    case ast.Assign(targets=[target], value=value):
-                        target_type = self.infer_type(target)
-                        value_type = self.infer_type(value)
-                        if not self.is_subtype(value_type, target_type):
-                            raise TypeError(value_type, target_type, stmt)
-                        expression_compiler.compile_expression(value, 'eval')
-                        w.write_line(scope.push_A())
-                        expression_compiler.compile_expression(target, 'access')
-                        w.write_line(ci.SWPAB, scope.pop_A(), ci.SWPAB, ci.STAb, ci.COMMENT('*TOP <- A'))
-                        
-                    case ast.Expr(expr):
-                        self.infer_type(expr)
-                        expression_compiler.compile_expression(expr, 'eval')
-                    
-                    # case ast.If(expr):
-                    #     self.infer_type(expr)
-                    #     yield from expression_compiler.compile_expression(expr, 'eval')
-                    
-                    case ast.Return(value=expr):
-                        if expr is None:
-                            raise CompilerError(expr, stmt)
-                        returned_type = self.infer_type(expr)
-                        if not self.is_subtype(returned_type, method_info.return_type):
-                            raise CompilerError(stmt)
-                        expression_compiler.compile_expression(expr, 'eval')
-                    
-                    case _:
-                        raise CompilerError(stmt)
-                
-                w.dedent()
-            
+            self.compile_stmts(function_def.body, scope=scope, expression_compiler=expression_compiler, method_info=method_info)
+
             # CALLING CONVENTION: [RETURN]
             w.write_line(ci.SWPAB, ci.COMMENT("save result"))
             w.write_line(*(ci.POPA for _ in range(len(scope.locals) + len(scope.args))), ci.COMMENT("clear stack"))
             w.write_line(ci.POPA, ci.SWPAB, ci.BRb, ci.COMMENT("A <- result; return"))
             w.write_line(".align")
+            # DEBUG INFO
             assert method_info.parent is not None
             param_list = ",".join(p.name for p in method_info.parameters)
             w.write_line(f'"{method_info.parent.name}.{method_info.name}({param_list})"', ".align")
         else:
             raise CompilerError(method_info)
+    
+    def compile_stmts(self, stmts: list[ast.stmt], scope: Scope, method_info: MethodInfo, expression_compiler: ExpressionCompiler) -> None:
+        ci = self.ci
+        w = self.line_writer
+        for stmt in stmts:
+            w.indent()
+            w.write_line(ci.COMMENT(f"stmt {stmt.__class__.__name__} {stmt.lineno=}"))
+            match stmt:
+                case ast.AnnAssign(target=ast.Name(id=variable_name), annotation=ast.Name(id=type_name), value=value):
+                    if variable_name not in scope.offsets:
+                        raise CompilerError(stmt)
+                    if not self.is_typename(type_name):
+                        raise TypeError(type_name, stmt)
+                    target_type = self.type_dict[type_name]
+                    self.variable_types[Identifier(variable_name)] = target_type
+                    if value is not None:
+                        value_type = self.infer_type(value)
+                        if not self.is_subtype(value_type, target_type):
+                            raise TypeError(value_type, target_type, stmt)
+                        expression_compiler.compile_expression(value, 'eval')
+                        w.write_line(ci.SWPAB)
+                        scope.access_variable(self.line_writer, variable_name, 'access')
+                        w.write_line(ci.SWPAB, ci.STAb)
+                
+                case ast.Assign(targets=[target], value=value):
+                    target_type = self.infer_type(target)
+                    value_type = self.infer_type(value)
+                    if not self.is_subtype(value_type, target_type):
+                        raise TypeError(value_type, target_type, stmt)
+                    expression_compiler.compile_expression(value, 'eval')
+                    w.write_line(scope.push_A())
+                    expression_compiler.compile_expression(target, 'access')
+                    w.write_line(ci.SWPAB, scope.pop_A(), ci.SWPAB, ci.STAb, ci.COMMENT('*TOP <- A'))
+                    
+                case ast.Expr(expr):
+                    self.infer_type(expr)
+                    expression_compiler.compile_expression(expr, 'eval')
+                
+                # case ast.If(expr):
+                #     self.infer_type(expr)
+                #     yield from expression_compiler.compile_expression(expr, 'eval')
+                
+                case ast.Return(value=expr):
+                    if expr is None:
+                        raise CompilerError(expr, stmt)
+                    returned_type = self.infer_type(expr)
+                    if not self.is_subtype(returned_type, method_info.return_type):
+                        raise CompilerError(stmt)
+                    expression_compiler.compile_expression(expr, 'eval')
+                
+                case _:
+                    raise CompilerError(stmt)
+            
+            w.dedent()
     
     def infer_type(self, expr: ast.expr) -> TypeInfo:
         match expr:
