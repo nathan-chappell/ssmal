@@ -134,7 +134,7 @@ class ExpressionCompiler:
             case ast.Constant(value=value) if mode == 'eval':
                 match value:
                     case None:          w.write_line(ci.LDAi, ci.NONE, ci.COMMENT('CONST None'))
-                    case str(val):      w.write_line(ci.LDAi, ci.ZSTR(val), ci.COMMENT('CONST str'))
+                    case str(val):      w.write_line(ci.LDAi, self.string_table[val], ci.COMMENT(f'CONST str {val}'))
                     case bytes(val):    raise CompilerError(val)
                     case True:          w.write_line(ci.LDAi, ci.TRUE, ci.COMMENT('CONST True'))
                     case False:         w.write_line(ci.LDAi, ci.FALSE, ci.COMMENT('CONST False'))

@@ -18,7 +18,7 @@ from ssmal.lang.ssmalloc.metadata.jit.type_info import TypeInfo, int_type, str_t
 from ssmal.lang.ssmalloc.metadata.jit.codegen.scope import Scope
 from ssmal.lang.ssmalloc.metadata.jit.codegen.method_compiler import MethodCompiler
 from ssmal.util.writer.line_writer import LineWriter
-import ssmal.lang.ssmalloc.metadata.jit.codegen.samples.pair as pair_module
+import tests.ssmal.lang.ssmalloc.metadata.jit.codegen.samples.pair as pair_module
 
 
 def test_object_creation():

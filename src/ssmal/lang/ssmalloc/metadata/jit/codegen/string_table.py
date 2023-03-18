@@ -2,6 +2,7 @@ from collections import OrderedDict
 import io
 import re
 from typing import NewType, overload
+from ssmal.lang.ssmalloc.metadata.jit.codegen.compiler_internals import CompilerInternals
 
 from ssmal.util.writer.line_writer import LineWriter
 
@@ -9,8 +10,9 @@ Symbol = NewType('Symbol', str)
 
 class StringTable:
     str_to_symbol: OrderedDict[str, Symbol]
+    ci = CompilerInternals()
 
-    def __init__(self, max_size: int) -> None:
+    def __init__(self) -> None:
         self.str_to_symbol = OrderedDict[str, Symbol]()
     
     def _make_symbol(self, string: str) -> Symbol:
@@ -29,5 +31,7 @@ class StringTable:
         self.add(string)
         return self.str_to_symbol[string]
 
-    def compile(self, line_writer: LineWriter) -> str:
-        ...
+    def compile(self, line_writer: LineWriter) -> None:
+        ci = self.ci
+        for str_, symbol in self.str_to_symbol.items():
+            line_writer.write_line(ci.MARK_LABEL(symbol), ci.ZSTR(str_))

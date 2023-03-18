@@ -42,7 +42,7 @@ class SsmalTypeEmbedder:
         self.arena_rw = ArenaReaderWriter(arena)
         self.ssmal_types = ssmal_types
         self.type_info_table_address = -1
-        self.string_table = StringTable(max_size=string_table_max_size)
+        self.string_table = StringTable()
         self.string_table_size = string_table_max_size
         self.symbol_table = OrderedDict[SymbolAddress, StringTableOffset]()
 

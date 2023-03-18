@@ -61,16 +61,17 @@ class JitParser:
     type_name_regex = re.compile(r"[A-Z][a-zA-Z]*")
 
     def __init__(self) -> None:
-        self.string_table = StringTable(0x400)
+        self.string_table = StringTable()
         self.type_info_dict = TypeInfo.builtin_type_info()
     
     def parse_module(self, module: ModuleType):
         for type_name, item in module.__dict__.items():
             if not self.type_name_regex.match(type_name):
                 continue
-            if isinstance(item, type) and is_dataclass(item):
+            elif isinstance(item, type) and is_dataclass(item):
                 self.type_info_dict[TypeName(Identifier(type_name))] = TypeInfo.from_py_type(item)
-            raise CompilerError(item)
+            else:
+                raise CompilerError(item)
 
         for type_name, type_info in self.type_info_dict.items():
             for method_info in type_info.methods:

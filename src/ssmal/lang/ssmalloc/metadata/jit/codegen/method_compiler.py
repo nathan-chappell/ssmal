@@ -58,6 +58,7 @@ class MethodCompiler:
         ci = self.ci
         w = self.line_writer
 
+        self.reset_variable_types(method_info)
         function_def = ast.parse(textwrap.dedent(inspect.getsource(method_info.method))).body[0]
 
         if isinstance(function_def, ast.FunctionDef):
