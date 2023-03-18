@@ -11,6 +11,7 @@ from types import ModuleType
 from ssmal.lang.ssmalloc.metadata.jit.codegen.compiler_error import CompilerError
 from ssmal.lang.ssmalloc.metadata.jit.codegen.compiler_internals import CompilerInternals
 from ssmal.lang.ssmalloc.metadata.jit.codegen.method_compiler import MethodCompiler
+from ssmal.lang.ssmalloc.metadata.jit.codegen.string_table import StringTable
 from ssmal.lang.ssmalloc.metadata.jit.strongly_typed_strings import Identifier, TypeName
 
 from ssmal.lang.ssmalloc.metadata.jit.type_info import MethodInfo, TypeInfo, int_type, str_type
@@ -54,20 +55,18 @@ class ParseError(Exception):
 
 
 class JitParser:
+    string_table: StringTable
     type_info_dict: OrderedDict[TypeName, TypeInfo]
     ci = CompilerInternals()
+    type_name_regex = re.compile(r"[A-Z][a-zA-Z]*")
 
-    @classmethod
-    def builtin_type_info(cls) -> OrderedDict[TypeName, TypeInfo]:
-        return OrderedDict(((TypeName(Identifier("int")), int_type), (TypeName(Identifier("str")), str_type)))
-
-    def __init__(self, module: ModuleType) -> None:
-        type_name_regex = re.compile(r"[A-Z][a-zA-Z]*")
-
-        self.type_info_dict = self.builtin_type_info()
-
+    def __init__(self) -> None:
+        self.string_table = StringTable(0x400)
+        self.type_info_dict = TypeInfo.builtin_type_info()
+    
+    def parse_module(self, module: ModuleType):
         for type_name, item in module.__dict__.items():
-            if not type_name_regex.match(type_name):
+            if not self.type_name_regex.match(type_name):
                 continue
             if isinstance(item, type) and is_dataclass(item):
                 self.type_info_dict[TypeName(Identifier(type_name))] = TypeInfo.from_py_type(item)
@@ -76,7 +75,7 @@ class JitParser:
         for type_name, type_info in self.type_info_dict.items():
             for method_info in type_info.methods:
                 line_writer = LineWriter()
-                method_compiler = MethodCompiler(line_writer, self.type_info_dict, self_type=type_info)
+                method_compiler = MethodCompiler(line_writer, self.type_info_dict, self_type=type_info, string_table=self.string_table)
                 method_compiler.compile_method(method_info)
                 method_info.assembly_code = method_compiler.line_writer.text
 
@@ -86,7 +85,10 @@ class JitParser:
     def get_type_info_binary(self, offset: int) -> tuple[bytes, OrderedDict[str, int]]:
         ...
 
-    def embed(self) -> Generator[str, None, None]:
+    def compile(self, line_writer: LineWriter) -> Generator[str, None, None]:
+        # We assume:
+        #   IP is 0
+        #   SP is after the HEAP_END symbol
         ci = self.ci
         TYPEINFO_OFFSET = 0x20
         ENTRYPOINT = "Program.Main"

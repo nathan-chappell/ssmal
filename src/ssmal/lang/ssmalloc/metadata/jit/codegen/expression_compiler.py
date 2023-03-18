@@ -4,6 +4,7 @@ import ast
 from collections import OrderedDict
 from dataclasses import dataclass, field
 from typing import Callable, Generator, Literal
+from ssmal.lang.ssmalloc.metadata.jit.codegen.string_table import StringTable
 
 from ssmal.util.writer.line_writer import LineWriter
 
@@ -18,12 +19,14 @@ class ExpressionCompiler:
     line_writer: LineWriter
     scope: Scope
     get_type: Callable[[ast.expr], TypeInfo]
+    string_table: StringTable
     _i: int = 0
     ci = CompilerInternals()
 
-    def __init__(self, assembler_writer: LineWriter, scope: Scope, get_type: Callable[[ast.expr], TypeInfo]) -> None:
+    def __init__(self, assembler_writer: LineWriter, scope: Scope, get_type: Callable[[ast.expr], TypeInfo], string_table: StringTable) -> None:
         self.line_writer = assembler_writer
         self.get_type = get_type
+        self.string_table = string_table
         self.scope = scope
 
     def get_label(self, expr: ast.expr) -> str:
@@ -129,7 +132,6 @@ class ExpressionCompiler:
 
             #   value: Any  # None, str, bytes, bool, int, float, complex, Ellipsis
             case ast.Constant(value=value) if mode == 'eval':
-                breakpoint()
                 match value:
                     case None:          w.write_line(ci.LDAi, ci.NONE, ci.COMMENT('CONST None'))
                     case str(val):      w.write_line(ci.LDAi, ci.ZSTR(val), ci.COMMENT('CONST str'))

@@ -7,6 +7,7 @@ import inspect
 import logging
 import textwrap
 from typing import Generator, Literal, TypeGuard, cast
+from ssmal.lang.ssmalloc.metadata.jit.codegen.string_table import StringTable
 
 from ssmal.util.writer.line_writer import LineWriter
 from ssmal.lang.ssmalloc.metadata.jit.codegen.compiler_error import CompilerError
@@ -32,10 +33,12 @@ class MethodCompiler:
     type_dict: OrderedDict[TypeName, TypeInfo]
     variable_types: OrderedDict[Identifier, TypeInfo]
     self_type: TypeInfo
+    string_table: StringTable
 
-    def __init__(self, assembler_writer: LineWriter, type_dict: OrderedDict[TypeName, TypeInfo], self_type: TypeInfo) -> None:
+    def __init__(self, assembler_writer: LineWriter, type_dict: OrderedDict[TypeName, TypeInfo], self_type: TypeInfo, string_table: StringTable) -> None:
         self.line_writer = assembler_writer
         self.self_type = self_type
+        self.string_table = string_table
         self.type_dict = type_dict
         self.variable_types = OrderedDict[Identifier, TypeInfo]()
     
@@ -60,7 +63,7 @@ class MethodCompiler:
         if isinstance(function_def, ast.FunctionDef):
             # create scope
             scope = Scope(function_def)
-            expression_compiler = ExpressionCompiler(self.line_writer, scope, self.infer_type)
+            expression_compiler = ExpressionCompiler(self.line_writer, scope, self.infer_type, string_table=self.string_table)
             
             # CALLING CONVENTION: [ANSWER]
             w.write_line(ci.LDAi, f'{0}', *(ci.PSHA for _ in range(len(scope.locals))), ci.COMMENT("create space on stack for locals"))

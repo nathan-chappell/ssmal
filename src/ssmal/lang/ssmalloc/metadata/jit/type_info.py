@@ -6,6 +6,7 @@ from inspect import signature
 import logging
 from types import GenericAlias
 from typing import Callable, Generic, get_type_hints
+from ssmal.lang.ssmalloc.metadata.jit.strongly_typed_strings import Identifier, TypeName
 
 from ssmal.lang.ssmalloc.metadata.util.merge_tables import merge_tables
 from ssmal.lang.ssmalloc.metadata.util.override_type import OverrideType
@@ -68,6 +69,10 @@ class TypeInfo(TypeInfoBase):
     @property
     def size(self) -> int:
         return 4 * (len(self.fields) + 1)
+
+    @classmethod
+    def builtin_type_info(cls) -> OrderedDict[TypeName, TypeInfo]:
+        return OrderedDict(((TypeName(Identifier("int")), int_type), (TypeName(Identifier("str")), str_type)))
 
     @classmethod
     def from_py_type(cls, py_type: type) -> TypeInfo:
