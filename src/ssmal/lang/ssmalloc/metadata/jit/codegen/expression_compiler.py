@@ -34,6 +34,11 @@ class ExpressionCompiler:
         self._i += 1
         return label
     
+    def get_label_from_name(self, name: str) -> str:
+        label = f"label_name_{name}__{self._i}"
+        self._i += 1
+        return label
+    
     # def ld_stack_offset(self, offset: int, clobber_B=False):
     #     ci = self.ci
     #     yield ci.MOVSA; yield ci.PSHA; yield ci.MOVSA; yield ci.POPA

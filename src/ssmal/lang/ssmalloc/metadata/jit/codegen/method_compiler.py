@@ -28,14 +28,19 @@ class TypeError(CompilerError):
 # fmt: off
 
 class MethodCompiler:
-    line_writer: LineWriter
     ci = CompilerInternals()
-    type_dict: OrderedDict[TypeName, TypeInfo]
-    variable_types: OrderedDict[Identifier, TypeInfo]
+
+    break_label_stack: list[str]
+    continue_label_stack: list[str]
+    line_writer: LineWriter
     self_type: TypeInfo
     string_table: StringTable
+    type_dict: OrderedDict[TypeName, TypeInfo]
+    variable_types: OrderedDict[Identifier, TypeInfo]
 
     def __init__(self, assembler_writer: LineWriter, type_dict: OrderedDict[TypeName, TypeInfo], self_type: TypeInfo, string_table: StringTable) -> None:
+        self.break_label_stack = []
+        self.continue_label_stack = []
         self.line_writer = assembler_writer
         self.self_type = self_type
         self.string_table = string_table
@@ -115,14 +120,31 @@ class MethodCompiler:
                     w.write_line(scope.push_A())
                     expression_compiler.compile_expression(target, 'access')
                     w.write_line(ci.SWPAB, scope.pop_A(), ci.SWPAB, ci.STAb, ci.COMMENT('*TOP <- A'))
+                
+                case ast.Break():
+                    if not self.break_label_stack:
+                        raise CompilerError(stmt)
+                    w.write_line(ci.GOTO_LABEL(self.break_label_stack[-1]), ci.COMMENT('break'))
+                
+                case ast.Continue():
+                    if not self.continue_label_stack:
+                        raise CompilerError(stmt)
+                    w.write_line(ci.GOTO_LABEL(self.continue_label_stack[-1]), ci.COMMENT('continue'))
                     
                 case ast.Expr(expr):
                     self.infer_type(expr)
                     expression_compiler.compile_expression(expr, 'eval')
                 
-                # case ast.If(expr):
-                #     self.infer_type(expr)
-                #     yield from expression_compiler.compile_expression(expr, 'eval')
+                case ast.If(test=test, body=body, orelse=orelse):
+                    test_type = self.infer_type(test)
+                    if test_type.name != 'int':
+                        raise CompilerError(test_type, stmt)
+                    expression_compiler.compile_expression(test, 'eval')
+                    else_label = expression_compiler.get_label(test)
+                    w.write_line(ci.BRZi, ci.GOTO_LABEL(else_label), ci.COMMENT('if'))
+                    self.compile_stmts(body, scope=scope, method_info=method_info, expression_compiler=expression_compiler)
+                    w.write_line(ci.MARK_LABEL(else_label), ci.COMMENT('else'))
+                    self.compile_stmts(orelse, scope=scope, method_info=method_info, expression_compiler=expression_compiler)
                 
                 case ast.Return(value=expr):
                     if expr is None:
@@ -131,6 +153,30 @@ class MethodCompiler:
                     if not self.is_subtype(returned_type, method_info.return_type):
                         raise CompilerError(stmt)
                     expression_compiler.compile_expression(expr, 'eval')
+                
+                case ast.While(test=test, body=body, orelse=orelse):
+                    test_type = self.infer_type(test)
+                    if test_type.name != 'int':
+                        raise CompilerError(test_type, stmt)
+                    test_label = expression_compiler.get_label_from_name(f'while_test')
+                    break_label = expression_compiler.get_label_from_name(f'while_break')
+                    else_label = expression_compiler.get_label_from_name(f'while_else')
+
+                    self.break_label_stack.append(break_label)
+                    self.continue_label_stack.append(test_label)
+                    # test / continue
+                    w.write_line(ci.MARK_LABEL(test_label), ci.COMMENT('while_test'))
+                    expression_compiler.compile_expression(test, 'eval')
+                    w.write_line(ci.BRZi, ci.GOTO_LABEL(else_label), ci.COMMENT('test fail'))
+                    # body
+                    self.compile_stmts(body, scope=scope, method_info=method_info, expression_compiler=expression_compiler)
+                    # else
+                    w.write_line(ci.MARK_LABEL(else_label), ci.COMMENT('while_else'))
+                    self.compile_stmts(orelse, scope=scope, method_info=method_info, expression_compiler=expression_compiler)
+                    # break
+                    w.write_line(ci.MARK_LABEL(break_label), ci.COMMENT('while_break'))
+                    self.continue_label_stack.pop()
+                    self.break_label_stack.pop()
                 
                 case _:
                     raise CompilerError(stmt)

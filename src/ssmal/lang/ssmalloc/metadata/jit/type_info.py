@@ -77,8 +77,7 @@ class TypeInfo(TypeInfoBase):
     @classmethod
     def from_py_type(cls, py_type: type) -> TypeInfo:
         if isinstance(py_type, GenericAlias):
-            breakpoint()
-            ...
+            raise NotImplementedError()
         name = py_type.__name__
 
         log.info(f"{py_type=}")
