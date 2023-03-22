@@ -8,6 +8,7 @@ from collections import OrderedDict
 from dataclasses import is_dataclass
 from typing import Any, Generator
 from types import ModuleType
+from ssmal.lang.ssmalloc.metadata.jit.codegen.allocator import TrivialAllocator
 from ssmal.lang.ssmalloc.metadata.jit.codegen.compiler_error import CompilerError
 from ssmal.lang.ssmalloc.metadata.jit.codegen.compiler_internals import CompilerInternals
 from ssmal.lang.ssmalloc.metadata.jit.codegen.label_maker import LabelMaker
@@ -59,6 +60,7 @@ class JitParser:
     ci = CompilerInternals()
     type_name_regex = re.compile(r"[A-Z][a-zA-Z]*")
 
+    allocator: TrivialAllocator
     label_maker: LabelMaker
     string_table: StringTable
     type_info_dict: OrderedDict[TypeName, TypeInfo]
@@ -67,6 +69,7 @@ class JitParser:
         self.label_maker = LabelMaker()
         self.string_table = StringTable()
         self.type_info_dict = TypeInfo.builtin_type_info()
+        self.allocator = TrivialAllocator(string_table=self.string_table, type_dict=self.type_info_dict, label_maker=self.label_maker)
 
     def parse_module(self, module: ModuleType):
         for type_name, item in module.__dict__.items():
@@ -98,12 +101,16 @@ class JitParser:
         #   SP is after the HEAP_END symbol
         ci = self.ci
         w = line_writer
+
+        INITAL_SP_OFFSET = 0x10
         TYPEINFO_OFFSET = 0x20
         ENTRYPOINT = "Program.Main"
+        INITIAL_SP = "INITIAL_SP"
         # create assembly...
         # type_info_binary, type_info_labels = self.get_type_info_binary(TYPEINFO_OFFSET)
 
         w.write_line(".goto 0", ci.BRi, ci.GOTO_LABEL(ENTRYPOINT), ci.COMMENT("start"))
+        w.write_line(f".goto 0x{INITAL_SP_OFFSET:02x}", ci.GOTO_LABEL(INITIAL_SP), ci.COMMENT("Initial SP"))
         w.write_line(f".goto 0x{TYPEINFO_OFFSET:02x}", ci.ZSTR("TYPEINFO"), f".align")
 
         # vtables
@@ -133,3 +140,9 @@ class JitParser:
                 w.write_line(".align")
                 w.dedent()
             w.dedent()
+        
+        # heap
+        self.allocator.create_heap(w)
+
+        # stack
+        w.write_line(".zeros 0x20", ci.MARK_LABEL(INITIAL_SP), ".here")

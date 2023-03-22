@@ -216,7 +216,7 @@ class MethodCompiler:
             case ast.BoolOp(values=values) if all([self.infer_type(value) == int_type for value in values]): return int_type
 
             case ast.BoolOp(values=values): raise TypeError(f'Operation not supported', expr)
-            
+
             case ast.Call(func=ast.Name(id="print"), args=args):
                 for arg in args:
                     self.infer_type(arg)
@@ -248,7 +248,7 @@ class MethodCompiler:
             
             case ast.Name(id=id): raise TypeError(f'Missing variable {id}', expr)
 
-            case _: raise TypeError(expr)
+            case _: breakpoint(); raise TypeError(expr)
     # fmt: on
 
     def infer_method(self, attr: ast.Attribute) -> MethodInfo:

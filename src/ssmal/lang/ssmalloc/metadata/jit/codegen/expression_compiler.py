@@ -122,9 +122,12 @@ class ExpressionCompiler:
 
                 w.write_line(ci.LDAi, f'{_PTOP}', ci.SYS, ci.COMMENT('print()'))
             
-            case ast.Call(func=ast.Name(id) as func, args=[]) if id in self.type_dict:
+            case ast.Call(func=ast.Name(type_name) as func, args=[]) if type_name in self.type_dict:
                 # allocate memory.
+                # push IP
+                # set A to size
                 ...
+                # w.write_line(ci.SWPAI, ci.PSHA)
 
             case ast.Call(func=ast.Attribute(value=self_expr, attr=method_name) as func, args=args) if mode == 'eval':
                 # CALLING CONVENTION: [CALL]
