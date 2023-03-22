@@ -144,6 +144,8 @@ class Assembler:
                 self.encoding = self.get_encoding(t1)
             elif t0.value == ".goto":
                 self.buffer.seek(self.get_address(t1))
+            elif t0.value == ".zeros":
+                self.emit(b"\x00" * self._get_int_value(t1), t0)
             else:
                 t2 = self.eat_token()
                 if t0.value == ".def":
@@ -153,8 +155,8 @@ class Assembler:
                     self.symbol_table[_symbol] = self.get_bytes(t2)
                     # if _symbol in self.unresolved_symbols:
                     #     self.unresolved_symbols[_symbol].token = t1
-                # elif t0.value == ".repeat":
-                #     self.emit(cast(int, self.get_repeated_value(t1)) * self.get_bytes(t2), t0)
+
+                    # self.emit(cast(int, self.get_repeated_value(t1)) * self.get_bytes(t2), t0)
                 else:
                     raise UnexpectedTokenError(t0, "Error processing directive.")
 

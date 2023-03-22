@@ -24,18 +24,18 @@ def test_STA_LDA_b(address: int, value: int):
     assert r.A == value
 
 
-_boring_stack_values = (-7,-1,1,8)
+_boring_stack_values = (-7, -1, 1, 8)
 _boring_stack_size = len(_boring_stack_values)
-_boring_stack_bytes = b''.join(i.to_bytes(4,'little',signed=True) for i in _boring_stack_values)
+_boring_stack_bytes = b"".join(i.to_bytes(4, "little", signed=True) for i in _boring_stack_values)
 
-@pytest.mark.parametrize("offset, value, next_value",
-    list((i, _boring_stack_values[_boring_stack_size - 1 - i], i+0x20) for i in range(_boring_stack_size))
+
+@pytest.mark.parametrize(
+    "offset, value, next_value", list((i, _boring_stack_values[_boring_stack_size - 1 - i], i + 0x20) for i in range(_boring_stack_size))
 )
 def test_STA_LDA__(offset: int, value: int, next_value: int):
-    
-    ip_offset_bytes = b'\xcc' + b'\xcc'.join(offset.to_bytes(4,'little',signed=True) for _ in range(_boring_stack_size))
+    ip_offset_bytes = b"\xcc" + b"\xcc".join(offset.to_bytes(4, "little", signed=True) for _ in range(_boring_stack_size))
 
-    IP=0x10
+    IP = 0x10
 
     r = Registers(SP=0x10, IP=IP)
     m = Memory()

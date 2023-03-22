@@ -34,7 +34,7 @@ def test_scope_get_offset():
     assert scope.get_offset_from_top("z") == 2 + 1
     assert scope.get_offset_from_top("a") == 1 + 1
     assert scope.get_offset_from_top("b") == 0 + 1
-    
+
     scope.pop_A()
 
     assert scope.get_offset_from_top("x") == 4

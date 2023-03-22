@@ -7,6 +7,7 @@ import inspect
 import logging
 import textwrap
 from typing import Generator, Literal, TypeGuard, cast
+from ssmal.lang.ssmalloc.metadata.jit.codegen.label_maker import LabelMaker
 from ssmal.lang.ssmalloc.metadata.jit.codegen.string_table import StringTable
 
 from ssmal.util.writer.line_writer import LineWriter
@@ -25,40 +26,47 @@ class TypeError(CompilerError):
     ...
 
 
-# fmt: off
-
 class MethodCompiler:
     ci = CompilerInternals()
 
     break_label_stack: list[str]
     continue_label_stack: list[str]
+    label_maker: LabelMaker
     line_writer: LineWriter
     self_type: TypeInfo
     string_table: StringTable
     type_dict: OrderedDict[TypeName, TypeInfo]
     variable_types: OrderedDict[Identifier, TypeInfo]
 
-    def __init__(self, assembler_writer: LineWriter, type_dict: OrderedDict[TypeName, TypeInfo], self_type: TypeInfo, string_table: StringTable) -> None:
+    def __init__(
+        self,
+        assembler_writer: LineWriter,
+        type_dict: OrderedDict[TypeName, TypeInfo],
+        self_type: TypeInfo,
+        string_table: StringTable,
+        label_maker: LabelMaker,
+    ) -> None:
         self.break_label_stack = []
         self.continue_label_stack = []
+        self.label_maker = label_maker
         self.line_writer = assembler_writer
         self.self_type = self_type
         self.string_table = string_table
         self.type_dict = type_dict
         self.variable_types = OrderedDict[Identifier, TypeInfo]()
-    
+
     def is_typename(self, name: str) -> TypeGuard[TypeName]:
         return name in self.type_dict
 
     def is_identifier(self, name: str) -> TypeGuard[Identifier]:
         return name in self.variable_types
-    
+
     def reset_variable_types(self, method_info: MethodInfo):
         self.variable_types = OrderedDict[Identifier, TypeInfo]()
-        self.variable_types[Identifier('self')] = self.self_type
+        self.variable_types[Identifier("self")] = self.self_type
         for param in method_info.parameters:
             self.variable_types[Identifier(param.name)] = param.type
-    
+
     def compile_method(self, method_info: MethodInfo) -> None:
         ci = self.ci
         w = self.line_writer
@@ -69,10 +77,17 @@ class MethodCompiler:
         if isinstance(function_def, ast.FunctionDef):
             # create scope
             scope = Scope(function_def)
-            expression_compiler = ExpressionCompiler(self.line_writer, scope, self.infer_type, string_table=self.string_table)
-            
+            expression_compiler = ExpressionCompiler(
+                self.line_writer,
+                scope,
+                self.infer_type,
+                string_table=self.string_table,
+                type_dict=self.type_dict,
+                label_maker=self.label_maker,
+            )
+
             # CALLING CONVENTION: [ANSWER]
-            w.write_line(ci.LDAi, f'{0}', *(ci.PSHA for _ in range(len(scope.locals))), ci.COMMENT("create space on stack for locals"))
+            w.write_line(ci.LDAi, f"{0}", *(ci.PSHA for _ in range(len(scope.locals))), ci.COMMENT("create space on stack for locals"))
 
             self.compile_stmts(function_def.body, scope=scope, expression_compiler=expression_compiler, method_info=method_info)
 
@@ -87,7 +102,8 @@ class MethodCompiler:
             w.write_line(f'"{method_info.parent.name}.{method_info.name}({param_list})"', ".align")
         else:
             raise CompilerError(method_info)
-    
+
+    # fmt: off
     def compile_stmts(self, stmts: list[ast.stmt], scope: Scope, method_info: MethodInfo, expression_compiler: ExpressionCompiler) -> None:
         ci = self.ci
         w = self.line_writer
@@ -140,7 +156,7 @@ class MethodCompiler:
                     if test_type.name != 'int':
                         raise CompilerError(test_type, stmt)
                     expression_compiler.compile_expression(test, 'eval')
-                    else_label = expression_compiler.get_label(test)
+                    else_label = self.label_maker.get_label_from_expr(test)
                     w.write_line(ci.BRZi, ci.GOTO_LABEL(else_label), ci.COMMENT('if'))
                     self.compile_stmts(body, scope=scope, method_info=method_info, expression_compiler=expression_compiler)
                     w.write_line(ci.MARK_LABEL(else_label), ci.COMMENT('else'))
@@ -158,9 +174,9 @@ class MethodCompiler:
                     test_type = self.infer_type(test)
                     if test_type.name != 'int':
                         raise CompilerError(test_type, stmt)
-                    test_label = expression_compiler.get_label_from_name(f'while_test')
-                    break_label = expression_compiler.get_label_from_name(f'while_break')
-                    else_label = expression_compiler.get_label_from_name(f'while_else')
+                    test_label = self.label_maker.get_label_from_name(f'while_test')
+                    break_label = self.label_maker.get_label_from_name(f'while_break')
+                    else_label = self.label_maker.get_label_from_name(f'while_else')
 
                     self.break_label_stack.append(break_label)
                     self.continue_label_stack.append(test_label)
@@ -233,8 +249,8 @@ class MethodCompiler:
             case ast.Name(id=id): raise TypeError(f'Missing variable {id}', expr)
 
             case _: raise TypeError(expr)
-                    
-    
+    # fmt: on
+
     def infer_method(self, attr: ast.Attribute) -> MethodInfo:
         method_name = attr.attr
         value_type = self.infer_type(attr.value)
@@ -242,9 +258,8 @@ class MethodCompiler:
         if method_info is not None:
             return method_info
         else:
-            raise TypeError(f'{method_name=} not found on {value_type.name=}', value_type, attr)
-                
-    
+            raise TypeError(f"{method_name=} not found on {value_type.name=}", value_type, attr)
+
     def is_subtype(self, l: TypeInfo, r: TypeInfo) -> bool:
         parent: TypeInfoBase | None = l
         for _ in range(20):

@@ -10,6 +10,7 @@ from typing import Any, Generator
 from types import ModuleType
 from ssmal.lang.ssmalloc.metadata.jit.codegen.compiler_error import CompilerError
 from ssmal.lang.ssmalloc.metadata.jit.codegen.compiler_internals import CompilerInternals
+from ssmal.lang.ssmalloc.metadata.jit.codegen.label_maker import LabelMaker
 from ssmal.lang.ssmalloc.metadata.jit.codegen.method_compiler import MethodCompiler
 from ssmal.lang.ssmalloc.metadata.jit.codegen.string_table import StringTable
 from ssmal.lang.ssmalloc.metadata.jit.strongly_typed_strings import Identifier, TypeName
@@ -55,15 +56,18 @@ class ParseError(Exception):
 
 
 class JitParser:
-    string_table: StringTable
-    type_info_dict: OrderedDict[TypeName, TypeInfo]
     ci = CompilerInternals()
     type_name_regex = re.compile(r"[A-Z][a-zA-Z]*")
 
+    label_maker: LabelMaker
+    string_table: StringTable
+    type_info_dict: OrderedDict[TypeName, TypeInfo]
+
     def __init__(self) -> None:
+        self.label_maker = LabelMaker()
         self.string_table = StringTable()
         self.type_info_dict = TypeInfo.builtin_type_info()
-    
+
     def parse_module(self, module: ModuleType):
         for type_name, item in module.__dict__.items():
             if not self.type_name_regex.match(type_name):
@@ -76,7 +80,9 @@ class JitParser:
         for type_name, type_info in self.type_info_dict.items():
             for method_info in type_info.methods:
                 line_writer = LineWriter()
-                method_compiler = MethodCompiler(line_writer, self.type_info_dict, self_type=type_info, string_table=self.string_table)
+                method_compiler = MethodCompiler(
+                    line_writer, self.type_info_dict, self_type=type_info, string_table=self.string_table, label_maker=self.label_maker
+                )
                 method_compiler.compile_method(method_info)
                 method_info.assembly_code = method_compiler.line_writer.text
 

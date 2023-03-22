@@ -4,7 +4,9 @@ import ast
 from collections import OrderedDict
 from dataclasses import dataclass, field
 from typing import Callable, Generator, Literal
+from ssmal.lang.ssmalloc.metadata.jit.codegen.label_maker import LabelMaker
 from ssmal.lang.ssmalloc.metadata.jit.codegen.string_table import StringTable
+from ssmal.lang.ssmalloc.metadata.jit.strongly_typed_strings import TypeName
 
 from ssmal.util.writer.line_writer import LineWriter
 
@@ -13,38 +15,35 @@ from ssmal.lang.ssmalloc.metadata.jit.codegen.compiler_internals import Compiler
 from ssmal.lang.ssmalloc.metadata.jit.codegen.scope import Scope
 from ssmal.lang.ssmalloc.metadata.jit.type_info import TypeInfo
 
-# fmt: off
 
 class ExpressionCompiler:
+    ci = CompilerInternals()
+
+    label_maker: LabelMaker
     line_writer: LineWriter
     scope: Scope
     get_type: Callable[[ast.expr], TypeInfo]
     string_table: StringTable
-    _i: int = 0
-    ci = CompilerInternals()
+    type_dict: OrderedDict[TypeName, TypeInfo]
 
-    def __init__(self, assembler_writer: LineWriter, scope: Scope, get_type: Callable[[ast.expr], TypeInfo], string_table: StringTable) -> None:
+    _i: int = 0
+
+    def __init__(
+        self,
+        assembler_writer: LineWriter,
+        scope: Scope,
+        get_type: Callable[[ast.expr], TypeInfo],
+        string_table: StringTable,
+        type_dict: OrderedDict[TypeName, TypeInfo],
+        label_maker: LabelMaker,
+    ) -> None:
+        self.label_maker = label_maker
         self.line_writer = assembler_writer
         self.get_type = get_type
         self.string_table = string_table
         self.scope = scope
+        self.type_dict = type_dict
 
-    def get_label(self, expr: ast.expr) -> str:
-        label = f"label_for_line_{expr.lineno}_col_{expr.col_offset}__{self._i}"
-        self._i += 1
-        return label
-    
-    def get_label_from_name(self, name: str) -> str:
-        label = f"label_name_{name}__{self._i}"
-        self._i += 1
-        return label
-    
-    # def ld_stack_offset(self, offset: int, clobber_B=False):
-    #     ci = self.ci
-    #     yield ci.MOVSA; yield ci.PSHA; yield ci.MOVSA; yield ci.POPA
-    #     yield ci.ADDi; yield f'{offset}'
-    #     yield from self.deref_A(clobber_B=clobber_B)
-    
     def get_method(self, self_expr: ast.expr, method_name: str) -> None:
         """
         We assume that A holds a pointer to the vtable
@@ -56,9 +55,10 @@ class ExpressionCompiler:
         method_info = value_type.get_method_info(method_name)
         if method_info is None:
             raise CompilerError(self_expr, method_name)
-        w.write_line(ci.FOLLOW_A(), ci.ADDi, f'{4*method_info.index}', ci.FOLLOW_A(), ci.COMMENT("A <- type_info.methods[index].code"))
+        w.write_line(ci.FOLLOW_A(), ci.ADDi, f"{4*method_info.index}", ci.FOLLOW_A(), ci.COMMENT("A <- type_info.methods[index].code"))
         # A now has ptr to method implementation
 
+    # fmt: off
     def compile_expression(self, expr: ast.expr, mode: Literal['eval','access']) -> None:
         ci = self.ci
         w = self.line_writer
@@ -95,9 +95,9 @@ class ExpressionCompiler:
                     case _:             raise CompilerError(expr)
 
             case ast.BoolOp(values=values, op=op) if mode == 'eval':
-                short_circuit_label = self.get_label(expr)
+                short_circuit_label = self.label_maker.get_label_from_expr(expr)
                 for value in values:
-                    continue_label = self.get_label(expr)
+                    continue_label = self.label_maker.get_label_from_expr(expr)
                     self.compile_expression(value, mode)
                     # value in register A
                     match op:
@@ -121,6 +121,10 @@ class ExpressionCompiler:
                     case _: raise CompilerError(func)
 
                 w.write_line(ci.LDAi, f'{_PTOP}', ci.SYS, ci.COMMENT('print()'))
+            
+            case ast.Call(func=ast.Name(id) as func, args=[]) if id in self.type_dict:
+                # allocate memory.
+                ...
 
             case ast.Call(func=ast.Attribute(value=self_expr, attr=method_name) as func, args=args) if mode == 'eval':
                 # CALLING CONVENTION: [CALL]
@@ -154,3 +158,4 @@ class ExpressionCompiler:
             case _: raise CompilerError(expr)
         
         w.dedent()
+    # fmt: on

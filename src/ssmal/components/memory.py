@@ -4,6 +4,7 @@ from typing import Callable, Literal
 from ssmal.util.hexdump_bytes import hexdump_bytes
 from ssmal.util.interval import Interval
 
+
 # NOTE:
 # MonitoredWrite has a terrible flaw, side-effects from the operation which cause the
 # signal won't be commited!
