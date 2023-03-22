@@ -92,31 +92,44 @@ class JitParser:
     def get_type_info_binary(self, offset: int) -> tuple[bytes, OrderedDict[str, int]]:
         ...
 
-    def compile(self, line_writer: LineWriter) -> Generator[str, None, None]:
+    def compile(self, line_writer: LineWriter) -> None:
         # We assume:
         #   IP is 0
         #   SP is after the HEAP_END symbol
         ci = self.ci
+        w = line_writer
         TYPEINFO_OFFSET = 0x20
         ENTRYPOINT = "Program.Main"
         # create assembly...
-        type_info_binary, type_info_labels = self.get_type_info_binary(TYPEINFO_OFFSET)
+        # type_info_binary, type_info_labels = self.get_type_info_binary(TYPEINFO_OFFSET)
 
-        yield ".goto 0"
-        yield ci.BRi
-        yield ci.GOTO_LABEL(ENTRYPOINT)
-        yield ".goto 0x20"
-        yield '"TYPEINFO"'
-        yield f".goto 0x{TYPEINFO_OFFSET:02x}"
-        yield f"b'{type_info_binary.hex()}"
-        for symbol, address in type_info_labels.items():
-            yield ci.MARK_LABEL(symbol)
-            yield f"0x{address:08x}"
-        yield ".align"
-        for type_info in self.type_info_dict.values():
+        w.write_line(".goto 0", ci.BRi, ci.GOTO_LABEL(ENTRYPOINT), ci.COMMENT("start"))
+        w.write_line(f".goto 0x{TYPEINFO_OFFSET:02x}", ci.ZSTR("TYPEINFO"), f".align")
+
+        # vtables
+        for type_name, type_info in self.type_info_dict.items():
+            w.write_line(ci.ZSTR(type_name), ".align")
+            w.write_line(ci.MARK_LABEL(f"{type_name}.vtable"))
+            w.indent()
             for method_info in type_info.methods:
-                yield ci.MARK_LABEL(f"{type_info.name}.{method_info.name}")
+                w.write_line(ci.GOTO_LABEL(method_info.implementation_symbol))
+            w.dedent()
+
+        # method implementations
+        for type_name, type_info in self.type_info_dict.items():
+            w.write_line(ci.ZSTR(type_name), ".align")
+            w.write_line(ci.MARK_LABEL(f"{type_name}.methods"))
+            w.indent()
+            for method_info in type_info.methods:
+                if method_info.parent != type_info:
+                    # implemented by someone else
+                    continue
                 if method_info.assembly_code is None:
                     raise CompilerError(method_info)
-                yield method_info.assembly_code
-                yield ".align"
+                w.write_line(ci.MARK_LABEL(method_info.implementation_symbol))
+                w.indent()
+                for line in "\n".split(method_info.assembly_code):
+                    w.write_line(line)
+                w.write_line(".align")
+                w.dedent()
+            w.dedent()

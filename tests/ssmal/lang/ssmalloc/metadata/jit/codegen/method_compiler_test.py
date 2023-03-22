@@ -10,6 +10,7 @@ from ssmal.assemblers.tokenizer import tokenize
 from ssmal.assemblers.assembler import Assembler
 from ssmal.components.memory import MonitoredWrite
 from ssmal.instructions.processor_signals import HaltSignal
+from ssmal.lang.ssmalloc.metadata.jit.codegen.label_maker import LabelMaker
 from ssmal.lang.ssmalloc.metadata.jit.codegen.string_table import StringTable
 from ssmal.lang.ssmalloc.metadata.jit.strongly_typed_strings import Identifier, TypeName
 from ssmal.processors.processor import Processor
@@ -34,8 +35,11 @@ def Base1_method_compiler():
     Base_type_info = TypeInfo.from_py_type(Base1)
     assembler_writer = LineWriter()
     string_table = StringTable()
+    label_maker = LabelMaker()
 
-    method_compiler = MethodCompiler(assembler_writer, TypeInfo.builtin_type_info(), Base_type_info, string_table=string_table)
+    method_compiler = MethodCompiler(
+        assembler_writer, TypeInfo.builtin_type_info(), Base_type_info, string_table=string_table, label_maker=label_maker
+    )
     yield method_compiler
 
 

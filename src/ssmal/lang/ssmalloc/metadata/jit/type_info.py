@@ -44,6 +44,7 @@ class MethodInfo(TypeInfoBase):
     assembly_code: str | None
     method: Callable
     index: int
+    implementation_symbol: str
 
 
 @dataclass
@@ -150,6 +151,7 @@ class TypeInfo(TypeInfoBase):
                             assembly_code=None,
                             method=class_methods[method_name],
                             index=index,
+                            implementation_symbol=f"{result.name}.{method_name}",
                         )
                     )
                 case OverrideType.DoesNotOverride if result.parent is not None and method_name in base_method_names:
