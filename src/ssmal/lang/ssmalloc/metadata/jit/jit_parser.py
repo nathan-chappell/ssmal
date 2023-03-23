@@ -8,6 +8,9 @@ from collections import OrderedDict
 from dataclasses import is_dataclass
 from typing import Any, Generator
 from types import ModuleType
+from ssmal.assemblers.assembler import Assembler
+from ssmal.assemblers.tokenizer import tokenize
+from ssmal.components.registers import Registers
 from ssmal.lang.ssmalloc.metadata.jit.codegen.allocator import TrivialAllocator
 from ssmal.lang.ssmalloc.metadata.jit.codegen.compiler_error import CompilerError
 from ssmal.lang.ssmalloc.metadata.jit.codegen.compiler_internals import CompilerInternals
@@ -17,6 +20,7 @@ from ssmal.lang.ssmalloc.metadata.jit.codegen.string_table import StringTable
 from ssmal.lang.ssmalloc.metadata.jit.strongly_typed_strings import Identifier, TypeName
 
 from ssmal.lang.ssmalloc.metadata.jit.type_info import MethodInfo, TypeInfo, int_type, str_type
+from ssmal.processors.processor import Processor
 from ssmal.util.writer.line_writer import LineWriter
 
 
@@ -65,13 +69,25 @@ class JitParser:
     string_table: StringTable
     type_info_dict: OrderedDict[TypeName, TypeInfo]
 
+    # pipeline...
+    line_writer: LineWriter | None
+    assembly: bytes | None
+    processor: Processor | None
+
+    INITAL_SP_OFFSET = 0x10
+
     def __init__(self) -> None:
         self.label_maker = LabelMaker()
         self.string_table = StringTable()
         self.type_info_dict = TypeInfo.builtin_type_info()
+
         self.allocator = TrivialAllocator(string_table=self.string_table, type_dict=self.type_info_dict, label_maker=self.label_maker)
 
-    def parse_module(self, module: ModuleType):
+        self.assembly = None
+        self.line_writer = None
+        self.processor = None
+
+    def parse_module(self, module: ModuleType, do_compile = True):
         for type_name, item in module.__dict__.items():
             if not self.type_name_regex.match(type_name):
                 continue
@@ -97,25 +113,25 @@ class JitParser:
         # at this point, all methods have their code compiled.
         # Now we just need to assemble the type_info_dict into an executable...
 
-    def get_type_info_binary(self, offset: int) -> tuple[bytes, OrderedDict[str, int]]:
-        ...
+        if do_compile:
+            self.compile()
 
-    def compile(self, line_writer: LineWriter) -> None:
+    def compile(self, do_assemble=True) -> None:
         # We assume:
         #   IP is 0
         #   SP is after the HEAP_END symbol
         ci = self.ci
-        w = line_writer
+        w = self.line_writer = LineWriter()
 
-        INITAL_SP_OFFSET = 0x10
+        # INITAL_SP_OFFSET = self.INITAL_SP_OFFSET
         TYPEINFO_OFFSET = 0x20
-        ENTRYPOINT = "Program.Main"
-        INITIAL_SP = "INITIAL_SP"
+        ENTRYPOINT = "Program.main"
+        # INITIAL_SP = "INITIAL_SP"
         # create assembly...
-        # type_info_binary, type_info_labels = self.get_type_info_binary(TYPEINFO_OFFSET)
 
         w.write_line(".goto 0", ci.BRi, ci.GOTO_LABEL(ENTRYPOINT), ci.COMMENT("start"))
-        w.write_line(f".goto 0x{INITAL_SP_OFFSET:02x}", ci.GOTO_LABEL(INITIAL_SP), ci.COMMENT("Initial SP"))
+        # it's pointless to try to get the initial_sp directly from the assembler...
+        # w.write_line(f".goto 0x{INITAL_SP_OFFSET:02x}", INITIAL_SP, ci.COMMENT("Initial SP"))
         w.write_line(f".goto 0x{TYPEINFO_OFFSET:02x}", ci.ZSTR("TYPEINFO"), f".align")
 
         # vtables
@@ -133,21 +149,49 @@ class JitParser:
             w.write_line(ci.MARK_LABEL(f"{type_name}.methods"))
             w.indent()
             for method_info in type_info.methods:
-                if method_info.parent != type_info:
+                assert isinstance(method_info.parent, TypeInfo)
+                if method_info.parent.name != type_info.name:
                     # implemented by someone else
                     continue
                 if method_info.assembly_code is None:
                     raise CompilerError(method_info)
                 w.write_line(ci.MARK_LABEL(method_info.implementation_symbol))
                 w.indent()
-                for line in "\n".split(method_info.assembly_code):
+                for line in method_info.assembly_code.split("\n"):
                     w.write_line(line)
                 w.write_line(".align")
                 w.dedent()
             w.dedent()
 
-        # heap
+        self.string_table.compile(w)
         self.allocator.create_heap(w)
+        w.write_line(".zeros 0x20", ".align", ci.COMMENT("a little space before stack."))
 
-        # stack
-        w.write_line(".zeros 0x20", ci.MARK_LABEL(INITIAL_SP), ".here")
+        if do_assemble:
+            self.assemble()
+
+    def assemble(self, do_initialize_processor=True):
+        if self.line_writer is None:
+            raise CompilerError(f"You must first compile before assembling.")
+
+        text = self.line_writer.text
+        print(text)
+        tokens = list(tokenize(text))
+        assembler = Assembler(tokens)
+        assembler.assemble()
+        assembly = bytearray(assembler.buffer.getvalue())
+        assembly[self.INITAL_SP_OFFSET : self.INITAL_SP_OFFSET + 4] = len(assembly).to_bytes(4, "little", signed=True)
+        self.assembly = bytes(assembly)
+
+        if do_initialize_processor:
+            self.initialize_processor()
+
+    def initialize_processor(self):
+        if self.assembly is None:
+            raise CompilerError(f"You must first assemble before initializing.")
+
+        processor = Processor()
+        processor.memory.store_bytes(0, self.assembly)
+        initial_sp = processor.memory.load(self.INITAL_SP_OFFSET)
+        processor.registers.SP = initial_sp
+        self.processor = processor

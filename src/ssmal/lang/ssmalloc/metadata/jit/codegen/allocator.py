@@ -38,7 +38,7 @@ class TrivialAllocator:
         # start+size:   heap_end / Allocation function
         # ...:          die (HALT)
         w.write_line(".align", ci.ZSTR("HEAP START"), ".align")
-        w.write_line(ci.MARK_LABEL(_start), ".zeros", f"{size + 0x20:x}")
+        w.write_line(ci.MARK_LABEL(_start), ".zeros", f"0x{size + 0x20:04x}")
         w.write_line(".align", ci.ZSTR("HEAP END"), ".align")
 
         die_label = self.label_maker.get_label_from_name("die")

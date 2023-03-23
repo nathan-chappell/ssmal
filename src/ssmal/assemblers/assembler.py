@@ -195,6 +195,8 @@ class Assembler:
             return bytes.fromhex(token.value[1:-1])
         elif token.type == "zstr":
             return bytes(token.value[1:-1], self.encoding) + b"\x00"
+        elif token.type == "dir" and token.value == ".here":
+            return self.buffer.tell().to_bytes(4, self.byteorder, signed=True)
         else:
             raise UnexpectedTokenError(token, "xint, dint, bstr, zstr")
 
