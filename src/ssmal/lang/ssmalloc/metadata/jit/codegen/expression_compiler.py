@@ -4,6 +4,7 @@ import ast
 from collections import OrderedDict
 from dataclasses import dataclass, field
 from typing import Callable, Generator, Literal
+from ssmal.lang.ssmalloc.metadata.jit.codegen.allocator import TrivialAllocator
 from ssmal.lang.ssmalloc.metadata.jit.codegen.label_maker import LabelMaker
 from ssmal.lang.ssmalloc.metadata.jit.codegen.string_table import StringTable
 from ssmal.lang.ssmalloc.metadata.jit.strongly_typed_strings import TypeName
@@ -19,6 +20,7 @@ from ssmal.lang.ssmalloc.metadata.jit.type_info import TypeInfo
 class ExpressionCompiler:
     ci = CompilerInternals()
 
+    allocator: TrivialAllocator
     label_maker: LabelMaker
     line_writer: LineWriter
     scope: Scope
@@ -36,12 +38,14 @@ class ExpressionCompiler:
         string_table: StringTable,
         type_dict: OrderedDict[TypeName, TypeInfo],
         label_maker: LabelMaker,
+        allocator: TrivialAllocator,
     ) -> None:
+        self.allocator = allocator
         self.label_maker = label_maker
         self.line_writer = assembler_writer
         self.get_type = get_type
-        self.string_table = string_table
         self.scope = scope
+        self.string_table = string_table
         self.type_dict = type_dict
 
     def get_method(self, self_expr: ast.expr, method_name: str) -> None:
@@ -126,8 +130,11 @@ class ExpressionCompiler:
                 # allocate memory.
                 # push IP
                 # set A to size
-                ...
-                # w.write_line(ci.SWPAI, ci.PSHA)
+                if type_name not in self.type_dict:
+                    raise CompilerError(type_name, expr)
+                allocating_type = self.type_dict[type_name]
+                w.write_line(ci.LDAi, f'{allocating_type.size}')
+                w.write_line(ci.CALi, ci.GOTO_LABEL(self.allocator.allocate_label))
 
             case ast.Call(func=ast.Attribute(value=self_expr, attr=method_name) as func, args=args) if mode == 'eval':
                 # CALLING CONVENTION: [CALL]
