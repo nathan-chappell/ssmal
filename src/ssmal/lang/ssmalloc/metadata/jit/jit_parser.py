@@ -84,7 +84,12 @@ class JitParser:
             for method_info in type_info.methods:
                 line_writer = LineWriter()
                 method_compiler = MethodCompiler(
-                    line_writer, self.type_info_dict, self_type=type_info, string_table=self.string_table, label_maker=self.label_maker
+                    line_writer,
+                    self.type_info_dict,
+                    self_type=type_info,
+                    string_table=self.string_table,
+                    label_maker=self.label_maker,
+                    allocator=self.allocator,
                 )
                 method_compiler.compile_method(method_info)
                 method_info.assembly_code = method_compiler.line_writer.text
@@ -140,7 +145,7 @@ class JitParser:
                 w.write_line(".align")
                 w.dedent()
             w.dedent()
-        
+
         # heap
         self.allocator.create_heap(w)
 

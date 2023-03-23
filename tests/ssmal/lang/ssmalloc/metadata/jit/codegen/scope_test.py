@@ -55,7 +55,7 @@ def test_scope_codegen(varname: str, value: int):
     assert isinstance(f_ast, ast.FunctionDef)
     scope = Scope(f_ast)
 
-    vals = x, y, z, a, b = 3, 4, 5, 6, 7
+    vals = x, y, z, a, b = 3, 4, 5, 6, 7 # type: ignore
 
     stack = b"".join(v.to_bytes(4, "little", signed=True) for v in vals)
     processor = Processor()

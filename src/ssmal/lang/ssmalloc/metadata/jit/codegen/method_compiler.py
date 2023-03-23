@@ -7,6 +7,7 @@ import inspect
 import logging
 import textwrap
 from typing import Generator, Literal, TypeGuard, cast
+from ssmal.lang.ssmalloc.metadata.jit.codegen.allocator import TrivialAllocator
 from ssmal.lang.ssmalloc.metadata.jit.codegen.label_maker import LabelMaker
 from ssmal.lang.ssmalloc.metadata.jit.codegen.string_table import StringTable
 
@@ -29,6 +30,7 @@ class TypeError(CompilerError):
 class MethodCompiler:
     ci = CompilerInternals()
 
+    allocator: TrivialAllocator
     break_label_stack: list[str]
     continue_label_stack: list[str]
     label_maker: LabelMaker
@@ -45,7 +47,9 @@ class MethodCompiler:
         self_type: TypeInfo,
         string_table: StringTable,
         label_maker: LabelMaker,
+        allocator: TrivialAllocator
     ) -> None:
+        self.allocator = allocator
         self.break_label_stack = []
         self.continue_label_stack = []
         self.label_maker = label_maker
@@ -84,6 +88,7 @@ class MethodCompiler:
                 string_table=self.string_table,
                 type_dict=self.type_dict,
                 label_maker=self.label_maker,
+                allocator=self.allocator
             )
 
             # CALLING CONVENTION: [ANSWER]
@@ -221,11 +226,14 @@ class MethodCompiler:
                 for arg in args:
                     self.infer_type(arg)
                 return int_type
+            
+            case ast.Call(func=ast.Name(id=type_name), args=[]) if type_name in self.type_dict:
+                return self.type_dict[type_name]
 
             case ast.Call(func=ast.Attribute() as method_attr, args=args):
                 method_info = self.infer_method(method_attr)
-                if method_info.parent != self.self_type:
-                    raise TypeError('Invalid method lookup', method_info, self.self_type, method_attr)
+                # if method_info.parent != self.self_type:
+                #     raise TypeError('Invalid method lookup', method_info, self.self_type, method_attr)
                 arg_types = [self.infer_type(arg) for arg in args]
                 for parameter, arg_type in zip(method_info.parameters, arg_types):
                     if not self.is_subtype(arg_type, parameter.type):
@@ -248,7 +256,8 @@ class MethodCompiler:
             
             case ast.Name(id=id): raise TypeError(f'Missing variable {id}', expr)
 
-            case _: breakpoint(); raise TypeError(expr)
+            case _: raise TypeError(expr)
+            # case _: breakpoint(); raise TypeError(expr)
     # fmt: on
 
     def infer_method(self, attr: ast.Attribute) -> MethodInfo:
