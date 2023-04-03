@@ -9,9 +9,23 @@ from ssmal.util.interval import Interval
 # MonitoredWrite has a terrible flaw, side-effects from the operation which cause the
 # signal won't be commited!
 class MonitoredWrite(Exception):
+    index: int
+    monitored_region: Interval
+    write_region: Interval
+    address: int
+    _bytes: bytes
+
     finish_write_callback: Callable[[], None] | None = None
 
+    def __init__(self, index: int, monitored_region: Interval, write_region: Interval, address: int, _bytes: bytes):
+        self.index = index
+        self.monitored_region = monitored_region
+        self.write_region = write_region
+        self.address = address
+        self._bytes = _bytes
+
     def finish_write(self):
+        # raise Warning("This doesn't work right!")
         if self.finish_write_callback:
             self.finish_write_callback()
         else:
@@ -21,6 +35,7 @@ class MonitoredWrite(Exception):
 class Memory:
     buffer: BytesIO
     monitored_regions: list[Interval]
+    monitor_action: Literal["raise"] | Callable[[MonitoredWrite], None] = "raise"
 
     def __init__(self, size=2**8):
         self.buffer = BytesIO(b"\x00" * size)
@@ -48,7 +63,10 @@ class Memory:
             if monitored_region & write_region:
                 monitored_write = MonitoredWrite(i, monitored_region, write_region, address, _bytes)
                 monitored_write.finish_write_callback = finish_write
-                raise monitored_write
+                if self.monitor_action == "raise":
+                    raise monitored_write
+                else:
+                    self.monitor_action(monitored_write)
         else:
             finish_write()
 
