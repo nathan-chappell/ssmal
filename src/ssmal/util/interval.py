@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+import math
+
 
 @dataclass
 class Interval:
@@ -9,6 +11,12 @@ class Interval:
 
     l: int
     r: int
+
+    def __repr__(self) -> str:
+        width = int(math.ceil(math.log(max(self.l, self.r), 256)))
+        _l = self.l.to_bytes(width, 'big', signed=False).hex()
+        _r = self.r.to_bytes(width, 'big', signed=False).hex()
+        return f"Interval(0x{_l}, 0x{_r})"
 
     def __le__(self, other: Interval) -> bool:
         """Is subset of"""

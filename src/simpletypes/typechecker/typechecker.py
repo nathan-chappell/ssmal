@@ -89,8 +89,8 @@ class TypeChecker:
                                 raise TypeError(f"Invalid call: {argument_type=} is not a subtype of {parameter_type=}", expression)
                         else:
                             return return_type
-            case _:  # pragma: no cover
-                raise TypeError(f"Failed to evaluate expression.", expression)
+            # case _:  # pragma: no cover
+        raise TypeError(f"Failed to evaluate expression.", expression) # pragma: no cover
 
     def check(self, program: N.Program):
         for statement in program.statements:

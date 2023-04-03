@@ -75,6 +75,8 @@ class JitParser:
     processor: Processor | None
 
     INITAL_SP_OFFSET = 0x10
+    heap_start_addr: int | None = None
+    heap_size = 0x200
 
     def __init__(self) -> None:
         self.label_maker = LabelMaker()
@@ -164,7 +166,7 @@ class JitParser:
             w.dedent()
 
         self.string_table.compile(w)
-        self.allocator.create_heap(w)
+        self.allocator.create_heap(w, self.heap_size)
         w.write_line(".zeros 0x20", ".align", ci.COMMENT("a little space before stack."))
 
         if do_assemble:
@@ -180,6 +182,7 @@ class JitParser:
         assembler = Assembler(tokens)
         assembler.assemble()
         assembly = bytearray(assembler.buffer.getvalue())
+        self.heap_start_addr = assembler.labels['label_name_HEAP_START__0'].address
         assembly[self.INITAL_SP_OFFSET : self.INITAL_SP_OFFSET + 4] = len(assembly).to_bytes(4, "little", signed=True)
         self.assembly = bytes(assembly)
 
@@ -189,9 +192,10 @@ class JitParser:
     def initialize_processor(self):
         if self.assembly is None:
             raise CompilerError(f"You must first assemble before initializing.")
-
+        assert self.heap_start_addr is not None
         processor = Processor()
         processor.memory.store_bytes(0, self.assembly)
         initial_sp = processor.memory.load(self.INITAL_SP_OFFSET)
         processor.registers.SP = initial_sp
+        processor.memory.monitor(0, self.heap_start_addr)
         self.processor = processor

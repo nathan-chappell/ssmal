@@ -93,7 +93,7 @@ Program.methods:
         
         .align
 .align "HEAP START" .align
-label_name_HEAP_START__0: .zeros 0x0420
+label_name_HEAP_START__0: .zeros 0x0220
 .align "HEAP END" .align
 allocator.malloc: ; Allocation function
 psha ldai $label_name_HEAP_START__0 swpab ldab ; Current index
@@ -101,7 +101,7 @@ swpab ldai $label_name_HEAP_START__0 addi 0x20 addb psha ; return value (pointer
 popa swpab popa swpab psha swpab psha ; Rotate top of stack
 ldai $label_name_HEAP_START__0 swpab ldab ; Current offset
 swpab popa addb psha ; New offset
-subi 400 muli -1 brni $label_name_die__2 ; die if too big
+subi 200 muli -1 brni $label_name_die__2 ; die if too big
 ldai $label_name_HEAP_START__0 swpab popa stab ; save new index
 popa retn ; return, A <- pointer
 label_name_die__2: halt
