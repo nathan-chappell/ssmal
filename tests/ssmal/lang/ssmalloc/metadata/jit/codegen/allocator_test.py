@@ -1,9 +1,11 @@
 import ast
+import inspect
+import json
+import textwrap
+
 from collections import OrderedDict
 from dataclasses import dataclass
-import inspect
 from pathlib import Path
-import textwrap
 
 import pytest
 
@@ -30,17 +32,23 @@ def test_object_creation():
     jit_parser.parse_module(pair_module)
     jit_parser.compile()
 
+    assert jit_parser.debug_info is not None
     assert jit_parser.line_writer is not None
     assert jit_parser.assembly is not None
     assert jit_parser.processor is not None
 
     build_dir = Path("tests/ssmal/lang/ssmalloc/metadata/jit/codegen/samples")
+    _text = jit_parser.line_writer.text
+    _text_lines = _text.split("\n")
     with open(build_dir / "output.al", "w") as f:
-        f.write(jit_parser.line_writer.text)
+        f.write(_text)
     with open(build_dir / "output.mem.bin", "wb") as f:
         f.write(jit_parser.processor.memory.buffer.getvalue())
     with open(build_dir / "output.mem.hex", "w") as f:
         f.write("\n".join(hexdump_bytes(jit_parser.processor.memory.buffer.getvalue())))
+    with open(build_dir / "output.debug_info.json", "w") as f:
+        f.write(jit_parser.debug_info)
+        _debug_info = json.loads(jit_parser.debug_info)
 
     _initial_sp = jit_parser.processor.memory.load(jit_parser.INITAL_SP_OFFSET)
 
@@ -80,12 +88,15 @@ def test_object_creation():
         print(f"{get_pretty_mem(_ip)} {jit_parser.processor.registers} | {op} (0x{_op:02x})")
 
         _ip_cursor_pos = IP % 0x20
+        if (_mapping := _debug_info['source_map'].get(str(IP), None)) is not None:
+            _line = _mapping['line']
+            print(f'{_line+1:4}: {_text_lines[_line]}')
         ip_cursor_line = " " * 6 + " " * (9 * (_ip_cursor_pos // 4) + 2 * (_ip_cursor_pos % 4)) + "^"
         print(ip_cursor_line)
-        print(f'{IP=}, {_ip=}, {_ip_cursor_pos=}')
+        # print(f'{IP=}, {_ip=}, {_ip_cursor_pos=}')
 
         jit_parser.processor.advance()
-        print(f'{jit_parser.processor.registers}')
+        # print(f'{jit_parser.processor.registers}')
 
         if wrote_heap:
             print("### WROTE HEAP ###")

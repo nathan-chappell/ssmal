@@ -1,4 +1,6 @@
+from dataclasses import asdict
 import io
+import json
 from typing import Literal
 
 from ssmal.processors.opcodes import opcode_map
@@ -22,6 +24,7 @@ class Assembler:
     tokens: list[Token]
     # unresolved_symbols: dict[str, Resolvable] # this was not a good idea.
 
+    DEBUG_INFO_VERSION = "0.0"
     _index: int
 
     UNRESOLVED_ADDRESS_MARKER = -1
@@ -30,6 +33,12 @@ class Assembler:
     @property
     def unresolved_address_bytes(self) -> bytes:
         return self.UNRESOLVED_ADDRESS_MARKER.to_bytes(4, self.byteorder, signed=True)
+
+    @property
+    def debug_info(self) -> str:
+        _debug_info = {offset: asdict(token) for offset, token in self.source_map.items()}
+        _labels = {label.token.value: f"{label.address:08x}" for label in self.labels.values() if label.token is not None}
+        return json.dumps({"version": self.DEBUG_INFO_VERSION, "labels": _labels, "source_map": _debug_info}, indent=2)
 
     def __init__(self, tokens: list[Token]):
         self.buffer = io.BytesIO()

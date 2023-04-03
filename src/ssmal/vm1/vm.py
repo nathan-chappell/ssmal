@@ -44,7 +44,6 @@ class VM:
 
     max_steps = 500
 
-    DEBUG_INFO_VERSION = "0.0"
     OBJECT_FILE_EXT = "bin"
     DEBUG_FILE_EXT = "ssmdebug.json"
 
@@ -69,11 +68,7 @@ class VM:
         with open(input_file.object_filename, "wb") as f:
             f.write(_bytes)
         with open(input_file.debug_filename, "w") as f:
-            _debug_info = {offset: asdict(token) for offset, token in self.file_assembler.source_map.items()}
-            _labels = {
-                label.token.value: f"{label.address:08x}" for label in self.file_assembler.labels.values() if label.token is not None
-            }
-            json.dump({"version": self.DEBUG_INFO_VERSION, "labels": _labels, "source_map": _debug_info}, f, indent=2)
+            f.write(self.file_assembler.debug_info)
 
     def compile_tm_lang(self, _input_file: str | InputFileVariant):
         """compiles input_file and outputs to input_file.al"""

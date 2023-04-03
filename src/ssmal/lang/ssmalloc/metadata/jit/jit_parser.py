@@ -70,6 +70,7 @@ class JitParser:
     type_info_dict: OrderedDict[TypeName, TypeInfo]
 
     # pipeline...
+    debug_info: str | None = None
     line_writer: LineWriter | None
     assembly: bytes | None
     processor: Processor | None
@@ -185,6 +186,7 @@ class JitParser:
         self.heap_start_addr = assembler.labels['label_name_HEAP_START__0'].address
         assembly[self.INITAL_SP_OFFSET : self.INITAL_SP_OFFSET + 4] = len(assembly).to_bytes(4, "little", signed=True)
         self.assembly = bytes(assembly)
+        self.debug_info = assembler.debug_info
 
         if do_initialize_processor:
             self.initialize_processor()
