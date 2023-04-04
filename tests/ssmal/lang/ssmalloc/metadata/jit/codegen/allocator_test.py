@@ -21,6 +21,7 @@ from ssmal.processors.processor import Processor
 from ssmal.lang.ssmalloc.metadata.jit.type_info import TypeInfo, int_type, str_type
 from ssmal.lang.ssmalloc.metadata.jit.codegen.scope import Scope
 from ssmal.lang.ssmalloc.metadata.jit.codegen.method_compiler import MethodCompiler
+from ssmal.util.ascii_safe_encode import ascii_safe_encode
 from ssmal.util.hexdump_bytes import hexdump_bytes
 from ssmal.util.writer.line_writer import LineWriter
 
@@ -28,16 +29,38 @@ import tests.ssmal.lang.ssmalloc.metadata.jit.codegen.samples.pair as pair_modul
 import tests.ssmal.lang.ssmalloc.metadata.jit.codegen.samples.hello_world as hello_world_module
 
 
-def test_object_creation():
+@pytest.mark.parametrize("module_name,expected_output", [
+    ("hello_world_module", "hello world"),
+    ("pair_module", "3"),
+])
+def test_object_creation(module_name: str, expected_output: bytes):
     jit_parser = JitParser()
     # jit_parser.parse_module(pair_module)
-    jit_parser.parse_module(hello_world_module)
+    _module = globals().get(module_name)
+    assert _module is not None
+    jit_parser.parse_module(_module)
     jit_parser.compile()
 
     assert jit_parser.debug_info is not None
     assert jit_parser.line_writer is not None
     assert jit_parser.assembly is not None
     assert jit_parser.processor is not None
+
+    class HeardResult(Exception):
+        zstr: str
+
+        def __init__(self, zstr: str, *args: object) -> None:
+            super().__init__(*args)
+            self.zstr = zstr
+
+    def _listen_result(*args, **kwargs) -> None:
+        assert jit_parser.processor is not None
+        _bytes = jit_parser.processor.memory.load_bytes(jit_parser.processor.memory.load(jit_parser.processor.registers.SP - 4), 100)
+        _bytes = _bytes[: _bytes.index(b"\x00")]
+        _result = ascii_safe_encode(_bytes)
+        raise HeardResult(_result)
+
+    jit_parser.processor.sys_vector[0] = _listen_result
 
     build_dir = Path("tests/ssmal/lang/ssmalloc/metadata/jit/codegen/samples")
     _text = jit_parser.line_writer.text
@@ -83,38 +106,42 @@ def test_object_creation():
     jit_parser.processor.memory.dump()
     last_source_line = ""
 
-    for _ in range(50):
-        opcode = jit_parser.processor.memory.load_bytes(jit_parser.processor.registers.IP, 1)
-        op = opcode_map.get(opcode, type(None)).__name__
-        _op = int.from_bytes(opcode, "little", signed=False)
-        IP = jit_parser.processor.registers.IP
-        source_line_key = f'0x{IP+1:04x}'
-        _mapping = _debug_info["source_map"].get(source_line_key, None) or {"line": -1}
-        source_line = _mapping["line"]
-        source_line = f"{source_line+1:03}: {_text_lines[source_line]}"
-        if last_source_line != source_line:
-            last_source_line = source_line
-            print(source_line)
+    try:
+        for _ in range(105):
+            opcode = jit_parser.processor.memory.load_bytes(jit_parser.processor.registers.IP, 1)
+            op = opcode_map.get(opcode, type(None)).__name__
+            _op = int.from_bytes(opcode, "little", signed=False)
+            IP = jit_parser.processor.registers.IP
+            source_line_key = f"0x{IP+1:04x}"
+            _mapping = _debug_info["source_map"].get(source_line_key, None) or {"line": -1}
+            source_line = _mapping["line"]
+            source_line = f"{source_line+1:03}: {_text_lines[source_line]}"
+            if last_source_line != source_line:
+                last_source_line = source_line
+                print(source_line)
 
-        _ip = IP & 0xFFFFFFE0
-        print(f"{get_pretty_mem(_ip)} {jit_parser.processor.registers} | {op} (0x{_op:02x})")
+            _ip = IP & 0xFFFFFFE0
+            print(f"{get_pretty_mem(_ip)} {jit_parser.processor.registers} | {op} (0x{_op:02x})")
 
-        _ip_cursor_pos = IP % 0x20
-        ip_cursor_line = " " * 6 + " " * (9 * (_ip_cursor_pos // 4) + 2 * (_ip_cursor_pos % 4)) + "^"
-        print(ip_cursor_line)
+            _ip_cursor_pos = IP % 0x20
+            ip_cursor_line = " " * 6 + " " * (9 * (_ip_cursor_pos // 4) + 2 * (_ip_cursor_pos % 4)) + "^"
+            print(ip_cursor_line)
 
-        # print(f'{IP=}, {_ip=}, {_ip_cursor_pos=}')
+            # print(f'{IP=}, {_ip=}, {_ip_cursor_pos=}')
 
-        jit_parser.processor.advance()
-        # print(f'{jit_parser.processor.registers}')
+            jit_parser.processor.advance()
+            # print(f'{jit_parser.processor.registers}')
 
-        if wrote_heap:
-            print("### WROTE HEAP ###")
-            print("\n".join(get_pretty_mem(jit_parser.heap_start_addr + 0x20 * i, 0x20) for i in range(jit_parser.heap_size // 0x20)))
-            print("###")
-        if wrote_stack:
-            print("### WROTE HEAP ###")
-            print("\n".join(get_pretty_mem(_initial_sp + 0x20 * i, 0x20) for i in range(2)))
-            print("###")
-        wrote_heap = wrote_stack = False
-    assert False
+            if wrote_heap:
+                print("### WROTE HEAP ###")
+                print("\n".join(get_pretty_mem(jit_parser.heap_start_addr + 0x20 * i, 0x20) for i in range(jit_parser.heap_size // 0x20)))
+                print("###")
+            if wrote_stack:
+                print("### WROTE HEAP ###")
+                print("\n".join(get_pretty_mem(_initial_sp + 0x20 * i, 0x20) for i in range(2)))
+                print("###")
+            wrote_heap = wrote_stack = False
+        else:
+            assert False
+    except HeardResult as result:
+        assert result.zstr == expected_output

@@ -5,6 +5,9 @@
 int.vtable:
 "str" .align
 str.vtable:
+"Pair" .align
+Pair.vtable:
+    $Pair.sum
 "Program" .align
 Program.vtable:
     $Program.main
@@ -12,6 +15,33 @@ Program.vtable:
 int.methods:
 "str" .align
 str.methods:
+"Pair" .align
+Pair.methods:
+    Pair.sum:
+        ; no locals - otw create space on stack for locals
+            ; stmt Return stmt.lineno=2
+                ; expr BinOp expr.lineno=2
+                    ; expr Attribute expr.lineno=2
+                        ; expr Name expr.lineno=2
+                            ; [access _location='self'] self _offset=0 mode='eval' self.push_count=0
+                            lda_ 0
+                    addi 4 ; attribute x of value_type.name='Pair' mode='eval'
+                    swpab ldab
+                psha ; TOP <- left
+                    ; expr Attribute expr.lineno=2
+                        ; expr Name expr.lineno=2
+                            ; [access _location='self'] self _offset=1 mode='eval' self.push_count=1
+                            lda_ 1
+                    addi 8 ; attribute y of value_type.name='Pair' mode='eval'
+                    swpab ldab
+                swpab popa  addb ; B <- right, A <- left
+        swpab ; save result
+        popa ; clear stack
+        popa swpab brb ; A <- result; return
+        .align
+        "Pair.sum()" .align
+        
+        .align
 "Program" .align
 Program.methods:
     Program.main:
