@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import ast
-from pprint import pprint
 import re
+import sys
+
+from pprint import pprint
 
 from collections import OrderedDict
 from dataclasses import is_dataclass
@@ -22,6 +24,7 @@ from ssmal.lang.ssmalloc.metadata.jit.strongly_typed_strings import Identifier, 
 from ssmal.lang.ssmalloc.metadata.jit.type_info import MethodInfo, TypeInfo, int_type, str_type
 from ssmal.processors.processor import Processor
 from ssmal.util.writer.line_writer import LineWriter
+from ssmal.vm1.sys_io import SysIO
 
 
 def dump_ast(node: ast.AST, indent=0, prefix=""):
@@ -90,7 +93,7 @@ class JitParser:
         self.line_writer = None
         self.processor = None
 
-    def parse_module(self, module: ModuleType, do_compile = True):
+    def parse_module(self, module: ModuleType, do_compile=True):
         for type_name, item in module.__dict__.items():
             if not self.type_name_regex.match(type_name):
                 continue
@@ -127,12 +130,14 @@ class JitParser:
         w = self.line_writer = LineWriter()
 
         # INITAL_SP_OFFSET = self.INITAL_SP_OFFSET
-        TYPEINFO_OFFSET = 0x20
+        EXIT_OFFSET = 0x20
+        TYPEINFO_OFFSET = 0x40
         ENTRYPOINT = "Program.main"
         # INITIAL_SP = "INITIAL_SP"
         # create assembly...
 
-        w.write_line(".goto 0", ci.BRi, ci.GOTO_LABEL(ENTRYPOINT), ci.COMMENT("start"))
+        w.write_line(".goto 0", ci.POPA, ci.LDAi, f"0x{EXIT_OFFSET:02x}", ci.PSHA, ci.BRi, ci.GOTO_LABEL(ENTRYPOINT), ci.COMMENT("start"))
+        w.write_line(f".goto 0x{EXIT_OFFSET:02x}", ci.HALT, ci.COMMENT("exit"))
         # it's pointless to try to get the initial_sp directly from the assembler...
         # w.write_line(f".goto 0x{INITAL_SP_OFFSET:02x}", INITIAL_SP, ci.COMMENT("Initial SP"))
         w.write_line(f".goto 0x{TYPEINFO_OFFSET:02x}", ci.ZSTR("TYPEINFO"), f".align")
@@ -183,7 +188,7 @@ class JitParser:
         assembler = Assembler(tokens)
         assembler.assemble()
         assembly = bytearray(assembler.buffer.getvalue())
-        self.heap_start_addr = assembler.labels['label_name_HEAP_START__0'].address
+        self.heap_start_addr = assembler.labels["label_name_HEAP_START__0"].address
         assembly[self.INITAL_SP_OFFSET : self.INITAL_SP_OFFSET + 4] = len(assembly).to_bytes(4, "little", signed=True)
         self.assembly = bytes(assembly)
         self.debug_info = assembler.debug_info
@@ -200,4 +205,7 @@ class JitParser:
         initial_sp = processor.memory.load(self.INITAL_SP_OFFSET)
         processor.registers.SP = initial_sp
         processor.memory.monitor(0, self.heap_start_addr)
+        sys_io = SysIO()
+        sys_io.bind(sys.stdin, sys.stdout)
+        processor.sys_vector = sys_io.sys_vector
         self.processor = processor

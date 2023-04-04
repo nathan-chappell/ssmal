@@ -92,7 +92,10 @@ class MethodCompiler:
             )
 
             # CALLING CONVENTION: [ANSWER]
-            w.write_line(ci.LDAi, f"{0}", *(ci.PSHA for _ in range(len(scope.locals))), ci.COMMENT("create space on stack for locals"))
+            if scope.locals:
+                w.write_line(ci.LDAi, f"{0}", *(ci.PSHA for _ in range(len(scope.locals))), ci.COMMENT("create space on stack for locals"))
+            else:
+                w.write_line(ci.COMMENT("no locals - otw create space on stack for locals"))
 
             self.compile_stmts(function_def.body, scope=scope, expression_compiler=expression_compiler, method_info=method_info)
 

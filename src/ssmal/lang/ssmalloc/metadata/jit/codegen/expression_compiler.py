@@ -124,7 +124,7 @@ class ExpressionCompiler:
                     case 'str': _PTOP = ci.PTOPz
                     case _: raise CompilerError(func)
 
-                w.write_line(ci.LDAi, f'{_PTOP}', ci.SYS, ci.COMMENT('print()'))
+                w.write_line(ci.LDAi, f'{_PTOP}', ci.SYS, ci.POPA, ci.COMMENT('print()'))
             
             case ast.Call(func=ast.Name(type_name) as func, args=[]) if type_name in self.type_dict:
                 # allocate memory.
@@ -153,7 +153,7 @@ class ExpressionCompiler:
             case ast.Constant(value=value) if mode == 'eval':
                 match value:
                     case None:          w.write_line(ci.LDAi, ci.NONE, ci.COMMENT('CONST None'))
-                    case str(val):      w.write_line(ci.LDAi, self.string_table[val], ci.COMMENT(f'CONST str {val}'))
+                    case str(val):      w.write_line(ci.LDAi, ci.GOTO_LABEL(self.string_table[val]), ci.COMMENT(f'CONST str {val}'))
                     case bytes(val):    raise CompilerError(val)
                     case True:          w.write_line(ci.LDAi, ci.TRUE, ci.COMMENT('CONST True'))
                     case False:         w.write_line(ci.LDAi, ci.FALSE, ci.COMMENT('CONST False'))

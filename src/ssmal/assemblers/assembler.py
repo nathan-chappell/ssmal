@@ -36,7 +36,7 @@ class Assembler:
 
     @property
     def debug_info(self) -> str:
-        _debug_info = {offset: asdict(token) for offset, token in self.source_map.items()}
+        _debug_info = {f'0x{offset:04x}': asdict(token) for offset, token in self.source_map.items()}
         _labels = {label.token.value: f"{label.address:08x}" for label in self.labels.values() if label.token is not None}
         return json.dumps({"version": self.DEBUG_INFO_VERSION, "labels": _labels, "source_map": _debug_info}, indent=2)
 
@@ -69,9 +69,9 @@ class Assembler:
         return token
 
     def emit(self, _bytes: bytes, token: Token):
-        self.buffer.write(_bytes)
         for i in range(len(_bytes)):
             self.source_map[self.current_position + i] = token
+        self.buffer.write(_bytes)
 
     def _update_resolvable(self, name: str, which_dict: Literal["labels"], action: Literal["ref", "def"], token: Token):
         _dict: dict[str, Resolvable] = getattr(self, which_dict)
