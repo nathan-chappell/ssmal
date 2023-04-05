@@ -47,7 +47,7 @@ class MethodCompiler:
         self_type: TypeInfo,
         string_table: StringTable,
         label_maker: LabelMaker,
-        allocator: TrivialAllocator
+        allocator: TrivialAllocator,
     ) -> None:
         self.allocator = allocator
         self.break_label_stack = []
@@ -88,7 +88,7 @@ class MethodCompiler:
                 string_table=self.string_table,
                 type_dict=self.type_dict,
                 label_maker=self.label_maker,
-                allocator=self.allocator
+                allocator=self.allocator,
             )
 
             # CALLING CONVENTION: [ANSWER]
@@ -143,7 +143,8 @@ class MethodCompiler:
                     expression_compiler.compile_expression(value, 'eval')
                     w.write_line(scope.push_A())
                     expression_compiler.compile_expression(target, 'access')
-                    w.write_line(ci.SWPAB, scope.pop_A(), ci.SWPAB, ci.STAb, ci.COMMENT('*TOP <- A'))
+                    # w.write_line(ci.SWPAB, scope.pop_A(), ci.SWPAB, ci.STAb, ci.COMMENT('*TOP <- A'))
+                    w.write_line(ci.SWPAB, scope.pop_A(), ci.STAb, ci.COMMENT('*TOP <- A'))
                 
                 case ast.Break():
                     if not self.break_label_stack:

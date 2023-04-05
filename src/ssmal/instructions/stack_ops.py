@@ -15,6 +15,7 @@ def _pop(r: Registers, m: Memory) -> int:
 # fmt: off
 def PSHA(r: Registers, m: Memory) -> None: r.IP += 1; _psh(r, m, r.A)
 def POPA(r: Registers, m: Memory) -> None: r.IP += 1; r.A = _pop(r, m)
+def PSHI(r: Registers, m: Memory) -> None: r.IP += 1; _psh(r, m, r.IP)
 
 def CALi(r: Registers, m: Memory) -> None: _psh(r, m, r.IP + 5); r.IP = m.load(r.IP + 1)
 def CALA(r: Registers, m: Memory) -> None: _psh(r, m, r.IP + 1); r.IP = r.A

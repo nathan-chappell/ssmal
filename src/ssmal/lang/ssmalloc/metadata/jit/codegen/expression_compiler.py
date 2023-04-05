@@ -139,7 +139,8 @@ class ExpressionCompiler:
             case ast.Call(func=ast.Attribute(value=self_expr, attr=method_name) as func, args=args) if mode == 'eval':
                 # CALLING CONVENTION: [CALL]
                 # save return address
-                w.write_line(ci.SWPAI, ci.PSHA, ci.SWPAI, ci.COMMENT('save return address'))
+                # w.write_line(ci.SWPAI, ci.PSHA, ci.SWPAI, ci.COMMENT('save return address'))
+                w.write_line(ci.PSHI, ci.COMMENT('save return address'))
                 self.compile_expression(self_expr, mode='eval')
                 w.write_line(ci.PSHA, ci.COMMENT('save self'))
                 for i,arg in enumerate(args):

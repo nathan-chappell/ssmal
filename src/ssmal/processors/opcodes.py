@@ -45,11 +45,12 @@ opcode_map: dict[bytes, Callable[[Registers, Memory], None]] = {
     b"\x33": s_op.CALA,
     b"\x34": s_op.CAL_,
     b"\x35": s_op.RETN,
+    b"\x36": s_op.PSHI,
     # syscall - must be added later so that io can be put in...
     SYS_BYTE: sys_op.SYS,
     # register ops
     b"\x40": r_op.SWPAB,
-    b"\x41": r_op.SWPAI,
+    # b"\x41": r_op.SWPAI,
     b"\x42": r_op.MOVSA,
     # branch ops
     b"\x50": b_op.BRi,

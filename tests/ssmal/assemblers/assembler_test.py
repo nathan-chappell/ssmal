@@ -10,8 +10,8 @@ T = Token
 
 
 def test_opcode_map():
-    _all_ops = "nop dbg halt addb subb mulb divb addi subi muli divi add_ sub_ mul_ div_ ldai ldab lda_ stai stab sta_ psha popa cali cala cal_ retn sys swpab swpai movsa bri bra brzi brni brzb brnb"
-    expected = b"\x00\x01\x02\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x20\x21\x22\x23\x24\x25\x30\x31\x32\x33\x34\x35\x80\x40\x41\x42\x50\x51\x52\x53\x54\x55"
+    _all_ops = "nop dbg halt addb subb mulb divb addi subi muli divi add_ sub_ mul_ div_ ldai ldab lda_ stai stab sta_ psha popa cali cala cal_ retn pshi sys swpab movsa bri bra brzi brni brzb brnb"
+    expected = b"\x00\x01\x02\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x20\x21\x22\x23\x24\x25\x30\x31\x32\x33\x34\x35\x36\x80\x40\x42\x50\x51\x52\x53\x54\x55"
     tokens = list(tokenize(_all_ops))
     assembler = Assembler(tokens)
     assembler.assemble()

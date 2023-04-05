@@ -32,11 +32,12 @@ class CompilerInternals:
     CALA    = "cala"
     CAL_    = "cal_"
     RETN    = "retn"
+    PSHI    = "pshi"
     # syscall - must be added later so that io can be put in...
     SYS     = "sys"
     # register ops
     SWPAB   = "swpab"
-    SWPAI   = "swpai"
+    # SWPAI   = "swpai"
     MOVSA   = "movsa"
     # branch ops
     BRi     = "bri"
