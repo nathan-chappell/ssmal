@@ -45,7 +45,7 @@ def test_heap(alloc_size: int):
     allocator = TrivialAllocator(string_table, type_dict, label_maker)
     line_writer: LineWriter = LineWriter()
     line_writer.write_line(f""".goto 0 ldai 0x{alloc_size:02x} cali $allocator.malloc halt""")
-    allocator.create_heap(line_writer, 0x20)
+    allocator.create_heap(line_writer, 0x40)
     line_writer.write_line(""".align""")
     assembler: Assembler = Assembler(list(tokenize(line_writer.text)))
     assembler.assemble()
@@ -84,6 +84,7 @@ def test_heap(alloc_size: int):
 @pytest.mark.parametrize("module_name,expected_output", [("pair_module", "3")])
 def test_object_creation(module_name: str, expected_output: bytes):
     jit_parser = JitParser()
+    jit_parser.heap_size = 0x40
     # jit_parser.parse_module(pair_module)
     _module = globals().get(module_name)
     assert _module is not None
@@ -151,9 +152,10 @@ def test_object_creation(module_name: str, expected_output: bytes):
     last_source_line = ""
 
     try:
-        for ins in range(30):
-            if ins % 20 == 0:
-                jit_parser.processor.memory.dump()
+        for _ in range(100):
+            # if ins % 20 == 0:
+            #     # jit_parser.processor.memory.dump()
+            #     print('*'*40)
             opcode = jit_parser.processor.memory.load_bytes(jit_parser.processor.registers.IP, 1)
             op = opcode_map.get(opcode, type(None)).__name__
             _op = int.from_bytes(opcode, "little", signed=False)
@@ -178,6 +180,9 @@ def test_object_creation(module_name: str, expected_output: bytes):
 
             jit_parser.processor.advance()
             # print(f'{jit_parser.processor.registers}')
+            if op in ('RETN','STAb'):
+                jit_parser.processor.memory.dump()
+
 
             if wrote_heap:
                 print("### WROTE HEAP ###")

@@ -79,8 +79,8 @@ Program.methods:
                     ; expr Call expr.lineno=6
                     pshi ; save return address
                         ; expr Name expr.lineno=6
-                            ; [access _location='local'] p _offset=0 mode='eval' self.push_count=0
-                            lda_ 0
+                            ; [access _location='local'] p _offset=1 mode='eval' self.push_count=1
+                            lda_ 1
                     psha ; save self
                     movsa subi 4 swpab ldab ; A <- self
                     swpab ldab addi 0 swpab ldab ; A <- type_info.methods[index].code
@@ -94,7 +94,7 @@ Program.methods:
         
         .align
 .align "HEAP START" .align
-label_name_HEAP_START__0: .zeros 0x0220
+label_name_HEAP_START__0: .zeros 0x0060
 .align "HEAP END" .align
 allocator.malloc: ; Allocation function
 psha ldai $label_name_HEAP_START__0 swpab ldab ; Current index
@@ -102,7 +102,7 @@ swpab ldai $label_name_HEAP_START__0 addi 0x20 addb psha ; return value (pointer
 popa swpab popa swpab psha swpab psha ; Rotate top of stack
 ldai $label_name_HEAP_START__0 swpab ldab ; Current offset
 swpab popa addb psha ; New offset
-subi 200 muli -1 brni $label_name_die__2 ; die if too big
+subi 40 muli -1 brni $label_name_die__2 ; die if too big
 ldai $label_name_HEAP_START__0 swpab popa stab ; save new index
 popa retn ; return, A <- pointer
 label_name_die__2: halt

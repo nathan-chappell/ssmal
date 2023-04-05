@@ -62,6 +62,14 @@ class Scope:
         ci = self.ci
         self.push_count += 1
         return ci.PSHA
+
+    def push_I(self):
+        """
+        PSHA, but does bookkeeping so that variable access works properly
+        """
+        ci = self.ci
+        self.push_count += 1
+        return ci.PSHI
     
     def pop_A(self):
         """

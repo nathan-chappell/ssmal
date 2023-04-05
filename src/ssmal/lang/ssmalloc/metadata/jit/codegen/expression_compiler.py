@@ -135,12 +135,14 @@ class ExpressionCompiler:
                 allocating_type = self.type_dict[type_name]
                 w.write_line(ci.LDAi, f'{allocating_type.size}')
                 w.write_line(ci.CALi, ci.GOTO_LABEL(self.allocator.allocate_label))
+                # TODO: need to insert vtable pointer
 
             case ast.Call(func=ast.Attribute(value=self_expr, attr=method_name) as func, args=args) if mode == 'eval':
                 # CALLING CONVENTION: [CALL]
                 # save return address
                 # w.write_line(ci.SWPAI, ci.PSHA, ci.SWPAI, ci.COMMENT('save return address'))
-                w.write_line(ci.PSHI, ci.COMMENT('save return address'))
+                # w.write_line(ci.PSHI, ci.COMMENT('save return address'))
+                w.write_line(self.scope.push_I(), ci.COMMENT('save return address'))
                 self.compile_expression(self_expr, mode='eval')
                 w.write_line(ci.PSHA, ci.COMMENT('save self'))
                 for i,arg in enumerate(args):
