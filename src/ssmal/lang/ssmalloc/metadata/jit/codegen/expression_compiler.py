@@ -135,14 +135,17 @@ class ExpressionCompiler:
                 allocating_type = self.type_dict[type_name]
                 w.write_line(ci.LDAi, f'{allocating_type.size}')
                 w.write_line(ci.CALi, ci.GOTO_LABEL(self.allocator.allocate_label))
-                # TODO: need to insert vtable pointer
+                # A holds pointer to new object
+                w.write_line(ci.SWPAB, ci.LDAi, ci.GOTO_LABEL(f'{type_name}.vtable'), ci.STAb, ci.SWPAB, ci.COMMENT('set vtable pointer'))
 
             case ast.Call(func=ast.Attribute(value=self_expr, attr=method_name) as func, args=args) if mode == 'eval':
                 # CALLING CONVENTION: [CALL]
                 # save return address
                 # w.write_line(ci.SWPAI, ci.PSHA, ci.SWPAI, ci.COMMENT('save return address'))
                 # w.write_line(ci.PSHI, ci.COMMENT('save return address'))
-                w.write_line(self.scope.push_I(), ci.COMMENT('save return address'))
+                return_label = self.label_maker.get_label_from_name('return')
+                # w.write_line(self.scope.push_I(), ci.COMMENT('save return address'))
+                w.write_line(ci.LDAi, ci.GOTO_LABEL(return_label), self.scope.push_A(), ci.COMMENT('save return address'))
                 self.compile_expression(self_expr, mode='eval')
                 w.write_line(ci.PSHA, ci.COMMENT('save self'))
                 for i,arg in enumerate(args):
@@ -151,6 +154,8 @@ class ExpressionCompiler:
                 w.write_line(ci.MOVSA, ci.SUBi, f'{4 * (len(args) + 1)}', ci.SWPAB, ci.LDAb, ci.COMMENT("A <- self"))
                 self.get_method(self_expr, method_name)
                 w.write_line(ci.BRa, ci.COMMENT(f'goto {method_name}'))
+                w.write_line(ci.MARK_LABEL(return_label))
+                self.scope.push_count -= 1
 
             #   value: Any  # None, str, bytes, bool, int, float, complex, Ellipsis
             case ast.Constant(value=value) if mode == 'eval':

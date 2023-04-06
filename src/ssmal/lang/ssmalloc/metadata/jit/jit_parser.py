@@ -149,6 +149,7 @@ class JitParser:
             w.indent()
             for method_info in type_info.methods:
                 w.write_line(ci.GOTO_LABEL(method_info.implementation_symbol))
+            w.write_line(".align")
             w.dedent()
 
         # method implementations

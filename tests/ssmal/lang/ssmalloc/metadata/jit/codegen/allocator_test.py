@@ -21,7 +21,7 @@ from ssmal.lang.ssmalloc.metadata.jit.jit_parser import JitParser
 from ssmal.lang.ssmalloc.metadata.jit.strongly_typed_strings import Identifier, TypeName
 from ssmal.processors.processor import Processor
 
-from ssmal.lang.ssmalloc.metadata.jit.type_info import TypeInfo, int_type, str_type
+from ssmal.lang.ssmalloc.metadata.jit.type_info import TypeInfo, int_type, str_type, type_cache
 from ssmal.lang.ssmalloc.metadata.jit.codegen.scope import Scope
 from ssmal.lang.ssmalloc.metadata.jit.codegen.method_compiler import MethodCompiler
 from ssmal.util.ascii_safe_encode import ascii_safe_encode
@@ -29,6 +29,7 @@ from ssmal.util.hexdump_bytes import hexdump_bytes
 from ssmal.util.writer.line_writer import LineWriter
 
 import tests.ssmal.lang.ssmalloc.metadata.jit.codegen.samples.pair as pair_module
+import tests.ssmal.lang.ssmalloc.metadata.jit.codegen.samples.triple as triple_module
 import tests.ssmal.lang.ssmalloc.metadata.jit.codegen.samples.hello_world as hello_world_module
 
 
@@ -80,12 +81,13 @@ def test_heap(alloc_size: int):
         assert False
 
 
-# @pytest.mark.parametrize("module_name,expected_output", [("hello_world_module", "hello world"), ("pair_module", "3")])
-@pytest.mark.parametrize("module_name,expected_output", [("pair_module", "3")])
+@pytest.mark.parametrize(
+    "module_name,expected_output", [("hello_world_module", "hello world"), ("pair_module", "3"), ("triple_module", "15")]
+)
 def test_object_creation(module_name: str, expected_output: bytes):
+    type_cache.clear()
     jit_parser = JitParser()
-    jit_parser.heap_size = 0x40
-    # jit_parser.parse_module(pair_module)
+    jit_parser.heap_size = 0x100
     _module = globals().get(module_name)
     assert _module is not None
     jit_parser.parse_module(_module)
@@ -103,14 +105,21 @@ def test_object_creation(module_name: str, expected_output: bytes):
             super().__init__(*args)
             self.zstr = zstr
 
-    def _listen_result(*args, **kwargs) -> None:
+    def _listen_result_0(*args, **kwargs) -> None:
         assert jit_parser.processor is not None
         _bytes = jit_parser.processor.memory.load_bytes(jit_parser.processor.memory.load(jit_parser.processor.registers.SP - 4), 100)
         _bytes = _bytes[: _bytes.index(b"\x00")]
         _result = ascii_safe_encode(_bytes)
         raise HeardResult(_result)
 
-    jit_parser.processor.sys_vector[0] = _listen_result
+    def _listen_result_1(*args, **kwargs) -> None:
+        assert jit_parser.processor is not None
+        value = jit_parser.processor.memory.load(jit_parser.processor.registers.SP - 4)
+        _result = f"{value}"
+        raise HeardResult(_result)
+
+    jit_parser.processor.sys_vector[0] = _listen_result_0
+    jit_parser.processor.sys_vector[1] = _listen_result_1
 
     build_dir = Path("tests/ssmal/lang/ssmalloc/metadata/jit/codegen/samples")
     _text = jit_parser.line_writer.text
@@ -124,8 +133,8 @@ def test_object_creation(module_name: str, expected_output: bytes):
         f.write("\n".join(hexdump_bytes(jit_parser.processor.memory.buffer.getvalue())))
     with open(build_dir / "output.debug_info.json", "w") as f:
         f.write(jit_parser.debug_info)
-        _debug_info = json.loads(jit_parser.debug_info)
 
+    _debug_info = json.loads(jit_parser.debug_info)
     _initial_sp = jit_parser.processor.memory.load(jit_parser.INITAL_SP_OFFSET)
 
     wrote_heap: bool = False
@@ -151,8 +160,8 @@ def test_object_creation(module_name: str, expected_output: bytes):
     # jit_parser.processor.memory.dump()
     last_source_line = ""
 
-    try:
-        for _ in range(100):
+    with pytest.raises(HeardResult) as heard_result:
+        for _ in range(400):
             # if ins % 20 == 0:
             #     # jit_parser.processor.memory.dump()
             #     print('*'*40)
@@ -180,9 +189,8 @@ def test_object_creation(module_name: str, expected_output: bytes):
 
             jit_parser.processor.advance()
             # print(f'{jit_parser.processor.registers}')
-            if op in ('RETN','STAb'):
+            if op in ("RETN", "STAb"):
                 jit_parser.processor.memory.dump()
-
 
             if wrote_heap:
                 print("### WROTE HEAP ###")
@@ -200,5 +208,6 @@ def test_object_creation(module_name: str, expected_output: bytes):
             wrote_heap = wrote_stack = False
         else:
             assert False
-    except HeardResult as result:
-        assert result.zstr == expected_output
+    assert heard_result.value.zstr == expected_output
+    # except HeardResult as result:
+    #     assert result.zstr == expected_output
